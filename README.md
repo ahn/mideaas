@@ -1,6 +1,6 @@
 # MIDEaaS
 
-[MIDEaaS](http://cored.cs.tut.fi/mideaas) (Mobile IDE as a Service) is an experimental web-based environment for creating Vaadin web apps.
+[MIDEaaS](http://cored.cs.tut.fi/#mideaas) (Mobile IDE as a Service) is an experimental web-based environment for creating Vaadin web apps.
 
 It's still in a research state. Not to be used for anything real.
 
