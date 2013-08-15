@@ -4,7 +4,7 @@
 
 It's still in a research state. Not to be used for anything real.
 
-The current version requires Vaadin 7 and Java 7.
+The current version requires Vaadin 7.1+ and Java 7.
 
 Lots of features a still missing.
 
