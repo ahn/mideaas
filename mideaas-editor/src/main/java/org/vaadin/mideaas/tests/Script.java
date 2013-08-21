@@ -6,12 +6,13 @@ import com.vaadin.ui.CheckBox;
 
 public class Script implements Serializable {
 	// class to preserve test case data temporarily. The script itself should be saved in a file
-	// given with git -variable, the rest of the data should be saved into a database(?)
+	// given with location -variable, the rest of the data should be saved into a database(?)
     private String name = "";
     private String description = "";    
     private String result = "";    
     private String location = "";
-    private boolean checked = false;
+    private CheckBox checkbox = new CheckBox("");
+    private String notes = "";
     
     public String getName() {
         return name;
@@ -29,7 +30,11 @@ public class Script implements Serializable {
         return result;
     }
     public void setResult(String result) {
-        this.result = result;
+    	if (result == "PASS" || result == "FAIL" || result == "BLOCKED" || result == "NOT RUN" || result == "RUNNING") {
+    		this.result = result;
+    	} else {
+    		result = "BLOCKED";
+    	}
     }
     public String getLocation() {
         return location;
@@ -37,17 +42,23 @@ public class Script implements Serializable {
     public void setLocation(String location) {
         this.location = location;
     }
-    public boolean getCheck() {
-        return checked;
+    public CheckBox getCheck() {
+    	//boolean checked = checkbox.getValue();
+        return checkbox;
     }
     public void setCheck(boolean checked) {
-    	this.checked = checked;
+    	checkbox.setValue(checked);
+    }
+    public String getNotes() {
+        return notes;
+    }
+    public void setNotes(String notes) {
+        this.notes = notes;
     }
     
     @Override
     public String toString() {
-    	String str = this.name + " in " + this.location;
-    	return str;
+    	return this.name;
     }
 
 }
