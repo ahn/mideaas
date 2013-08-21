@@ -267,6 +267,7 @@ public class MideaasUI extends UI implements LobbyBroadcastListener, MideaasEdit
 			plugins.add(new FeedbackPlugin(fbf));
 		}
 		
+		plugins.add(new TestPlugin());
 		
 		MideaasEditor editor = new MideaasEditor(user, project, settings, plugins);
 		editor.setTestingEnabled(!MideaasConfig.isExperiment());

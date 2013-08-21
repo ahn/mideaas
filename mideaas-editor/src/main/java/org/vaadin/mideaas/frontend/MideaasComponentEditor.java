@@ -7,8 +7,8 @@ import org.vaadin.aceeditor.SuggestionExtension;
 import org.vaadin.aceeditor.java.JavaErrorChecker;
 import org.vaadin.aceeditor.java.JavaSuggester;
 import org.vaadin.mideaas.model.AsyncErrorChecker;
-import org.vaadin.mideaas.model.SharedView;
 import org.vaadin.mideaas.model.SharedProject;
+import org.vaadin.mideaas.model.SharedView;
 import org.vaadin.mideaas.model.User;
 
 import com.vaadin.ui.Component;
@@ -31,7 +31,6 @@ public class MideaasComponentEditor extends TabSheet implements
 
 	private final ClaraEditor claraEditor;
 	private final MultiUserEditor controllerEditor;
-	private MideaasTest testEditor;
 
 	final private SharedView comp;
 	private HashMap<Component, EditingMode> modeByTab = new HashMap<Component, EditingMode>();
@@ -63,10 +62,10 @@ public class MideaasComponentEditor extends TabSheet implements
 		controllerEditor.setSuggestionExtension(new SuggestionExtension(sugger));
 		controllerEditor.setSizeFull();
 
-		if (testingEnabled) {
-			testEditor = new MideaasTest("Tests");
-			testEditor.setSizeFull();
-		}
+//		if (testingEnabled) {
+//			testEditor = new MideaasTest("Tests");
+//			testEditor.setSizeFull();
+//		}
 
 		init();
 	}
@@ -84,9 +83,9 @@ public class MideaasComponentEditor extends TabSheet implements
 		
 		addTab(EditingMode.CLARA, claraEditor, "Layout");
 
-		if (testingEnabled) {
-			addTab(EditingMode.TEST, testEditor, "Tests");
-		}
+//		if (testingEnabled) {
+//			addTab(EditingMode.TEST, testEditor, "Tests");
+//		}
 
 		addSelectedTabChangeListener(new SelectedTabChangeListener() {
 
@@ -113,8 +112,8 @@ public class MideaasComponentEditor extends TabSheet implements
 			setSelectedTab(controllerEditor);
 		} else if (mode == EditingMode.CLARA) {
 			setSelectedTab(claraEditor);
-		} else if (mode == EditingMode.TEST) {
-			setSelectedTab(testEditor);
+//		} else if (mode == EditingMode.TEST) {
+//			setSelectedTab(testEditor);
 		}
 		// Doing what super.setSelectedTab does when not available: nothing.
 	}

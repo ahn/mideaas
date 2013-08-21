@@ -1,4 +1,4 @@
-package org.vaadin.mideaas.frontend;
+package org.vaadin.mideaas.app;
 
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Panel;

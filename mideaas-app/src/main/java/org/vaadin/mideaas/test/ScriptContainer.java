@@ -1,4 +1,4 @@
-package org.vaadin.mideaas.tests;
+package org.vaadin.mideaas.test;
 
 import java.io.IOException;
 import java.io.Serializable;
@@ -10,8 +10,7 @@ import java.util.ArrayList;
 import java.util.Random;
 import java.util.Set;
 
-import org.vaadin.mideaas.frontend.MideaasTest;
-import org.vaadin.mideaas.tests.Script;
+import org.vaadin.mideaas.app.MideaasTest;
 
 import com.vaadin.data.Item;
 import com.vaadin.data.util.BeanItemContainer;

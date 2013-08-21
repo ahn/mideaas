@@ -1,4 +1,4 @@
-package org.vaadin.mideaas.tests;
+package org.vaadin.mideaas.test;
 
 import java.io.Serializable;
 import com.vaadin.ui.CheckBox;

@@ -1,4 +1,4 @@
-package org.vaadin.mideaas.frontend;
+package org.vaadin.mideaas.app;
 
 import com.vaadin.data.Property;
 import com.vaadin.data.Property.ValueChangeEvent;
@@ -24,6 +24,7 @@ import com.vaadin.ui.Notification;
 
 import java.io.*;
 
+import org.vaadin.mideaas.test.Script;
 import org.vaadin.mideaas.tests.*;
 import org.vaadin.mideaas.model.XmlRpcContact;
 

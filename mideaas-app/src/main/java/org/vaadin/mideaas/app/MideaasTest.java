@@ -1,4 +1,4 @@
-package org.vaadin.mideaas.frontend;
+package org.vaadin.mideaas.app;
 
 import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.Label;
@@ -27,15 +27,19 @@ import com.vaadin.ui.Table;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
+
+import org.vaadin.mideaas.test.Script;
+import org.vaadin.mideaas.test.ScriptContainer;
 import org.vaadin.mideaas.tests.*;
 import org.vaadin.mideaas.model.XmlRpcContact;
-import org.vaadin.mideaas.frontend.XmlRpcServerDetails;
+import org.vaadin.mideaas.app.XmlRpcServerDetails;
 
 public class MideaasTest extends CustomComponent {
 
     Window editwindow;
     //Window confirmTests;
 
+    // XXX should not be static?
     static public Table table = new Table();
 
     HashSet<Object> markedRows = new HashSet<Object>();

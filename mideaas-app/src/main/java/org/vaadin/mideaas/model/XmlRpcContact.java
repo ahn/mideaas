@@ -9,7 +9,7 @@ import java.util.Map;
 
 import org.apache.xmlrpc.client.XmlRpcClient;
 import org.apache.xmlrpc.client.XmlRpcClientConfigImpl;
-import org.vaadin.mideaas.tests.ScriptContainer;
+import org.vaadin.mideaas.test.ScriptContainer;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
