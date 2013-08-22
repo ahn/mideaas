@@ -13,6 +13,7 @@ public class Script implements Serializable {
     private String location = "";
     private CheckBox checkbox = new CheckBox("");
     private String notes = "";
+    private String script = ""; 
     
     public String getName() {
         return name;
@@ -54,6 +55,12 @@ public class Script implements Serializable {
     }
     public void setNotes(String notes) {
         this.notes = notes;
+    }
+    public String getScript() {
+        return script;
+    }
+    public void setScript(String script) {
+        this.script = script;
     }
     
     @Override

@@ -15,6 +15,7 @@ public class MideaasConfig {
         DEPLOY_DIR,
         DEPLOY_SERVER,
         MAVEN_HOME,
+        FNTS_SERVERS,
         PROJECTS_DIR,
         APP_PACKAGE_BASE,
         VISUAL_DESIGNER_URL,
@@ -121,6 +122,11 @@ public class MideaasConfig {
 	public static File getFeedbackFile() {
 		String d = MideaasConfig.getProperty(Prop.FEEDBACK_FILE);
 		return d==null ? null : new File(d);
+	}
+	
+	public static String getFNTSServers() {
+		String servers = MideaasConfig.getProperty(Prop.FNTS_SERVERS);
+		return servers;
 	}
 
 }
