@@ -1,11 +1,5 @@
 package org.vaadin.mideaas.app;
 
-import com.vaadin.data.Property;
-import com.vaadin.data.Property.ValueChangeEvent;
-import com.vaadin.ui.Label;
-import com.vaadin.ui.Panel;
-import com.vaadin.ui.UI;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -13,20 +7,19 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import com.vaadin.ui.Button;
-
-import com.vaadin.ui.VerticalLayout;
-import com.vaadin.ui.HorizontalLayout;
-
-import com.vaadin.ui.Button.ClickEvent;
-import com.vaadin.ui.Window;
-import com.vaadin.ui.Notification;
-
-import java.io.*;
-
-import org.vaadin.mideaas.test.Script;
-import org.vaadin.mideaas.tests.*;
 import org.vaadin.mideaas.model.XmlRpcContact;
+import org.vaadin.mideaas.test.Script;
+
+import com.vaadin.data.Property;
+import com.vaadin.data.Property.ValueChangeEvent;
+import com.vaadin.ui.Button;
+import com.vaadin.ui.Button.ClickEvent;
+import com.vaadin.ui.HorizontalLayout;
+import com.vaadin.ui.Notification;
+import com.vaadin.ui.Panel;
+import com.vaadin.ui.UI;
+import com.vaadin.ui.VerticalLayout;
+import com.vaadin.ui.Window;
 
 public class TestRunConfirmation extends Window {
 	
