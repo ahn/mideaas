@@ -16,6 +16,7 @@ public class MideaasConfig {
         DEPLOY_SERVER,
         MAVEN_HOME,
         FNTS_SERVERS,
+        EXECUTORS,
         PROJECTS_DIR,
         APP_PACKAGE_BASE,
         VISUAL_DESIGNER_URL,
@@ -124,9 +125,19 @@ public class MideaasConfig {
 		return d==null ? null : new File(d);
 	}
 	
+	public static String getProjectsDir() {
+		String dir = MideaasConfig.getProperty(Prop.PROJECTS_DIR);
+		return dir;
+	}
+	
 	public static String getFNTSServers() {
 		String servers = MideaasConfig.getProperty(Prop.FNTS_SERVERS);
 		return servers;
+	}
+	
+	public static int getExecutorNumber() {
+		int executors = Integer.valueOf(MideaasConfig.getProperty(Prop.EXECUTORS));
+		return executors;
 	}
 
 }

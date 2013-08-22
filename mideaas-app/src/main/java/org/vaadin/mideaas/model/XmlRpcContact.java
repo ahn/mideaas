@@ -1,5 +1,8 @@
 package org.vaadin.mideaas.model;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -9,7 +12,11 @@ import java.util.Map;
 
 import org.apache.xmlrpc.client.XmlRpcClient;
 import org.apache.xmlrpc.client.XmlRpcClientConfigImpl;
+import org.vaadin.mideaas.app.MideaasConfig;
 import org.vaadin.mideaas.test.ScriptContainer;
+import org.vaadin.mideaas.test.Script;
+
+import com.vaadin.ui.Notification;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -98,8 +105,9 @@ public class XmlRpcContact {
 		for (String test : list) {
 
 			System.out.println("index is " + i);
+			String script = this.getScriptFromFile(test);
 			
-			Runnable worker = new XmlRpcRunnable(server, test, map, i);
+			Runnable worker = new XmlRpcRunnable(server, test, script, map, i);
 		    executor.execute(worker);
 			i++;
 			
@@ -129,6 +137,36 @@ public class XmlRpcContact {
         }
 		System.out.println(result.toString());
 		return result; 
+	}
+	
+	public String getScriptFromFile(String scriptName) {
+		Script test = (Script)ScriptContainer.getScriptFromContainer(scriptName);
+		String script = "";
+		try {
+			String path = MideaasConfig.getProjectsDir() + test.getLocation() + scriptName + ".txt"; //TODO: needs project name
+			BufferedReader br = new BufferedReader(new FileReader(path));
+			try {
+				StringBuilder sb = new StringBuilder();
+				String line = br.readLine();
+
+				while (line != null) {
+					sb.append(line);
+					sb.append("\n");
+					line = br.readLine();
+				}
+				script = sb.toString();
+			} catch (IOException e) {
+				Notification.show("Whoops", "Reading from a file failed", Notification.Type.ERROR_MESSAGE);
+				e.printStackTrace();
+			} finally {
+				br.close();
+			}
+		} catch (Exception e) {
+			Notification.show("Whoops", "Reading from a file failed", Notification.Type.ERROR_MESSAGE);
+			e.printStackTrace();
+		}
+		
+		return script;
 	}
 }
 

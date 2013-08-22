@@ -19,7 +19,6 @@ import com.vaadin.ui.Notification;
 
 import java.io.*;
 
-import org.vaadin.mideaas.tests.*;
 import org.vaadin.mideaas.model.XmlRpcContact;
 
 public class XmlRpcServerDetails extends Window {
