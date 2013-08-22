@@ -172,17 +172,21 @@ public class MultiUserEditor extends CustomComponent implements DiffListener, Di
 
 	@Override
 	public void detach() {
-		super.detach();
+		
 		if (activeDoc!=null) {
 			activeDoc.removeListener(this);
 		}
+		
+		mud.removeDifferingUsersChangedListener(this);
+		
+		super.detach();
 	}
 	
 	private void setActiveDoc(User u) {
 		if (activeDoc!=null) {
 			activeDoc.removeListener(this);
 		}
-		UserDoc ud = mud.getUserDoc(u);
+		UserDoc ud = mud.createUserDoc(u);
 		activeDoc = ud;
 		activeDoc.addListener(this);
 		editor.setReadOnly(false);
@@ -214,8 +218,11 @@ public class MultiUserEditor extends CustomComponent implements DiffListener, Di
 	
 	private void checkErrors() {
 		if (checker!=null) {
-			String code = mud.getUserDoc(user).getDoc().getText();
-			checker.checkErrors(code, this);
+			UserDoc doc = mud.getUserDoc(user);
+			if (doc!=null) {
+				String code = doc.getDoc().getText();
+				checker.checkErrors(code, this);
+			}
 		}
 	}
 	

@@ -92,6 +92,13 @@ public class MideaasEditor extends CustomComponent implements Listener {
 		componentTree.addComponentListener(this);
 
 	}
+	
+	@Override
+	public void detach() {
+		project.removeDiffering(user);
+		
+		super.detach();
+	}
 
 	private void createLayout() {
 		setSizeFull();

@@ -6,7 +6,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ExecutorService;
@@ -148,10 +147,11 @@ public class MultiUserDoc {
 		}
 	}
 	
-	private void removeDiffering(User user) {
+	public void removeDiffering(User user) {
 		boolean removed;
 		synchronized (this) {
 			removed = differing.remove(user);
+			userDocs.remove(user.getUserId());
 		}
 		if (removed) {
 			fireDifferingChanged();
@@ -185,12 +185,12 @@ public class MultiUserDoc {
 	}
 	
 	/**
-	 * If the doc doesn't exist, it is created, initialized with base value.
+	 * If the doc exists, it's returned. If not, initialized with base value.
 	 * 
 	 * @param user
 	 * @return
 	 */
-	public synchronized UserDoc getUserDoc(User user) {
+	public synchronized UserDoc createUserDoc(User user) {
 		UserDoc ud = userDocs.get(user.getUserId());
 		if (ud == null) {
 			ud = new UserDoc(user, base);
@@ -200,8 +200,9 @@ public class MultiUserDoc {
 		return ud;
 	}
 	
-	public synchronized void removeUserDoc(User user) {
-		userDocs.remove(user.getUserId());
+
+	public synchronized UserDoc getUserDoc(User user) {
+		return userDocs.get(user.getUserId());
 	}
 	
 	private synchronized List<UserDoc> getUserDocs() {
@@ -240,4 +241,5 @@ public class MultiUserDoc {
 	public void removeDifferingUsersChangedListener(DifferingUsersChangedListener li) {
 		ducListeners.remove(li);
 	}
+
 }

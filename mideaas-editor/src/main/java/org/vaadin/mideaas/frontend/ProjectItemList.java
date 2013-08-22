@@ -139,12 +139,17 @@ public class ProjectItemList extends CustomComponent implements ItemClickListene
 		
 		draw();
 		
-		project.addListener(this);
-		
 		tree.addItemClickListener(this);
-
 		tree.setImmediate(true);
 		
+		project.addListener(this);
+	}
+	
+	@Override public void detach() {
+		
+		project.removeListener(this);
+		
+		super.detach();
 	}
 	
 	private void draw() {

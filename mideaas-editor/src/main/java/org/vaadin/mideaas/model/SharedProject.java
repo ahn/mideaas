@@ -962,6 +962,16 @@ public class SharedProject {
 		return getProjectNames().contains(name);
 	}
 
+	public synchronized void removeDiffering(User user) {
+		for (ProjectFile f : files.values()) {
+			f.getMud().removeDiffering(user);
+		}
+		for (SharedView v : views.values()) {
+			v.getControllerMUD().removeDiffering(user);
+			v.getModelMud().removeDiffering(user);
+		}
+	}
+
 	
 
 }

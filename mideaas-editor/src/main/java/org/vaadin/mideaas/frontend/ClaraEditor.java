@@ -154,7 +154,7 @@ public class ClaraEditor extends CustomComponent implements
 	}
 	
 	public void setXml(String xml) {
-		mud.getUserDoc(user).setDoc(new AceDoc(xml));
+		mud.createUserDoc(user).setDoc(new AceDoc(xml));
 	}
 
 	private ClaraXmlHandler parseDocument(InputStream is) {
