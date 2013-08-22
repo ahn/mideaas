@@ -104,19 +104,10 @@ public class MultiUserDoc {
 		}
 	}
 	
-	static Random r = new Random();
-
 	private void fireBaseChanged(final AceDoc base, final User byUser) {
 		new Thread(new Runnable() {
 			@Override
 			public void run() {
-				
-				try {
-					Thread.sleep(r.nextInt(5000));
-				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
 				
 				// TODO: should userdocs add themselves as BaseChangedListeners instead?
 				List<UserDoc> uds = getUserDocs();
