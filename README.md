@@ -17,7 +17,7 @@ To run MIDEaaS, you need Java 7 SDK and [Maven](http://maven.apache.org/).
 2. In the mideaas root folder run `mvn install`.
 3. To run MIDEaaS, go to `mideaas-app` directory and type `mvn jetty:run`. Now it should be available `http://localhost:8080/mideaas/`.
 
-4. (Optional) To use VisualDesigner, you must run the VisualDesigner ([here](https://collab.nokia.com/svn/SME)) somewhere and configure its address in `mideaas-app/src/main/resources/mideaas.properties`.
+4. (Optional) To use VisualDesigner, you must run the VisualDesigner ([here](https://collab.nokia.com/SME/browser/sme/VisualDesigner)) somewhere and configure its address in `mideaas-app/src/main/resources/mideaas.properties`.
 
 ---
 
