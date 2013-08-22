@@ -1,26 +1,18 @@
 package org.vaadin.mideaas.app;
 
-import com.vaadin.ui.Label;
-import com.vaadin.ui.Panel;
-
-import java.net.URL;
 import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
 import com.vaadin.ui.Button;
-
-import com.vaadin.ui.VerticalLayout;
-import com.vaadin.ui.HorizontalLayout;
-
 import com.vaadin.ui.Button.ClickEvent;
-import com.vaadin.ui.Window;
+import com.vaadin.ui.HorizontalLayout;
+import com.vaadin.ui.Label;
 import com.vaadin.ui.Notification;
-
-import java.io.*;
-
-import org.vaadin.mideaas.tests.*;
-import org.vaadin.mideaas.model.XmlRpcContact;
+import com.vaadin.ui.Panel;
+import com.vaadin.ui.VerticalLayout;
+import com.vaadin.ui.Window;
 
 public class XmlRpcServerDetails extends Window {
 	

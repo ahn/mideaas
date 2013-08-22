@@ -1,38 +1,36 @@
 package org.vaadin.mideaas.app;
 
-import com.vaadin.ui.CustomComponent;
-import com.vaadin.ui.Label;
-import com.vaadin.ui.Panel;
-
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import org.vaadin.mideaas.model.XmlRpcContact;
+import org.vaadin.mideaas.test.Script;
+import org.vaadin.mideaas.test.ScriptContainer;
+
 import com.vaadin.data.Property;
 import com.vaadin.event.Action;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.CheckBox;
+import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.HorizontalLayout;
+import com.vaadin.ui.Label;
 import com.vaadin.ui.Notification;
+import com.vaadin.ui.Panel;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
-
-import org.vaadin.mideaas.test.Script;
-import org.vaadin.mideaas.test.ScriptContainer;
-import org.vaadin.mideaas.tests.*;
-import org.vaadin.mideaas.model.XmlRpcContact;
-import org.vaadin.mideaas.app.XmlRpcServerDetails;
 
 public class MideaasTest extends CustomComponent {
 
