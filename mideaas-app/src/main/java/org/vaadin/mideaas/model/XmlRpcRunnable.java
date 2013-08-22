@@ -9,7 +9,6 @@ import org.apache.xmlrpc.client.XmlRpcClientConfigImpl;
 
 import org.vaadin.mideaas.app.MideaasTest;
 import org.vaadin.mideaas.test.ScriptContainer;
-import org.vaadin.mideaas.tests.*;
 
 public class XmlRpcRunnable implements Runnable {
 	private final String server;

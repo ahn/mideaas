@@ -13,6 +13,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -30,7 +31,6 @@ import com.vaadin.ui.Window;
 
 import org.vaadin.mideaas.test.Script;
 import org.vaadin.mideaas.test.ScriptContainer;
-import org.vaadin.mideaas.tests.*;
 import org.vaadin.mideaas.model.XmlRpcContact;
 import org.vaadin.mideaas.app.XmlRpcServerDetails;
 
@@ -61,7 +61,12 @@ public class MideaasTest extends CustomComponent {
     private List<String> fntsServers = new ArrayList<String>();
     
     public MideaasTest(String tabMessage) {
-        fntsServers.add("http://192.168.8.100:8000"); //TODO: this should be taken from a config file
+    	// getting servers from the config file
+        List<String> servers = Arrays.asList(MideaasConfig.getFNTSServers().split("\\s*,\\s*"));
+        for (String server : servers) {
+        	fntsServers.add(server);
+        }
+        
         
     	final com.vaadin.ui.TextArea testNotes = new com.vaadin.ui.TextArea("Notes", "");
     	testNotes.setWidth("100%");

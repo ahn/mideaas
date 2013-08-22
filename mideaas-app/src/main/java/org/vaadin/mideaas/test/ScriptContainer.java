@@ -43,6 +43,7 @@ public class ScriptContainer extends BeanItemContainer<Script> implements
                 p.setResult("NOT RUN");
                 p.setCheck(false);
                 p.setNotes("This test has not been executed yet");
+                p.setScript("Write your script here");
                 c.addItem(p);
             }
         } catch (InstantiationException e) {
@@ -64,6 +65,7 @@ public class ScriptContainer extends BeanItemContainer<Script> implements
         p.setResult("NOT RUN");
         p.setCheck(false);
         p.setNotes("This test has not been executed yet");
+        p.setScript((String)testData.get(3));
     	c.addItem(p);
     
     	return c;

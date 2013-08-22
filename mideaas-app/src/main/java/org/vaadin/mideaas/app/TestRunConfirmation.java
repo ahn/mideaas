@@ -25,7 +25,6 @@ import com.vaadin.ui.Notification;
 import java.io.*;
 
 import org.vaadin.mideaas.test.Script;
-import org.vaadin.mideaas.tests.*;
 import org.vaadin.mideaas.model.XmlRpcContact;
 
 public class TestRunConfirmation extends Window {
