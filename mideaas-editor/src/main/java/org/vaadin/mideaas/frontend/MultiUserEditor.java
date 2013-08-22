@@ -11,7 +11,6 @@ import org.vaadin.aceeditor.AceEditor.DiffListener;
 import org.vaadin.aceeditor.AceEditor.SelectionChangeListener;
 import org.vaadin.aceeditor.AceMode;
 import org.vaadin.aceeditor.AceTheme;
-import org.vaadin.aceeditor.ServerSideDocDiff;
 import org.vaadin.aceeditor.SuggestionExtension;
 import org.vaadin.aceeditor.TextRange;
 import org.vaadin.aceeditor.client.AceAnnotation;
@@ -24,9 +23,8 @@ import org.vaadin.mideaas.model.AsyncErrorChecker.ResultListener;
 import org.vaadin.mideaas.model.ErrorChecker.Error;
 import org.vaadin.mideaas.model.MultiUserDoc;
 import org.vaadin.mideaas.model.MultiUserDoc.DifferingUsersChangedListener;
-import org.vaadin.mideaas.model.SharedDoc;
-import org.vaadin.mideaas.model.SharedDocRevision;
 import org.vaadin.mideaas.model.User;
+import org.vaadin.mideaas.model.UserDoc;
 
 import com.vaadin.annotations.StyleSheet;
 import com.vaadin.data.Property.ValueChangeEvent;
@@ -43,13 +41,19 @@ import com.vaadin.ui.VerticalLayout;
 
 @StyleSheet("ace-markers.css")
 @SuppressWarnings("serial")
-public class MultiUserEditor extends CustomComponent implements DiffListener, SharedDoc.Listener, DifferingUsersChangedListener, ResultListener {
+public class MultiUserEditor extends CustomComponent implements DiffListener, DifferingUsersChangedListener, ResultListener, UserDoc.Listener {
 	
+	public enum DocType {
+		BASE,
+		MINE,
+		OTHERS
+	}
+
 	private final User user;
 	private final MultiUserDoc mud;
 	private final AceEditor editor;
 	private Label statusLabel = new Label();
-	private SharedDoc activeDoc;
+	private UserDoc activeDoc;
 	private UI ui;
 	
 	private final HorizontalLayout hBar = new HorizontalLayout();
@@ -142,7 +146,7 @@ public class MultiUserEditor extends CustomComponent implements DiffListener, Sh
 	}
 	
 	private void useCode() {
-		mud.getUserDoc(user).setValue(editor.getDoc(), true);
+		mud.getUserDoc(user).setDoc(editor.getDoc());
 		changeEditor(user);
 	}
 
@@ -153,10 +157,10 @@ public class MultiUserEditor extends CustomComponent implements DiffListener, Sh
 		
 		if (object instanceof User) {
 			User u = (User)object;
-			setActiveDoc(mud.getUserDoc(u));
+			setActiveDoc(u);
 			editor.setReadOnly(u!=user);
 		}
-		else if (object == MultiUserDoc.Type.BASE) {
+		else if (object == DocType.BASE) {
 			setActiveDoc(mud.getBase());
 			editor.setReadOnly(true);
 		}
@@ -170,23 +174,24 @@ public class MultiUserEditor extends CustomComponent implements DiffListener, Sh
 	public void detach() {
 		super.detach();
 		if (activeDoc!=null) {
-			activeDoc.unregister(this);
+			activeDoc.removeListener(this);
 		}
 	}
 	
-	private void setActiveDoc(SharedDoc doc) {
+	private void setActiveDoc(User u) {
 		if (activeDoc!=null) {
-			activeDoc.unregister(this);
+			activeDoc.removeListener(this);
 		}
-		activeDoc = doc;
-		activeDoc.register(this);
+		UserDoc ud = mud.getUserDoc(u);
+		activeDoc = ud;
+		activeDoc.addListener(this);
 		editor.setReadOnly(false);
 		editor.setDoc(activeDoc.getDoc());
 	}
 	
 	private void setActiveDoc(AceDoc doc) {
 		if (activeDoc!=null) {
-			activeDoc.unregister(this);
+			activeDoc.removeListener(this);
 		}
 		activeDoc = null;
 		editor.setReadOnly(false);
@@ -194,15 +199,16 @@ public class MultiUserEditor extends CustomComponent implements DiffListener, Sh
 	}
 
 	@Override
-	public void changed(final SharedDocRevision rev) {
+	public void changed(final AceDoc doc, ChangeType type) {
+//		System.out.println("\nchanged "+user.getName()+" - " + type + "\n" + doc.getText());
 		ui.access(new Runnable() {
 			@Override
 			public void run() {
-				setEditorDoc(rev.getDoc());
+				setEditorDoc(doc);
 			}
 		});
 		if (checker!=null) {
-			checker.checkErrors(rev.getDoc().getText(), this);
+			checker.checkErrors(doc.getText(), this);
 		}
 	}
 	
@@ -259,8 +265,7 @@ public class MultiUserEditor extends CustomComponent implements DiffListener, Sh
 
 	@Override
 	public void diff(DiffEvent e) {
-		ServerSideDocDiff d = e.getDiff();
-		activeDoc.applyDiff(d);
+		activeDoc.editorChanged(editor.getDoc());
 	}
 
 	@Override
@@ -279,8 +284,8 @@ public class MultiUserEditor extends CustomComponent implements DiffListener, Sh
 		
 		if (!differing.isEmpty()) {
 			if (iDiffer) {
-				group.addItem(MultiUserDoc.Type.BASE);
-				group.setItemCaption(MultiUserDoc.Type.BASE, "(shared)");
+				group.addItem(DocType.BASE);
+				group.setItemCaption(DocType.BASE, "(shared)");
 			}
 			else {
 				group.addItem(user);

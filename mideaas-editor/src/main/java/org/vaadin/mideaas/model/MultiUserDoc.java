@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ExecutorService;
@@ -17,21 +18,6 @@ import org.vaadin.aceeditor.client.AceDoc;
 import org.vaadin.aceeditor.client.Util;
 
 public class MultiUserDoc {
-
-	public enum Type {
-		/**
-		 * Error-free document.
-		 */
-		BASE,
-		/**
-		 * Document containing each users changes.
-		 */
-		WORK,
-		/**
-		 * Users own document.
-		 */
-		USER
-	}
 	
 	public interface BaseChangedListener {
 		public void baseChanged(AceDoc doc);
@@ -69,13 +55,6 @@ public class MultiUserDoc {
 		this.saveBaseTo = saveBaseTo;
 		
 		this.log = log;
-		
-		//XXX
-		/*
-		if (saveBaseTo!=null) {
-			writeToDisk(saveBaseTo, initial.getText());
-		}
-		*/
 	}
 
 	// TODO: where to sync?
@@ -124,25 +103,38 @@ public class MultiUserDoc {
 			e.printStackTrace();
 		}
 	}
+	
+	static Random r = new Random();
 
-	private void fireBaseChanged(AceDoc base, User byUser) {
-		List<UserDoc> uds = getUserDocs();
-		
-		HashSet<User> differingUsers = new HashSet<User>();
-		
-		// TODO: should userdocs add themselves as BaseChangedListeners instead?
-		for (UserDoc ud : uds) {
-			boolean same = ud.baseChanged(base, byUser);
-			if (!same) {
-				differingUsers.add(ud.getUser());
+	private void fireBaseChanged(final AceDoc base, final User byUser) {
+		new Thread(new Runnable() {
+			@Override
+			public void run() {
+				
+				try {
+					Thread.sleep(r.nextInt(5000));
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				
+				// TODO: should userdocs add themselves as BaseChangedListeners instead?
+				List<UserDoc> uds = getUserDocs();
+				HashSet<User> differingUsers = new HashSet<User>();
+				for (UserDoc ud : uds) {
+					boolean same = ud.baseChanged(base, byUser);
+					if (!same) {
+						differingUsers.add(ud.getUser());
+					}
+				}
+				
+				for (BaseChangedListener li : listeners) {
+					li.baseChanged(base);
+				}
+				
+				setDiffering(differingUsers);
 			}
-		}
-		
-		for (BaseChangedListener li : listeners) {
-			li.baseChanged(base);
-		}
-		
-		setDiffering(differingUsers);
+		}).start();
 	}
 	
 	private void setDiffering(Set<User> differing) {
@@ -207,14 +199,14 @@ public class MultiUserDoc {
 	 * @param user
 	 * @return
 	 */
-	public synchronized SharedDoc getUserDoc(User user) {
+	public synchronized UserDoc getUserDoc(User user) {
 		UserDoc ud = userDocs.get(user.getUserId());
 		if (ud == null) {
 			ud = new UserDoc(user, base);
 			ud.setMUD(this);
 			userDocs.put(user.getUserId(), ud);
 		}
-		return ud.getWorking();
+		return ud;
 	}
 	
 	public synchronized void removeUserDoc(User user) {

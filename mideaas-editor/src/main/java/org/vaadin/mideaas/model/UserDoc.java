@@ -1,68 +1,115 @@
 package org.vaadin.mideaas.model;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.vaadin.aceeditor.ServerSideDocDiff;
 import org.vaadin.aceeditor.client.AceDoc;
+import org.vaadin.mideaas.model.UserDoc.Listener.ChangeType;
 
 public class UserDoc {
 	
+	public interface Listener {
+		public enum ChangeType {
+			FROM_EDITOR,
+			FROM_MUD
+		}
+		void changed(AceDoc doc, ChangeType type);
+	}
+
+	private List<Listener> listeners = new ArrayList<Listener>();
+	
 	private final User user;
 	private AceDoc shadow;
-	private final SharedDoc work;
+	private AceDoc work;
 	private MultiUserDoc mud;
-	
-	private SharedDoc.Listener workListener = new SharedDoc.Listener() {
-		@Override
-		public void changed(SharedDocRevision rev) {
-			workChanged(rev);
-		}
-	};
 	
 	public UserDoc(User user, AceDoc initial) {
 		this.user = user;
 		shadow = initial;
-		work = new SharedDoc(shadow);
+		work = initial;
 		
 	}
+
+	public synchronized void addListener(Listener listener) {
+        listeners.add(listener);
+    }
+
+    public synchronized void removeListener(Listener listener) {
+        listeners.remove(listener);
+    }
+
+    private synchronized List<Listener> getListeners() {
+        return new ArrayList<Listener>(listeners);
+    }
+
 	
 	public synchronized void setMUD(MultiUserDoc mud) {
 		this.mud = mud;
-		work.register(workListener);
 	}
 	
-	private synchronized /* <-- TODO too much? */ void workChanged(SharedDocRevision rev) {
-		AceDoc shadow = this.shadow;
-		ServerSideDocDiff diff = ServerSideDocDiff.diff(shadow, rev.getDoc());
-		
-		boolean applied = mud.tryToApply(diff, user);
-		if (applied) {
-			this.shadow = rev.getDoc();
+	public void editorChanged(AceDoc doc) {
+		synchronized (this) {
+//			debugPrint("editorChanged", doc);
+			this.work = doc;
+			ServerSideDocDiff diff = ServerSideDocDiff.diff(shadow, doc);
+			boolean applied = mud.tryToApply(diff, user);
+			if (applied) {
+				shadow = doc;
+			}
 		}
+		fireChanged(doc, Listener.ChangeType.FROM_EDITOR);
 	}
 	
-	public SharedDoc getWorking() {
-		// No need to sync because final.
-		return work;
-	}
-	
-	/**
-	 * 
-	 * @param base
-	 * @return true iff in the end base==userdoc
-	 */
-	public synchronized boolean baseChanged(AceDoc base, User byUser) {
-		if (!user.equals(byUser)) {
+	public boolean baseChanged(AceDoc base, User byUser) {
+		boolean sameAsBase;
+		AceDoc newWork;
+		synchronized (this) {
+//			debugPrint("baseChanged", base);
 			ServerSideDocDiff diff = ServerSideDocDiff.diff(shadow, base);
 			shadow = base;
-			work.applyDiff(diff);
+			newWork = work = diff.applyTo(work);
+			sameAsBase = work.equals(base);
 		}
-		return work.getDoc().equals(base);
 		
-		//System.out.println("WRITE USERDOC TO DISK "+user.getName()+"\n"+base.getText());
+		fireChanged(newWork, Listener.ChangeType.FROM_MUD);
+		
+		return sameAsBase;
+	}
+	
+	@SuppressWarnings("unused")
+	private synchronized void debugPrint(String s, AceDoc doc) {
+		System.out.println("\n--- "+user.getName()+" --- " + s + " --- " + this + " - " +Thread.currentThread());
+		System.out.println(doc.getText());
+		System.out.println("SHADOW:\n"+shadow.getText());
+	}
+
+	private void fireChanged(final AceDoc doc, final ChangeType type) {
+		final List<Listener> lis = getListeners();
+		new Thread(new Runnable() {
+			@Override
+			public void run() {
+				for (Listener li : lis) {
+					li.changed(doc, type);
+				}
+			}
+		}).run();
+		
 	}
 	
 	public User getUser() {
 		// No need to sync because final.
 		return user;
 	}
+
+	public synchronized void setDoc(AceDoc doc) {
+		this.work = doc;
+		// XXX???
+	}
+
+	public synchronized AceDoc getDoc() {
+		return work;
+	}
+
 	
 }
