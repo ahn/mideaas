@@ -6,6 +6,7 @@ import org.vaadin.oauth.FacebookButton;
 import org.vaadin.oauth.OAuthButton.OAuthListener;
 
 import com.vaadin.server.Page;
+import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Button.ClickListener;
@@ -29,8 +30,8 @@ public class LoginPanel extends Panel implements OAuthListener {
     public LoginPanel(MideaasUI ui, User user) {
         this.ui = ui;
         this.user = user;
-        this.setSizeFull();
         this.setContent(mainLayout);
+        mainLayout.setMargin(true);
         mainLayout.setSizeFull();
 		mainLayout.removeAllComponents();
     	initSimpleLogin();
@@ -59,6 +60,8 @@ public class LoginPanel extends Panel implements OAuthListener {
 			}
 		});
 		mainLayout.addComponent(simpleLoginButton);
+		
+		mainLayout.addComponent(new Label("&nbsp;", ContentMode.HTML));
 
 		FacebookButton button = new FacebookButton("141905209336309", "9770d931e88104028e07cda983b33ab5", this);
 		mainLayout.addComponent(button);
