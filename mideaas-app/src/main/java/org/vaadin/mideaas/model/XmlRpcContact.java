@@ -140,10 +140,11 @@ public class XmlRpcContact {
 	}
 	
 	public String getScriptFromFile(String scriptName) {
-		Script test = (Script)ScriptContainer.getScriptFromContainer(scriptName);
+		Script item = ScriptContainer.getScriptFromContainer(scriptName);
+		System.out.println(item.toString());
 		String script = "";
 		try {
-			String path = MideaasConfig.getProjectsDir() + test.getLocation() + scriptName + ".txt"; //TODO: needs project name
+			String path = MideaasConfig.getProjectsDir() + "test/" + item.getLocation() + scriptName + ".txt"; //TODO: project name needs to be dynamic
 			BufferedReader br = new BufferedReader(new FileReader(path));
 			try {
 				StringBuilder sb = new StringBuilder();

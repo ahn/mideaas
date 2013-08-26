@@ -66,8 +66,8 @@ public class XmlRpcRunnable implements Runnable {
 			newmap.put( key, map.get( key ) );
 		}
 		newmap.put("testCaseName", name);
-		newmap.put("scriptNames", testName);
-		newmap.put("script", this.script);
+		newmap.put("scripts", testName);  	// script file names
+		newmap.put("script", this.script);	// the test script
 		
 		return newmap;
 	}

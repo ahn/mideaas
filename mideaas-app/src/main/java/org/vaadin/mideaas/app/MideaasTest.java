@@ -156,7 +156,7 @@ public class MideaasTest extends CustomComponent {
             		
             					//write test into a file
             					try {
-            						String path = textLocation.getValue() + textName.getValue() + ".txt";
+            						String path = MideaasConfig.getProjectsDir() + "test/" + textLocation.getValue() + textName.getValue() + ".txt"; //TODO: project name needs to be dynamic
             						BufferedWriter out = new BufferedWriter(new FileWriter(path));
             						out.write(editor.getValue());
             						out.close();
@@ -284,7 +284,7 @@ public class MideaasTest extends CustomComponent {
                 				textLocation.setValue(item.getLocation());
                 				textDescription.setValue(item.getDescription());
                 				
-                				String path = textLocation.getValue() + textName.getValue() + ".txt";
+                				String path = MideaasConfig.getProjectsDir() + "test/" + textLocation.getValue() + textName.getValue() + ".txt"; //TODO: project name needs to be dynamic
                 				BufferedReader br = new BufferedReader(new FileReader(path));
                 			    try {
                 			        StringBuilder sb = new StringBuilder();
