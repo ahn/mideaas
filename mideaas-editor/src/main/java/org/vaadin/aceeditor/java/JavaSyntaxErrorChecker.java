@@ -2,6 +2,7 @@ package org.vaadin.aceeditor.java;
 
 import japa.parser.JavaParser;
 import japa.parser.ParseException;
+import japa.parser.TokenMgrError;
 import japa.parser.ast.CompilationUnit;
 
 import java.io.ByteArrayInputStream;
@@ -34,7 +35,7 @@ public class JavaSyntaxErrorChecker implements ErrorChecker {
 		try {
 			getCu(s);
 			return Collections.emptyList();
-		} catch (ParseException e) {
+		} catch (ParseException | TokenMgrError e) {
 			return Collections.singletonList(new Error("error",0,0) /* TODO */);
 		}
 	}
