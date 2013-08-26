@@ -103,8 +103,12 @@ public class UserDoc {
 	}
 
 	public synchronized void setDoc(AceDoc doc) {
-		this.work = doc;
-		// XXX???
+		work = doc;
+		ServerSideDocDiff diff = ServerSideDocDiff.diff(shadow, doc);
+		boolean applied = mud.tryToApply(diff, null /* XXX */);
+		if (applied) {
+			shadow = doc;
+		}
 	}
 
 	public synchronized AceDoc getDoc() {
