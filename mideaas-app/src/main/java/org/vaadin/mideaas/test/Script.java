@@ -56,12 +56,6 @@ public class Script implements Serializable {
     public void setNotes(String notes) {
         this.notes = notes;
     }
-    public String getScript() {
-        return script;
-    }
-    public void setScript(String script) {
-        this.script = script;
-    }
     
     @Override
     public String toString() {

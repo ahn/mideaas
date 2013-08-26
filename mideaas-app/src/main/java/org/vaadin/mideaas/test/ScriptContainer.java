@@ -43,7 +43,6 @@ public class ScriptContainer extends BeanItemContainer<Script> implements
                 p.setResult("NOT RUN");
                 p.setCheck(false);
                 p.setNotes("This test has not been executed yet");
-                p.setScript("Write your script here");
                 c.addItem(p);
             }
         } catch (InstantiationException e) {
@@ -65,7 +64,6 @@ public class ScriptContainer extends BeanItemContainer<Script> implements
         p.setResult("NOT RUN");
         p.setCheck(false);
         p.setNotes("This test has not been executed yet");
-        p.setScript((String)testData.get(3));
     	c.addItem(p);
     
     	return c;
@@ -118,7 +116,10 @@ public class ScriptContainer extends BeanItemContainer<Script> implements
     public static synchronized Script getScriptFromContainer(String scriptName) {
     	Script item = null;
     	for (Script p : (List<Script>) c.getItemIds()) {
-    		if (p.getName() == scriptName) {
+    		//System.out.println("found item " + p.getName() + " from container");
+    		//System.out.println("checking if item '" + p.getName() + "' is '" + scriptName + "'...");
+    		if (p.getName().matches(scriptName)) {
+    			//System.out.println("found it!");
     			item = p;
     		}
     	}

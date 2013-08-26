@@ -2,6 +2,7 @@ package org.vaadin.mideaas.app;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -123,7 +124,7 @@ public class MideaasTest extends CustomComponent {
             		
             					//write test into a file
             					try {
-            						String path = textLocation.getValue() + textName.getValue() + ".txt";
+            						File path = new File(MideaasConfig.getProjectsDir() + "test/" + textLocation.getValue() + textName.getValue() + ".txt"); //TODO: project name needs to be dynamic
             						BufferedWriter out = new BufferedWriter(new FileWriter(path));
             						out.write(editor.getValue());
             						out.close();

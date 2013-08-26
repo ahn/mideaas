@@ -140,6 +140,7 @@ public class XmlRpcContact {
 	}
 	
 	public String getScriptFromFile(String scriptName) {
+		System.out.println(scriptName);
 		Script item = ScriptContainer.getScriptFromContainer(scriptName);
 		System.out.println(item.toString());
 		String script = "";
