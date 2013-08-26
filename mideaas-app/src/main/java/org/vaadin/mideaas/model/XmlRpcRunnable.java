@@ -58,12 +58,13 @@ public class XmlRpcRunnable implements Runnable {
 		
 		testName = testName + ".txt";
 		String name = map.get("testCaseName");
+		System.out.println("testcasename: " + name);
 		name = name + Integer.toString(i);
-		map.remove("testCaseName");
 		Map<String, String> newmap = new HashMap<String, String>();
 		for( String key : map.keySet() ) {
 			newmap.put( key, map.get( key ) );
 		}
+		newmap.remove("testCaseName");
 		newmap.put("testCaseName", name);
 		newmap.put("scripts", testName);  	// script file names
 		newmap.put("script", this.script);	// the test script
