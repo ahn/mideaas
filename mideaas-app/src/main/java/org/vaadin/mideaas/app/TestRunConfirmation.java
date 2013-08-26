@@ -110,7 +110,7 @@ public class TestRunConfirmation extends Window {
 							map.put("tolerance", (String)textTolerance.getValue());
 							map.put("runtimes", (String)textRuntimes.getValue());
 			        	
-							xmlrpc.executeParallelTests((String)cmbServer.getValue(), map, 5);
+							xmlrpc.executeParallelTests((String)cmbServer.getValue(), map, MideaasConfig.getExecutorNumber());
 							UI.getCurrent().removeWindow(confirmTests);
 						}
 					}

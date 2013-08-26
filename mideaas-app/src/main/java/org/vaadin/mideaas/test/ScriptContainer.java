@@ -114,6 +114,16 @@ public class ScriptContainer extends BeanItemContainer<Script> implements
     		}
     	}
     }
+    
+    public static synchronized Script getScriptFromContainer(String scriptName) {
+    	Script item = null;
+    	for (Script p : (List<Script>) c.getItemIds()) {
+    		if (p.getName() == scriptName) {
+    			item = p;
+    		}
+    	}
+    	return item;
+    }
 }
 
 

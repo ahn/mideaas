@@ -12,12 +12,14 @@ import org.vaadin.mideaas.test.ScriptContainer;
 public class XmlRpcRunnable implements Runnable {
 	private final String server;
 	private final String testName;
+	private final String script;
 	private final Map<String, String> map;
 	private final int i; 
 	
-	XmlRpcRunnable(String server, String testName, Map<String, String> map, int i) {
+	XmlRpcRunnable(String server, String testName, String script, Map<String, String> map, int i) {
 		this.server = server;
 		this.testName = testName;
+		this.script = script;
 		this.map = map;
 		this.i = i;
 		System.out.println(this.map.toString());
@@ -63,7 +65,8 @@ public class XmlRpcRunnable implements Runnable {
 			newmap.put( key, map.get( key ) );
 		}
 		newmap.put("testCaseName", name);
-		newmap.put("scripts", testName);
+		newmap.put("scripts", testName);  	// script file names
+		newmap.put("script", this.script);	// the test script
 		
 		return newmap;
 	}
