@@ -49,8 +49,9 @@ public class TestRunConfirmation extends Window {
         listTests.setColumns(25);
         listTests.setReadOnly(true);
         
-        cmbServer.addItem(ServerContainer.getFirstServer().getIP());
-        cmbServer.setValue(ServerContainer.getFirstServer().getIP());
+        String first = ServerContainer.getFirstServer().getIP();
+        cmbServer.addItem(first);
+        cmbServer.setValue(first);
         
         for (String engine : ServerContainer.getServerEngines((String)cmbServer.getValue())){
         	cmbEngine.addItem(engine);

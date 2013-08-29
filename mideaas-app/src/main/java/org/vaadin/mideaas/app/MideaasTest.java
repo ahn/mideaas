@@ -67,7 +67,7 @@ public class MideaasTest extends CustomComponent {
         XmlRpcContact xmlrpc = new XmlRpcContact();
         for (String server : servers) {
         	Map<String, String> result = (HashMap<String, String>)xmlrpc.getServerDetails(server);
-        	ServerContainer.addServer(server, Arrays.asList(result.get("engines").split("\\s*,\\s*")));
+        	ServerContainer.addServer(server, Arrays.asList(result.get("engines").split(" ")));
         }
         
         

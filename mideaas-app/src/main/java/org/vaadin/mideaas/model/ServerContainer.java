@@ -32,7 +32,7 @@ public class ServerContainer extends BeanItemContainer<Server> implements
     	sc.addItem(p);
     }
     
-    public static Server getServer(String ip){
+    public static Server getServer(String ip) {
     	Server server = null;
     	for (Server p : sc.getItemIds()) {
     		if (p.getIP().matches(ip)) {
@@ -42,7 +42,15 @@ public class ServerContainer extends BeanItemContainer<Server> implements
     	return server;
     }
     
-    public static ServerContainer getServerContainer(){
+    public static synchronized void removeServer(String serverIP) {
+    	for (Server server : sc.getAllItemIds()) {
+    		if (server.getIP().matches(serverIP)) {
+    			sc.removeItem(server);
+    		}
+    	}
+    }
+    
+    public static ServerContainer getServerContainer() {
     	return sc;
     }
     
