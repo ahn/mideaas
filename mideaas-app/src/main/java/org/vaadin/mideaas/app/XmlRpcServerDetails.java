@@ -16,8 +16,6 @@ import com.vaadin.ui.Window;
 
 public class XmlRpcServerDetails extends Window {
 	
-	List<String> fntsServers = new ArrayList<String>();
-	
 	protected Window newWindow(){
 		Window settings = new Window("FNTS Server details");
 		
@@ -37,20 +35,23 @@ public class XmlRpcServerDetails extends Window {
             	try {
             	    url = new URL(newServer.getValue());
             	} catch (MalformedURLException e) {
-            		Notification.show("Whoops", "A bad server URL was given", Notification.Type.ERROR_MESSAGE);
+            		Notification.show("Whoops", "The given server URL is malformed", Notification.Type.ERROR_MESSAGE);
             	}
             	if (url != null) {
-            		fntsServers.add(newServer.getValue());
-            		servers.addItem(newServer.getValue());
-            		servers.setValue(newServer.getValue());
-            		newServer.setValue("");
+            		try {
+            			servers.addItem(newServer.getValue());
+            			servers.setValue(newServer.getValue());
+            			newServer.setValue("");
+            		}
+            		catch (Exception e) {
+            			
+            		}
             	}
             }});
         final com.vaadin.ui.Button btnRemove = new com.vaadin.ui.Button("Remove Server", new Button.ClickListener() {
             // inline click-listener
             public void buttonClick(ClickEvent event) { 
             	// TODO: a quick check if the user is sure
-            	fntsServers.remove(servers.getValue());
             	servers.removeItem(servers.getValue());
             }});
         
@@ -71,7 +72,4 @@ public class XmlRpcServerDetails extends Window {
 		return settings;
 	}
 	
-	public List<String> getServers() {
-		return fntsServers;
-	}
 }

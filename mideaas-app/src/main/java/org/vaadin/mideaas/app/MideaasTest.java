@@ -18,6 +18,8 @@ import java.util.Set;
 import org.vaadin.mideaas.model.XmlRpcContact;
 import org.vaadin.mideaas.test.Script;
 import org.vaadin.mideaas.test.ScriptContainer;
+import org.vaadin.mideaas.model.Server;
+import org.vaadin.mideaas.model.ServerContainer;
 
 import com.vaadin.data.Property;
 import com.vaadin.event.Action;
@@ -58,14 +60,14 @@ public class MideaasTest extends CustomComponent {
     private static final String initialText = "Write script here";
     
     private String savemode = "add";
-
-    private List<String> fntsServers = new ArrayList<String>();
     
     public MideaasTest(String tabMessage) {
     	// getting servers from the config file
         List<String> servers = Arrays.asList(MideaasConfig.getFNTSServers().split("\\s*,\\s*"));
+        XmlRpcContact xmlrpc = new XmlRpcContact();
         for (String server : servers) {
-        	fntsServers.add(server);
+        	Map<String, String> result = (HashMap<String, String>)xmlrpc.getServerDetails(server);
+        	ServerContainer.addServer(server, Arrays.asList(result.get("engines").split("\\s*,\\s*")));
         }
         
         
@@ -356,7 +358,7 @@ public class MideaasTest extends CustomComponent {
         });        
         
         final TestRunConfirmation conf = new TestRunConfirmation();
-        final Window confirmTests = conf.newWindow(markedRows, fntsServers);
+        final Window confirmTests = conf.newWindow(markedRows);
         final Window settings = new XmlRpcServerDetails().newWindow();
         
         //buttons to the main window
@@ -386,7 +388,7 @@ public class MideaasTest extends CustomComponent {
         	new Button.ClickListener() {
             	// inline click-listener
             	public void buttonClick(ClickEvent event) {
-            		conf.updateData(markedRows, fntsServers);
+            		conf.updateData(markedRows);
             		UI.getCurrent().addWindow(confirmTests);
             	}
         }));
