@@ -7,8 +7,10 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import org.vaadin.mideaas.model.ServerContainer;
 import org.vaadin.mideaas.model.XmlRpcContact;
 import org.vaadin.mideaas.test.Script;
+import org.vaadin.mideaas.test.ScriptContainer;
 
 import com.vaadin.data.Property;
 import com.vaadin.data.Property.ValueChangeEvent;
@@ -35,11 +37,8 @@ public class TestRunConfirmation extends Window {
     final com.vaadin.ui.TextField textRuntimes = new com.vaadin.ui.TextField("Run # of times");
     final com.vaadin.ui.ComboBox cmbServer = new com.vaadin.ui.ComboBox("XMLRPC Server");
 	
-	protected Window newWindow(HashSet<Object> rows, List<String> servers){
+	protected Window newWindow(HashSet<Object> rows){
 		markedRows.addAll(rows);
-		fntsServers.addAll(servers);
-		
-		System.out.println(fntsServers.toString());
 		
 		//the test confirmation window
         confirmTests.setWidth("640px");
@@ -50,7 +49,15 @@ public class TestRunConfirmation extends Window {
         listTests.setColumns(25);
         listTests.setReadOnly(true);
         
-        String[] engines = getServerDetails(fntsServers.get(0));
+        String first = ServerContainer.getFirstServer().getIP();
+        cmbServer.addItem(first);
+        cmbServer.setValue(first);
+        
+        for (String engine : ServerContainer.getServerEngines((String)cmbServer.getValue())){
+        	cmbEngine.addItem(engine);
+        }
+        //old codes
+        /*String[] engines = getServerDetails(fntsServers.get(0));
         if (engines[0].matches("error")) {
         	Notification.show("Whoops", engines[1], Notification.Type.WARNING_MESSAGE);
         } else {
@@ -60,21 +67,14 @@ public class TestRunConfirmation extends Window {
         	for (String server: fntsServers) {
         		cmbServer.addItem(server);
         	}
-        }
+        }*/
         cmbServer.setImmediate(true);
         cmbServer.addListener(new Property.ValueChangeListener() {
 			
 			@Override
 			public void valueChange(ValueChangeEvent event) {
-				String[] engines = getServerDetails((String)cmbServer.getValue());
-				if (engines[0].matches("error")) {
-					cmbEngine.removeAllItems();
-					Notification.show("Whoops", engines[1], Notification.Type.ERROR_MESSAGE);
-				} else {
-					cmbEngine.removeAllItems();
-					for (String engine: engines) {
-						cmbEngine.addItem(engine);
-					}
+				for (String engine : ServerContainer.getServerEngines((String)cmbServer.getValue())){
+		        	cmbEngine.addItem(engine);
 		        }
 			}
 		});
@@ -155,11 +155,10 @@ public class TestRunConfirmation extends Window {
         return confirmTests;
 	}
 	
-	public void updateData(HashSet<Object> rows, List<String> servers) {
+	public void updateData(HashSet<Object> rows) {
 		markedRows.clear();
 		markedRows.addAll(rows);
-		fntsServers.clear();
-		fntsServers.addAll(servers);
+		//TODO: fntsservers!
 		
 		this.updateList();
 	}
@@ -183,7 +182,7 @@ public class TestRunConfirmation extends Window {
 		cmbEngine.setValue("robotEngine");
 		textTolerance.setValue("80");
 		textRuntimes.setValue("1");
-		cmbServer.setValue(fntsServers.get(0));
+		cmbServer.setValue(ServerContainer.getFirstServer().getIP());
 	}
 	
 	public synchronized String[] getServerDetails(String server) {
