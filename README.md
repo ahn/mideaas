@@ -8,6 +8,7 @@ The current version requires Vaadin 7.1+ and Java 7.
 
 Lots of features a still missing.
 
+Source code license: [Apache 2.0](https://raw.github.com/ahn/mideaas/master/LICENSE)
 
 ## QuickStart
 
