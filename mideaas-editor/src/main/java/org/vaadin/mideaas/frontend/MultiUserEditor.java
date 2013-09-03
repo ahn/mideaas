@@ -272,7 +272,7 @@ public class MultiUserEditor extends CustomComponent implements DiffListener, Di
 
 	@Override
 	public void diff(DiffEvent e) {
-		activeDoc.editorChanged(editor.getDoc());
+		activeDoc.editorChanged(editor.getDoc().withoutMarkers());
 	}
 
 	@Override
