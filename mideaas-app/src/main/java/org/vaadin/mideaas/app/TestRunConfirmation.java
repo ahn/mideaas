@@ -49,12 +49,16 @@ public class TestRunConfirmation extends Window {
         listTests.setColumns(25);
         listTests.setReadOnly(true);
         
-        String first = ServerContainer.getFirstServer().getIP();
-        cmbServer.addItem(first);
-        cmbServer.setValue(first);
+        try {
+        	String first = ServerContainer.getFirstServer().getIP();
+        	cmbServer.addItem(first);
+        	cmbServer.setValue(first);
         
-        for (String engine : ServerContainer.getServerEngines((String)cmbServer.getValue())){
-        	cmbEngine.addItem(engine);
+        	for (String engine : ServerContainer.getServerEngines((String)cmbServer.getValue())){
+        		cmbEngine.addItem(engine);
+        	}
+        } catch (NullPointerException e) {
+        	//no servers to connect to, leaving the options empty
         }
         //old codes
         /*String[] engines = getServerDetails(fntsServers.get(0));
@@ -179,10 +183,14 @@ public class TestRunConfirmation extends Window {
 			textCaseName.setValue("Test Run");
 		}
 			
-		cmbEngine.setValue("robotEngine");
-		textTolerance.setValue("80");
-		textRuntimes.setValue("1");
-		cmbServer.setValue(ServerContainer.getFirstServer().getIP());
+		try {
+			cmbEngine.setValue(ServerContainer.getFirstServer().getEngines().get(0));
+			textTolerance.setValue("80");
+			textRuntimes.setValue("1");
+			cmbServer.setValue(ServerContainer.getFirstServer().getIP());
+		} catch (NullPointerException e) {
+			//no servers to connect to, leaving the options empty
+		}
 	}
 	
 	public synchronized String[] getServerDetails(String server) {

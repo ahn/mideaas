@@ -13,7 +13,6 @@ public class Script implements Serializable {
     private String location = "";
     private CheckBox checkbox = new CheckBox("");
     private String notes = "";
-    private String script = ""; 
     
     public String getName() {
         return name;
@@ -46,6 +45,10 @@ public class Script implements Serializable {
     public CheckBox getCheck() {
     	//boolean checked = checkbox.getValue();
         return checkbox;
+    }
+    public boolean getBoolCheck() {
+    	//boolean checked = checkbox.getValue();
+        return checkbox.getValue();
     }
     public void setCheck(boolean checked) {
     	checkbox.setValue(checked);

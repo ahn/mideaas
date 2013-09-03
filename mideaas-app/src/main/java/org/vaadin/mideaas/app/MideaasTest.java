@@ -65,9 +65,21 @@ public class MideaasTest extends CustomComponent {
     	// getting servers from the config file
         List<String> servers = Arrays.asList(MideaasConfig.getFNTSServers().split("\\s*,\\s*"));
         XmlRpcContact xmlrpc = new XmlRpcContact();
+        String errServers = "";
         for (String server : servers) {
-        	Map<String, String> result = (HashMap<String, String>)xmlrpc.getServerDetails(server);
-        	ServerContainer.addServer(server, Arrays.asList(result.get("engines").split(" ")));
+        	try {
+        		Map<String, String> result = (HashMap<String, String>)xmlrpc.getServerDetails(server);
+        		ServerContainer.addServer(server, Arrays.asList(result.get("engines").split(" ")));
+        	} catch (Exception e) {
+        		if (errServers == "") {
+        			errServers = server;
+        		} else {
+        			errServers = errServers + "\n" + server;
+        		}
+        	}
+        }
+        if (errServers != "") {
+        	Notification.show("Whoops", "Unable to reach the following servers:\n" + errServers, Notification.Type.ERROR_MESSAGE);
         }
         
         

@@ -55,17 +55,26 @@ public class ServerContainer extends BeanItemContainer<Server> implements
     }
     
     public static Server getFirstServer() {
-    	Server server = sc.getIdByIndex(0);
+    	Server server = null;
+    	try {
+    		server = sc.getIdByIndex(0);
+    	} catch (NullPointerException e) {
+    		server = null;
+    	}
     	return server;
     }
     
     public static List<String> getServerEngines(String serverIP) {
     	List<String> engines = new ArrayList<String>();
-    	for (Server server : sc.getItemIds()) {
-    		System.out.println(server.getEngines());
-    		if (server.getIP().matches(serverIP)) {
-    			engines = server.getEngines();
+    	try {
+    		for (Server server : sc.getItemIds()) {
+    			System.out.println(server.getEngines());
+    			if (server.getIP().matches(serverIP)) {
+    				engines = server.getEngines();
+    			}
     		}
+    	} catch (NullPointerException e) {
+    		engines = null;
     	}
     	return engines;
     }

@@ -33,9 +33,9 @@ public class XmlRpcContact {
 			XmlRpcClient client = new XmlRpcClient();
 			client.setConfig(config);
 
-        	Object result = null;
-            result = client.execute("ping", new Object[] {"guest"});
-            return (String)result;
+        	HashMap<String, String> result = null;
+            result = (HashMap<String, String>)client.execute("ping", new Object[] {"guest"});
+            return (String)result.get("ping");
         }
         catch ( Exception ex ) {
         	ex.printStackTrace();
