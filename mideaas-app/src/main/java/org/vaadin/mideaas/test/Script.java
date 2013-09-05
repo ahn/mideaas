@@ -30,7 +30,7 @@ public class Script implements Serializable {
         return result;
     }
     public void setResult(String result) {
-    	if (result == "PASS" || result == "FAIL" || result == "BLOCKED" || result == "NOT RUN" || result == "RUNNING") {
+    	if (result.matches("PASS") || result.matches("FAIL") || result.matches("BLOCKED") || result.matches("NOT RUN") || result.matches("RUNNING")) {
     		this.result = result;
     	} else {
     		result = "BLOCKED";
@@ -45,10 +45,6 @@ public class Script implements Serializable {
     public CheckBox getCheck() {
     	//boolean checked = checkbox.getValue();
         return checkbox;
-    }
-    public boolean getBoolCheck() {
-    	//boolean checked = checkbox.getValue();
-        return checkbox.getValue();
     }
     public void setCheck(boolean checked) {
     	checkbox.setValue(checked);

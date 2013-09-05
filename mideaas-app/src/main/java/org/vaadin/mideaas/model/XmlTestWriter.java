@@ -20,6 +20,20 @@ import org.vaadin.mideaas.app.MideaasConfig;
 import org.vaadin.mideaas.model.ServerContainer;
 import org.vaadin.mideaas.model.Server;
 
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.util.Arrays;
+
+import javax.xml.parsers.SAXParser;
+import javax.xml.parsers.SAXParserFactory;
+import org.xml.sax.Attributes;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
+import org.xml.sax.helpers.DefaultHandler;
+
 public class XmlTestWriter{
 	
 	public static synchronized void DOMWriteTestsToXml() {
@@ -58,7 +72,7 @@ public class XmlTestWriter{
 				test.appendChild(location);
 				
 				Element checked = doc.createElement("checked");
-				checked.appendChild(doc.createTextNode(String.valueOf(p.getBoolCheck())));
+				checked.appendChild(doc.createTextNode(String.valueOf(p.getCheck().getValue())));
 				test.appendChild(checked);
 				
 				Element notes = doc.createElement("notes");
@@ -102,12 +116,124 @@ public class XmlTestWriter{
 		}
 	}
 	
-	public static synchronized void SAXWriteTestsToXml() {
-		
+	public static synchronized void WriteTestsToXml() {
+		XmlWriter xml = new XmlWriter();
+		xml.startWriting();
 	}
 	
-	public static synchronized void loadTestsFromXml() {
-		
-	}
+	public static synchronized String SAXloadTestsFromXml() {
+		try {
+			 
+			SAXParserFactory factory = SAXParserFactory.newInstance();
+  	      	SAXParser saxParser = factory.newSAXParser();
 
+  	      	DefaultHandler handler = new DefaultHandler() {
+
+  	      		boolean project = false;
+  	      		boolean tests = false;
+  	      		boolean test = false;
+  	      		boolean testlocation = false;
+  	      		boolean testdescription = false;
+  	      		boolean testresult = false;
+  	      		boolean testcheck = false;
+  	      		boolean testnotes = false;
+  	      		boolean servers = false;
+  	      		boolean server = false;
+  	      		boolean serverengines = false;
+  	      		Script scr;
+  	      		Server serv;
+
+  	      		public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
+  	      			if (qName.equalsIgnoreCase("project")) {
+  	      				project = true;
+  	      			} else if (qName.equalsIgnoreCase("tests")) {
+  	      				tests = true;
+  	      			} else if (qName.equalsIgnoreCase("test")) {
+  	      				scr = new Script();
+  	      				scr.setName(attributes.getValue("name").trim());
+  	      				test = true;
+  	      			} else if (qName.equalsIgnoreCase("location")) {
+  	      				testlocation = true;
+  	      			} else if (qName.equalsIgnoreCase("description")) {
+	      				testdescription = true;
+	      			} else if (qName.equalsIgnoreCase("result")) {
+	      				testresult = true;
+	      			} else if (qName.equalsIgnoreCase("check")) {
+	      				testcheck = true;
+	      			} else if (qName.equalsIgnoreCase("notes")) {
+	      				testnotes = true;
+	      			} else if (qName.equalsIgnoreCase("servers")) {
+	      				servers = true;
+	      			} else if (qName.equalsIgnoreCase("server")) {
+	      				serv = new Server();
+  	      				serv.setIP(attributes.getValue("IP").trim());
+	      				server = true;
+	      			} else if (qName.equalsIgnoreCase("engines")) {
+	      				serverengines = true;
+	      			}
+  	      		}
+
+  	      		public void endElement(String uri, String localName, String qName) throws SAXException {
+  	      			if (qName.equalsIgnoreCase("project")) {
+  	      				project = false;
+  	      			} else if (qName.equalsIgnoreCase("tests")) {
+  	      				tests = false;
+  	      			} else if (qName.equalsIgnoreCase("test")) {
+  	      				ScriptContainer.addTestObjectToContainer(scr);
+  	      				test = false;
+  	      			} else if (qName.equalsIgnoreCase("location")) {
+  	      				testlocation = false;
+  	      			} else if (qName.equalsIgnoreCase("description")) {
+  	      				testdescription = false;
+  	      			} else if (qName.equalsIgnoreCase("result")) {
+  	      				testresult = false;
+  	      			} else if (qName.equalsIgnoreCase("check")) {
+  	      				testcheck = false;
+  	      			} else if (qName.equalsIgnoreCase("notes")) {
+  	      				testnotes = false;
+  	      			} else if (qName.equalsIgnoreCase("servers")) {
+  	      				servers = false;
+  	      			} else if (qName.equalsIgnoreCase("server")) {
+  	      				ServerContainer.addServerObjectToContainer(serv);
+  	      				server = false;
+  	      			} else if (qName.equalsIgnoreCase("engines")) {
+  	      				serverengines = false;
+  	      			}
+  	      		}
+
+  	      		public void characters(char ch[], int start, int length) throws SAXException {
+	      			if (testlocation) {
+	      				scr.setLocation(new String(ch, start, length).trim());
+	      			} else if (testdescription) {
+	      				scr.setDescription(new String(ch, start, length).trim());
+	      			} else if (testresult) {
+	      				scr.setResult(new String(ch, start, length).trim());
+	      			} else if (testcheck) {
+	      				scr.setCheck(Boolean.valueOf(new String(ch, start, length).trim()));
+	      			} else if (testnotes) {
+	      				scr.setNotes(new String(ch, start, length).trim());
+	      			} else if (serverengines) {
+	      				serv.setEngines(Arrays.asList(new String(ch, start, length).split(",")));
+	      			}
+  	      		}
+  	      	};
+
+  	      	File file = new File(MideaasConfig.getProjectsDir() + "test/" + "TestDataStorage.xml");	//TODO: needs changeable project name
+  	      	InputStream inputStream= new FileInputStream(file);
+  	      	Reader reader = new InputStreamReader(inputStream,"UTF-8");
+
+  	      	InputSource is = new InputSource(reader);
+  	      	is.setEncoding("UTF-8");
+
+  	      	saxParser.parse(is, handler);
+  	      	
+  	      	return "ok";
+
+		} catch (IOException e) {
+			return "Something went wrong while loading file!";
+		} catch (Exception e) {
+  	      	e.printStackTrace();
+  	      	return "Something went wrong while reading data!";
+  	    }
+	}
 }
