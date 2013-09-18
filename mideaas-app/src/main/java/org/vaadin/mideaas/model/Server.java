@@ -19,6 +19,9 @@ public class Server implements Serializable {
         return engines;
     }
     public void setEngines(List<String> engines) {
+    	for (String e : engines) {
+    		e = e.trim();
+    	}
         this.engines = engines;
     }
 }

@@ -2,12 +2,13 @@
 
 [MIDEaaS](http://cored.cs.tut.fi/#mideaas) (Mobile IDE as a Service) is an experimental web-based environment for creating Vaadin web apps.
 
-It's still in a research state. Not to be used for anything real.
+It's still in a research state. Not to be used for anything real. See  [cored.cs.tut.fi](http://cored.cs.tut.fi) for related information.
 
 The current version requires Vaadin 7.1+ and Java 7.
 
 Lots of features a still missing.
 
+Source code license: [Apache 2.0](https://raw.github.com/ahn/mideaas/master/LICENSE)
 
 ## QuickStart
 

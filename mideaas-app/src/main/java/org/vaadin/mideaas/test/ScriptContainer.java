@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.Random;
 
 import org.vaadin.mideaas.app.MideaasTest;
+import org.vaadin.mideaas.model.ServerContainer;
+import org.vaadin.mideaas.model.XmlTestWriter;
 
 import com.vaadin.data.util.BeanItemContainer;
 
@@ -59,8 +61,27 @@ public class ScriptContainer extends BeanItemContainer<Script> implements
         p.setCheck(false);
         p.setNotes("This test has not been executed yet");
     	c.addItem(p);
+    	
+    	XmlTestWriter.WriteTestsToXml();
     
     	return c;
+    }
+    
+    public static void addTestObjectToContainer(Script script) {
+    	if (c == null) {
+    		try {
+    			c = new ScriptContainer();
+    		} catch (InstantiationException e) {
+                e.printStackTrace();
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+            }
+    	}
+    	c.addItem(script);
+    }
+    
+    public static void setScriptContainer(ScriptContainer container) {
+    	c = container;
     }
     
     
@@ -105,6 +126,7 @@ public class ScriptContainer extends BeanItemContainer<Script> implements
     			break;	//no need to look for more tests
     		}
     	}
+    	XmlTestWriter.WriteTestsToXml();
     }
     
     public static synchronized Script getScriptFromContainer(String scriptName) {

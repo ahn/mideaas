@@ -13,7 +13,6 @@ public class Script implements Serializable {
     private String location = "";
     private CheckBox checkbox = new CheckBox("");
     private String notes = "";
-    private String script = ""; 
     
     public String getName() {
         return name;
@@ -31,7 +30,7 @@ public class Script implements Serializable {
         return result;
     }
     public void setResult(String result) {
-    	if (result == "PASS" || result == "FAIL" || result == "BLOCKED" || result == "NOT RUN" || result == "RUNNING") {
+    	if (result.matches("PASS") || result.matches("FAIL") || result.matches("BLOCKED") || result.matches("NOT RUN") || result.matches("RUNNING")) {
     		this.result = result;
     	} else {
     		result = "BLOCKED";

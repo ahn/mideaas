@@ -41,8 +41,22 @@ public class XmlRpcServerDetails extends Window {
         
         Panel topPanel = new Panel();
         
-        for (Server server : ServerContainer.getServerContainer().getItemIds()) {
-        	cmbServers.addItem(server.getIP());
+        try {
+        	for (Server server : ServerContainer.getServerContainer().getItemIds()) {
+        		cmbServers.addItem(server.getIP());
+        	}
+        
+        	String first = ServerContainer.getFirstServer().getIP();
+        	cmbServers.setValue(first);
+        
+        	listEngines.setReadOnly(false);
+        	listEngines.setValue("");
+        	for (String engine : ServerContainer.getServerEngines(first)){
+        		listEngines.setValue(listEngines.getValue() + engine + "\n");
+        	}
+        	listEngines.setReadOnly(true);
+        } catch (NullPointerException e) {
+        	//no servers to connect to, leaving the options empty
         }
         
         
@@ -56,16 +70,35 @@ public class XmlRpcServerDetails extends Window {
             		Notification.show("Whoops", "The given server URL is malformed", Notification.Type.ERROR_MESSAGE);
             	}
             	if (url != null) {
-            		try {
-            			cmbServers.addItem(newServer.getValue());
-            			cmbServers.setValue(newServer.getValue());
-            			Map<String, String> result = (HashMap<String, String>)xmlrpc.getServerDetails(newServer.getValue());
-            			ServerContainer.addServer(newServer.getValue(), Arrays.asList(result.get("engines").split(" ")));
-            			newServer.setValue("");
-            		}
-            		catch (Exception e) {
-            			Notification.show("Whoops", "Something went wrong while adding new server", Notification.Type.ERROR_MESSAGE);
-            			e.printStackTrace();
+            		String ping = xmlrpc.ping(newServer.getValue());
+            		if (ping.equals("pong")) { //ping succeeded!
+            			try {
+            				cmbServers.addItem(newServer.getValue());
+            				cmbServers.setValue(newServer.getValue());
+            				Map<String, String> result = (HashMap<String, String>)xmlrpc.getServerDetails(newServer.getValue());
+            				ServerContainer.addServer(newServer.getValue(), Arrays.asList(result.get("engines").split(" ")));
+            				listEngines.setReadOnly(false);
+        					listEngines.setValue("");
+        					for (String engine : ServerContainer.getServerEngines((String)cmbServers.getValue())){
+        						listEngines.setValue(listEngines.getValue() + engine + "\n");
+        					}
+        					listEngines.setReadOnly(true);
+            				newServer.setValue("");
+            				Notification.show("Server saved!", Notification.Type.HUMANIZED_MESSAGE);
+            			}
+            			catch (NullPointerException e) {
+            				Notification.show("Whoops", "Something went wrong while adding new server", Notification.Type.ERROR_MESSAGE);
+            				e.printStackTrace();
+            				if (cmbServers.containsId(newServer.getValue())) {
+            					cmbServers.removeItem(newServer.getValue());
+            				}
+            				if (ServerContainer.getServer(newServer.getValue()) != null) {
+            					ServerContainer.removeServer(newServer.getValue());
+            				}
+            				newServer.setValue("");
+            			}
+            		} else {
+            			Notification.show("Whoops", "Could not reach the server, check the URL", Notification.Type.ERROR_MESSAGE);
             		}
             	}
             }});
@@ -85,6 +118,7 @@ public class XmlRpcServerDetails extends Window {
         Panel serverDetails = new Panel();
         VerticalLayout mainServerDetails = new VerticalLayout();
         HorizontalLayout detailSection = new HorizontalLayout();
+        detailSection.setMargin(true);
         
         
         listEngines.setRows(10);
@@ -95,12 +129,17 @@ public class XmlRpcServerDetails extends Window {
 			
 			@Override
 			public void valueChange(ValueChangeEvent event) {
-				listEngines.setReadOnly(false);
-				listEngines.setValue("");
-				for (String engine : ServerContainer.getServerEngines((String)cmbServers.getValue())){
-					listEngines.setValue(listEngines.getValue() + engine + "\n");
-		        }
-				listEngines.setReadOnly(true);
+				try {
+					listEngines.setReadOnly(false);
+					listEngines.setValue("");
+					for (String engine : ServerContainer.getServerEngines((String)cmbServers.getValue())){
+						listEngines.setValue(listEngines.getValue() + engine + "\n");
+					}
+					listEngines.commit();
+					listEngines.setReadOnly(true);
+				} catch (NullPointerException e) {
+					listEngines.setReadOnly(true);
+				}
 			}
 		});
         
@@ -109,19 +148,18 @@ public class XmlRpcServerDetails extends Window {
         top.addComponent(cmbServers);
         top.addComponent(newServer);
         top.addComponent(btnAdd);
-        top.addComponent(btnRemove);
-        top.setMargin(true);
+        //top.addComponent(btnRemove);	//might not be a good idea to remove servers...
         topPanel.setContent(top);
 		
 		Label label = new Label("Server Details");
 		
 		mainServerDetails.addComponent(label);
 		mainServerDetails.addComponent(detailSection);
-		mainServerDetails.setMargin(true);
 		serverDetails.setContent(mainServerDetails);
 		
 		main.addComponent(topPanel);
 		main.addComponent(serverDetails);
+		main.setMargin(true);
 		
 		settings.setContent(main);
 		settings.center();

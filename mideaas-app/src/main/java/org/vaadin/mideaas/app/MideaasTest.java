@@ -20,6 +20,7 @@ import org.vaadin.mideaas.test.Script;
 import org.vaadin.mideaas.test.ScriptContainer;
 import org.vaadin.mideaas.model.Server;
 import org.vaadin.mideaas.model.ServerContainer;
+import org.vaadin.mideaas.model.XmlTestWriter;
 
 import com.vaadin.data.Property;
 import com.vaadin.event.Action;
@@ -62,15 +63,7 @@ public class MideaasTest extends CustomComponent {
     private String savemode = "add";
     
     public MideaasTest(String tabMessage) {
-    	// getting servers from the config file
-        List<String> servers = Arrays.asList(MideaasConfig.getFNTSServers().split("\\s*,\\s*"));
-        XmlRpcContact xmlrpc = new XmlRpcContact();
-        for (String server : servers) {
-        	Map<String, String> result = (HashMap<String, String>)xmlrpc.getServerDetails(server);
-        	ServerContainer.addServer(server, Arrays.asList(result.get("engines").split(" ")));
-        }
-        
-        
+    	
     	final com.vaadin.ui.TextArea testNotes = new com.vaadin.ui.TextArea("Notes", "");
     	testNotes.setWidth("100%");
     	testNotes.setRows(15);
@@ -220,7 +213,38 @@ public class MideaasTest extends CustomComponent {
         table.addContainerProperty("Result", String.class, null);
         //table.setColumnHeaders(new String[] { "Name", "Location", "Description", "Result" });
         
-        table.setContainerDataSource(ScriptContainer.createWithTestData());
+        //load and set data if possible
+        String loadResult = XmlTestWriter.SAXloadTestsFromXml();
+        if (loadResult.matches("ok")) {
+        	table.setContainerDataSource(ScriptContainer.getContainer());
+        	for (Script p : ScriptContainer.getContainer().getItemIds()) {
+        		if (p.getCheck().getValue() == true) {
+        			markedRows.add(p);
+        		}
+        	}
+        } else {
+        	table.setContainerDataSource(ScriptContainer.createWithTestData());
+        	
+        	// getting servers from the config file
+            List<String> servers = Arrays.asList(MideaasConfig.getFNTSServers().split("\\s*,\\s*"));
+            XmlRpcContact xmlrpc = new XmlRpcContact();
+            String errServers = "";
+            for (String server : servers) {
+            	try {
+            		Map<String, String> result = (HashMap<String, String>)xmlrpc.getServerDetails(server);
+            		ServerContainer.addServer(server, Arrays.asList(result.get("engines").split(" ")));
+            	} catch (Exception e) {
+            		if (errServers == "") {
+            			errServers = server;
+            		} else {
+            			errServers = errServers + "\n" + server;
+            		}
+            	}
+            }
+            if (errServers != "") {
+            	Notification.show("Whoops", "Unable to reach the following servers:\n" + errServers, Notification.Type.ERROR_MESSAGE);
+            }
+        }
 
         // Actions (a.k.a context menu)
         table.addActionHandler(new Action.Handler() {
