@@ -76,7 +76,7 @@
 		<dependency>
 			<groupId>org.vaadin.addons</groupId>
 			<artifactId>aceeditor</artifactId>
-			<version>0.8.4</version>
+			<version>0.8.5</version>
 		</dependency>
 
 		<dependency>
