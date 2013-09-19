@@ -7,6 +7,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import org.vaadin.mideaas.model.Server;
 import org.vaadin.mideaas.model.ServerContainer;
 import org.vaadin.mideaas.model.XmlRpcContact;
 import org.vaadin.mideaas.test.Script;
@@ -47,85 +48,93 @@ public class TestRunConfirmation extends Window {
         //fields that contain the info needed for running the tests
         listTests.setRows(10);
         listTests.setColumns(25);
-        listTests.setReadOnly(true);
+        listTests.setReadOnly(false);
+        
         
         try {
+        	//set the first server at startup
         	String first = ServerContainer.getFirstServer().getIP();
-        	cmbServer.addItem(first);
-        	cmbServer.setValue(first);
-        
+        	if (XmlRpcContact.ping(first).matches("pong")) {
+        		cmbServer.addItem(first);
+        		cmbServer.setValue(first);
+        	} else {
+        		//the first server didn't respond, looking for the next server...
+        		for (Server server : ServerContainer.getServerContainer().getItemIds()) {
+        			String ip = server.getIP();
+        			if (XmlRpcContact.ping(ip).matches("pong")) {
+                		cmbServer.addItem(ip);
+                		cmbServer.setValue(ip);
+                		break;
+        			}
+        		}
+        	}
+        	
+        	System.out.println(cmbServer.getValue().toString());
         	for (String engine : ServerContainer.getServerEngines((String)cmbServer.getValue())){
         		cmbEngine.addItem(engine);
         	}
         } catch (NullPointerException e) {
         	//no servers to connect to, leaving the options empty
+        } catch (Exception e) {
+        	e.printStackTrace();
         }
-        //old codes
-        /*String[] engines = getServerDetails(fntsServers.get(0));
-        if (engines[0].matches("error")) {
-        	Notification.show("Whoops", engines[1], Notification.Type.WARNING_MESSAGE);
-        } else {
-        	for (String engine: engines) {
-        		cmbEngine.addItem(engine);
-        	}
-        	for (String server: fntsServers) {
-        		cmbServer.addItem(server);
-        	}
-        }*/
+        
+        
+        listTests.setReadOnly(true);
         cmbServer.setImmediate(true);
         cmbServer.addListener(new Property.ValueChangeListener() {
 			
 			@Override
 			public void valueChange(ValueChangeEvent event) {
-				for (String engine : ServerContainer.getServerEngines((String)cmbServer.getValue())){
-		        	cmbEngine.addItem(engine);
-		        }
+				try {
+					for (String engine : ServerContainer.getServerEngines((String)cmbServer.getValue())){
+						cmbEngine.addItem(engine);
+					}
+				} catch (NullPointerException e) {
+					//...why are you doing this to me, Jens?
+					e.printStackTrace();
+				}
 			}
 		});
         
         //buttons for confirmation window
-        Button btnAccept = new Button("Run tests",
-        		new Button.ClickListener() {
-					public void buttonClick(ClickEvent event) {
-						if (markedRows.isEmpty()) {
-							
+        Button btnAccept = new Button("Run tests", new Button.ClickListener() {
+			public void buttonClick(ClickEvent event) {
+				if (markedRows.isEmpty()) {
+						
+				} else {
+					// send test request to FNTS
+					Map<String, String> map = new HashMap<String, String>();
+					map.put("testCaseName", textCaseName.getValue());
+			       	
+					//adding test script names
+					String tests = "";
+					for (Iterator i = markedRows.iterator(); i.hasNext();) {
+						Script item = (Script) i.next();
+						if (tests == "") {
+							tests = item.getName();
 						} else {
-							// send test request to FNTS
-							XmlRpcContact xmlrpc = new XmlRpcContact();
-	            		
-							Map<String, String> map = new HashMap<String, String>();
-							map.put("testCaseName", textCaseName.getValue());
-			        	
-							//adding test script names
-							String tests = "";
-							for (Iterator i = markedRows.iterator(); i.hasNext();) {
-								Script item = (Script) i.next();
-								if (tests == "") {
-									tests = item.getName();
-								}
-								else {
-									tests = tests + ", " + item.getName();
-								}
-							}
-			        	
-							map.put("scripts", tests);
-							System.out.println(tests);
-							map.put("engine", (String)cmbEngine.getValue());
-							map.put("tolerance", (String)textTolerance.getValue());
-							map.put("runtimes", (String)textRuntimes.getValue());
-			        	
-							xmlrpc.executeParallelTests((String)cmbServer.getValue(), map, MideaasConfig.getExecutorNumber());
-							UI.getCurrent().removeWindow(confirmTests);
+							tests = tests + ", " + item.getName();
 						}
 					}
-				});
-        Button btnCancel = new Button("Cancel", 
-        		new Button.ClickListener() {
-					public void buttonClick(ClickEvent event) {
-						// go back to main window
-						UI.getCurrent().removeWindow(confirmTests);
-					}
-				});
+			        	
+					map.put("scripts", tests);
+					System.out.println(tests);
+					map.put("engine", (String)cmbEngine.getValue());
+					map.put("tolerance", (String)textTolerance.getValue());
+					map.put("runtimes", (String)textRuntimes.getValue());
+			        	
+					XmlRpcContact.executeParallelTests((String)cmbServer.getValue(), map, MideaasConfig.getExecutorNumber());
+					UI.getCurrent().removeWindow(confirmTests);
+				}
+			}
+		});
+        Button btnCancel = new Button("Cancel", new Button.ClickListener() {
+			public void buttonClick(ClickEvent event) {
+				// go back to main window
+				UI.getCurrent().removeWindow(confirmTests);
+			}
+		});
         
         //create the confirmation window layout
         VerticalLayout textAreaLayout = new VerticalLayout();
@@ -163,6 +172,14 @@ public class TestRunConfirmation extends Window {
 		markedRows.clear();
 		markedRows.addAll(rows);
 		//TODO: fntsservers!
+		cmbServer.removeAllItems();
+		String ping = "";
+		for (Server server : ServerContainer.getServerContainer().getItemIds()) {
+			ping = XmlRpcContact.ping(server.getIP());
+			if (ping.matches("pong")) {
+				cmbServer.addItem(server.getIP());
+			}
+		}
 		
 		this.updateList();
 	}
@@ -194,8 +211,7 @@ public class TestRunConfirmation extends Window {
 	}
 	
 	public synchronized String[] getServerDetails(String server) {
-    	XmlRpcContact xmlrpc = new XmlRpcContact();
-    	Map<String, String> result = (HashMap<String, String>)xmlrpc.getServerDetails(server);
+    	Map<String, String> result = (HashMap<String, String>)XmlRpcContact.getServerDetails(server);
     	System.out.println(result.toString());
     	String[] engines = null; 
     	if (result.containsKey("engines")) {

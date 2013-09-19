@@ -31,7 +31,6 @@ public class XmlRpcServerDetails extends Window {
 	
 	protected Window newWindow(){
 		Window settings = new Window("FNTS Server details");
-		final XmlRpcContact xmlrpc = new XmlRpcContact();
 		
 		settings.setWidth("640px");
         settings.setHeight("480px");
@@ -70,12 +69,12 @@ public class XmlRpcServerDetails extends Window {
             		Notification.show("Whoops", "The given server URL is malformed", Notification.Type.ERROR_MESSAGE);
             	}
             	if (url != null) {
-            		String ping = xmlrpc.ping(newServer.getValue());
+            		String ping = XmlRpcContact.ping(newServer.getValue());
             		if (ping.equals("pong")) { //ping succeeded!
             			try {
             				cmbServers.addItem(newServer.getValue());
             				cmbServers.setValue(newServer.getValue());
-            				Map<String, String> result = (HashMap<String, String>)xmlrpc.getServerDetails(newServer.getValue());
+            				Map<String, String> result = (HashMap<String, String>)XmlRpcContact.getServerDetails(newServer.getValue());
             				ServerContainer.addServer(newServer.getValue(), Arrays.asList(result.get("engines").split(" ")));
             				listEngines.setReadOnly(false);
         					listEngines.setValue("");

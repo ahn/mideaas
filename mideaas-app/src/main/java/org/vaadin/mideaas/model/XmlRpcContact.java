@@ -25,7 +25,7 @@ public class XmlRpcContact {
 	
 	volatile List<String> scriptList = new ArrayList<String>();
 	
-	public String ping(String server) {
+	public static String ping(String server) {
 		
 		try{
 			XmlRpcClientConfigImpl config = new XmlRpcClientConfigImpl();
@@ -44,7 +44,7 @@ public class XmlRpcContact {
 	}
 	
 	//executes all tests at once, no threading
-	public Object executeTests(String server, Map<String, String> map) {
+	public static Object executeTests(String server, Map<String, String> map) {
     	Object result = null;
 		
 		try{
@@ -61,7 +61,7 @@ public class XmlRpcContact {
 		return result;
 	}
 	
-	public void executeParallelTests(String server, Map<String, String> map, int NTHREADS) {
+	public static void executeParallelTests(String server, Map<String, String> map, int NTHREADS) {
 		/*
 		 * the executor runs all the tests in separate threads, making better use of FNTS
 		 * this way the page doesn't have to hang until the tests have been executed, they will be reported the instant
@@ -105,7 +105,7 @@ public class XmlRpcContact {
 		for (String test : list) {
 
 			System.out.println("index is " + i);
-			String script = this.getScriptFromFile(test);
+			String script = getScriptFromFile(test);
 			
 			Runnable worker = new XmlRpcRunnable(server, test, script, map, i);
 		    executor.execute(worker);
@@ -117,7 +117,7 @@ public class XmlRpcContact {
 	    executor.shutdown();
 	}
 	
-	public synchronized Object getServerDetails(String server) {
+	public static synchronized Object getServerDetails(String server) {
 		Object result = null;
 		Map<String, String> map = new HashMap<String, String>();
 		map.put("key", "value");
@@ -139,7 +139,7 @@ public class XmlRpcContact {
 		return result; 
 	}
 	
-	public String getScriptFromFile(String scriptName) {
+	public static String getScriptFromFile(String scriptName) {
 		System.out.println(scriptName);
 		Script item = ScriptContainer.getScriptFromContainer(scriptName);
 		System.out.println(item.toString());

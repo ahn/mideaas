@@ -90,6 +90,10 @@ public class MideaasTest extends CustomComponent {
         final com.vaadin.ui.TextField textLocation = new com.vaadin.ui.TextField("Location");
         final com.vaadin.ui.TextField textDescription = new com.vaadin.ui.TextField("Description");
         
+        textName.setRequired(true);
+        textLocation.setRequired(true);
+        textDescription.setRequired(true);
+        
         editorLayout.addComponent(textName);
         editorLayout.addComponent(textLocation);
         editorLayout.addComponent(textDescription);
@@ -177,7 +181,7 @@ public class MideaasTest extends CustomComponent {
             		}
             	} else {
             		//only two possible options, so this should not happen
-            		Notification.show("Whoops", "We have a bad coder!", Notification.Type.WARNING_MESSAGE);
+            		Notification.show("Whoops", "We have a bad coder!", Notification.Type.ERROR_MESSAGE);
             	}
             }
         });
@@ -198,7 +202,7 @@ public class MideaasTest extends CustomComponent {
 
         // size
         table.setWidth("100%");
-        table.setHeight("300px");
+        table.setHeight("200px");
         // selectable
         table.setSelectable(true);
         table.setMultiSelect(true);
