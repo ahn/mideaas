@@ -123,7 +123,9 @@ public class TestRunConfirmation extends Window {
 					map.put("engine", (String)cmbEngine.getValue());
 					map.put("tolerance", (String)textTolerance.getValue());
 					map.put("runtimes", (String)textRuntimes.getValue());
-			        	
+					map.put("gitRepository", "ironclad.labranet.jamk.fi:robot_testing_scripts");
+					map.put("tag", "");
+			       	
 					XmlRpcContact.executeParallelTests((String)cmbServer.getValue(), map, MideaasConfig.getExecutorNumber());
 					UI.getCurrent().removeWindow(confirmTests);
 				}
