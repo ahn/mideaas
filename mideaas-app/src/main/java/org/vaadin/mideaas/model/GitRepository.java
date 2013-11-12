@@ -21,6 +21,7 @@ import org.eclipse.jgit.storage.file.FileRepository;
 import org.eclipse.jgit.transport.CredentialsProvider;
 import org.eclipse.jgit.transport.PushResult;
 import org.eclipse.jgit.transport.RemoteRefUpdate;
+import org.eclipse.jgit.transport.RemoteRefUpdate.Status;
 import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
 
 import com.vaadin.ui.Notification;
@@ -151,13 +152,6 @@ public class GitRepository {
 		}	
 	}
 	
-	
-	/**
-	 * Commit all.
-	 *
-	 * @param msg the msg
-	 * @throws GitAPIException the git api exception
-	 */
 	public void pushAll(String userName, String passWord) throws GitAPIException { 
         // credentials
         CredentialsProvider credentials = null;
@@ -171,11 +165,6 @@ public class GitRepository {
 			for (PushResult result:results){
 				for (RemoteRefUpdate r : result.getRemoteUpdates()) {
 					updates++;
-					// This should check if the push was succesful (?)
-					if (!"OK".equals(r.getStatus())) {
-						Notification.show("Push failed: " + r.getStatus() + " - " + r.getMessage(), Notification.Type.ERROR_MESSAGE);
-						return;
-					}
 				}
 			}
 			if (updates==0){
@@ -195,11 +184,11 @@ public class GitRepository {
 	}
 
 	/**
-	 * Show origin if project has been initialized from remote git repository.
+	 * Get origin if project has been initialized from remote git repository.
 	 *
 	 * @return the string
 	 */
-	public String showOrigin(){
+	public String getOrigin(){
 		StoredConfig config = this.git.getRepository().getConfig();
 		String url = config.getString("remote", "origin", "url");
 		return url;

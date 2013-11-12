@@ -172,7 +172,7 @@ public class MideaasUI extends UI implements LobbyBroadcastListener, MideaasEdit
 			return new ExperimentLoginPanel(this);
 		}
 		else {
-			return new LoginPanel(this, user);
+			return new LoginPanel(this);
 		}
 	}
 
