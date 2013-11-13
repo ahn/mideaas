@@ -122,7 +122,7 @@ public class LoginPanel extends VerticalLayout {
 		button.addListener(new OAuthListener() {
 			@Override
 			public void authSuccessful(String accessToken, String accessTokenSecret) {
-				Twitter twitter = TwitterFactory.getSingleton();
+				Twitter twitter = new TwitterFactory().getInstance();
 				twitter.setOAuthConsumer(key, secret);
 				twitter.setOAuthAccessToken(new AccessToken(accessToken, accessTokenSecret));
 			    try {
