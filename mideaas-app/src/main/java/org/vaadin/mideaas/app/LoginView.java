@@ -18,6 +18,8 @@ import twitter4j.auth.AccessToken;
 
 import com.restfb.DefaultFacebookClient;
 import com.restfb.FacebookClient;
+import com.vaadin.navigator.View;
+import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
@@ -28,26 +30,34 @@ import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
 
 @SuppressWarnings("serial")
-public class LoginPanel extends VerticalLayout {
+public class LoginView extends VerticalLayout implements View {
 	
+    private final MideaasUI ui;
+	private final String nextView;
 
-    private MideaasUI ui;
-
-	private TextField simpleLoginField;
+	private TextField loginField;
 	private TextField emailField;
+
 	
-    public LoginPanel(MideaasUI ui) {
-        this.ui = ui;
+    public LoginView(MideaasUI ui, String nextView) {
+    	this.ui = ui;
+    	this.nextView = nextView;
         setMargin(true);
-    	initLogin();
+        initLogin();
     }
+    
+    @Override
+	public void enter(ViewChangeEvent event) {
+    	
+	}
 
 	/**
 	 * Inits the loginscreen.
 	 */
 	private void initLogin() {
-		simpleLoginField = new TextField("Nick:");
-		addComponent(simpleLoginField);
+		System.out.println("initLogin");
+		loginField = new TextField("Nick:");
+		addComponent(loginField);
 		
 		emailField = new TextField("Email (optional):");
 		addComponent(emailField);
@@ -56,7 +66,7 @@ public class LoginPanel extends VerticalLayout {
 		Button simpleLoginButton = new Button("Login");
 		simpleLoginButton.addClickListener(new ClickListener() {
 			public void buttonClick(ClickEvent event) {
-				String nick = (String) simpleLoginField.getValue();
+				String nick = (String) loginField.getValue();
 				if (!nick.isEmpty()) {
 					login(User.newUser(nick));
 				}
@@ -122,7 +132,7 @@ public class LoginPanel extends VerticalLayout {
 		button.addListener(new OAuthListener() {
 			@Override
 			public void authSuccessful(String accessToken, String accessTokenSecret) {
-				Twitter twitter = TwitterFactory.getSingleton();
+				Twitter twitter = new TwitterFactory().getInstance();
 				twitter.setOAuthConsumer(key, secret);
 				twitter.setOAuthAccessToken(new AccessToken(accessToken, accessTokenSecret));
 			    try {
@@ -177,7 +187,10 @@ public class LoginPanel extends VerticalLayout {
 	}
 
 	private void login(User user) {
-		ui.loggedIn(user);
+		ui.setUser(user);
+		ui.navigateTo(nextView);
 	}
+
+	
 
 }

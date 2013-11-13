@@ -649,10 +649,14 @@ public class SharedProject {
 	 *            the user
 	 */
 	public void addUser(User user) {
+		boolean added;
 		synchronized (this) {
-			users.add(user);
+			added = users.add(user);
 		}
-		// TODO: should we fire some changed event?
+		if (added) {
+			getChat().addLine(user.getName() + " joined");
+			// TODO: should we fire some changed event?
+		}
 	}
 
 	/**
@@ -661,12 +665,13 @@ public class SharedProject {
 	 * @param user
 	 *            the user
 	 */
-	public void removeFromProject(User user) {
+	public void removeUser(User user) {
 		boolean removed;
 		synchronized (this) {
 			removed = users.remove(user);
 		}
 		if (removed) {
+			getChat().addLine(user.getName() + " left");
 			// TODO fire something?
 		}
 	}
@@ -690,7 +695,7 @@ public class SharedProject {
 	public static void removeFromProjects(User user) {
 		synchronized (projects) {
 			for (SharedProject project : projects.values()) {
-				project.removeFromProject(user);
+				project.removeUser(user);
 			}
 		}
 	}

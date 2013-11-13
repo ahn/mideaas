@@ -1,7 +1,6 @@
 package org.vaadin.mideaas.app;
 
 import org.vaadin.mideaas.frontend.Icons;
-import org.vaadin.mideaas.model.LobbyBroadcaster;
 import org.vaadin.mideaas.model.SharedProject;
 import org.vaadin.mideaas.model.User;
 
@@ -41,7 +40,7 @@ public class RemoveProjectWindow extends Window {
 					boolean removed = SharedProject.removeProject(projectName);
 					if (removed) {
 						SharedProject.removeProject(projectName);
-				        LobbyBroadcaster.broadcast(user.getName() + " removed project: " + projectName);
+				        //LobbyBroadcaster.broadcast(user.getName() + " removed project: " + projectName);
 					}
 					else {
 						Notification.show("Failed to remove "+projectName+"!");

@@ -82,24 +82,29 @@ public class SelectProjectPanel extends Panel implements
 		this.ui = ui;
 		setIcon(Icons.BOX_ARROW);
 		
-		//adds items to table
+		update();
+	}
+	
+	public void update() {
+		table.removeAllItems();
+		
 		Collection<String> projects = SharedProject.getProjectNames();
 		for (String projectName : projects) {
 			List<User> users = SharedProject.getProjectUsers(projectName);
 			String collabStr = createCollabString(users);
 			table.addItem(new Object[] { projectName, collabStr }, projectName);
 		}
-		
-		//creates layouts and layouts components
+
+		// creates layouts and layouts components
 		VerticalLayout layout = new VerticalLayout();
 		layout.addComponent(table);
-		
+
 		HorizontalLayout hl = new HorizontalLayout();
 		hl.setWidth("100%");
 		hl.addComponent(removeProjectButton);
 		hl.addComponent(openProjectButton);
 		hl.setExpandRatio(openProjectButton, 1);
-		
+
 		layout.addComponent(hl);
 		this.setContent(layout);
 	}
