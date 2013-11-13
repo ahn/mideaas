@@ -1,51 +1,56 @@
 package org.vaadin.mideaas.app;
 
-import org.vaadin.mideaas.model.User;
-import org.vaadin.oauth.FBUser;
-import org.vaadin.oauth.FacebookButton;
-import org.vaadin.oauth.OAuthButton.OAuthListener;
+import java.io.IOException;
 
-import com.vaadin.server.Page;
+import org.kohsuke.github.GHMyself;
+import org.kohsuke.github.GitHub;
+import org.vaadin.addon.oauthpopupbuttons.OAuthListener;
+import org.vaadin.addon.oauthpopupbuttons.buttons.FacebookButton;
+import org.vaadin.addon.oauthpopupbuttons.buttons.TwitterButton;
+import org.vaadin.mideaas.app.MideaasConfig.Prop;
+import org.vaadin.mideaas.model.User;
+import org.vaadin.mideaas.model.UserToken.Service;
+
+import twitter4j.Twitter;
+import twitter4j.TwitterException;
+import twitter4j.TwitterFactory;
+import twitter4j.auth.AccessToken;
+
+import com.restfb.DefaultFacebookClient;
+import com.restfb.FacebookClient;
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Button.ClickListener;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Notification;
-import com.vaadin.ui.Panel;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
 
 @SuppressWarnings("serial")
-public class LoginPanel extends Panel implements OAuthListener {
+public class LoginPanel extends VerticalLayout {
+	
 
     private MideaasUI ui;
 
-    private VerticalLayout mainLayout = new VerticalLayout();
 	private TextField simpleLoginField;
 	private TextField emailField;
-
-	private User user;
 	
-    public LoginPanel(MideaasUI ui, User user) {
+    public LoginPanel(MideaasUI ui) {
         this.ui = ui;
-        this.user = user;
-        this.setContent(mainLayout);
-        mainLayout.setMargin(true);
-        mainLayout.setSizeFull();
-		mainLayout.removeAllComponents();
-    	initSimpleLogin();
+        setMargin(true);
+    	initLogin();
     }
 
 	/**
 	 * Inits the loginscreen.
 	 */
-	private void initSimpleLogin() {
+	private void initLogin() {
 		simpleLoginField = new TextField("Nick:");
-		mainLayout.addComponent(simpleLoginField);
+		addComponent(simpleLoginField);
 		
 		emailField = new TextField("Email (optional):");
-		mainLayout.addComponent(emailField);
+		addComponent(emailField);
 		
 		//button that fires the login action
 		Button simpleLoginButton = new Button("Login");
@@ -53,65 +58,126 @@ public class LoginPanel extends Panel implements OAuthListener {
 			public void buttonClick(ClickEvent event) {
 				String nick = (String) simpleLoginField.getValue();
 				if (!nick.isEmpty()) {
-					User user= User.newUser(nick);
-					setLoggedInUser(user);
-					ui.loggedIn(user);
+					login(User.newUser(nick));
 				}
 			}
 		});
-		mainLayout.addComponent(simpleLoginButton);
+		addComponent(simpleLoginButton);
 		
-		mainLayout.addComponent(new Label("&nbsp;", ContentMode.HTML));
-
-		FacebookButton button = new FacebookButton("141905209336309", "9770d931e88104028e07cda983b33ab5", this);
-		mainLayout.addComponent(button);
+		addComponent(new Label("&nbsp;", ContentMode.HTML));
+		
+		FacebookButton fbButton = createFacebookButton();
+		if (fbButton!=null) {
+			addComponent(fbButton);
+		}
+		
+		TwitterButton twButton = createTwitterButton();
+		if (twButton!=null) {
+			addComponent(twButton);
+		}
+		
+		GitHubButton ghButton = createGitHubButton();
+		if (ghButton!=null) {
+			addComponent(ghButton);
+		}
 	}
 
 
-	private void drawLoggedIn() {
-		mainLayout.removeAllComponents();
-		mainLayout.addComponent(new Label("Logged in as " + user.getName()));
-		Button logout = new Button("Log out");
-		logout.addClickListener(new ClickListener() {
-			public void buttonClick(ClickEvent event) {
-				setLoggedInUser(null);
+	private FacebookButton createFacebookButton() {
+		String key = MideaasConfig.getProperty(Prop.FACEBOOK_KEY);
+		String secret = MideaasConfig.getProperty(Prop.FACEBOOK_SECRET);
+		if (key==null || secret==null) {
+			return null;
+		}
+
+		FacebookButton button = new FacebookButton(key, secret);
+		button.setCaption("Login with Facebook");
+		button.addListener(new OAuthListener() {
+			@Override
+			public void authSuccessful(String accessToken, String accessTokenSecret) {
+				FacebookClient client = new DefaultFacebookClient(accessToken);
+				com.restfb.types.User me = client.fetchObject("me", com.restfb.types.User.class);
+				User user = User.newUser(me.getName());
+				user.setToken(Service.FACEBOOK, accessToken, accessTokenSecret);
+				login(user);
+			}
+			
+			@Override
+			public void authFailed(String reason) {
+				Notification.show("Not authenticated.");
 			}
 		});
-		mainLayout.addComponent(logout);
+		return button;
 	}
 	
-	public interface LoggedInUserListener {
-		void loggedInUserChanged(User user);
+	private TwitterButton createTwitterButton() {
+		final String key = MideaasConfig.getProperty(Prop.TWITTER_KEY);
+		final String secret = MideaasConfig.getProperty(Prop.TWITTER_SECRET);
+		if (key==null || secret==null) {
+			return null;
+		}
+
+		TwitterButton button = new TwitterButton(key, secret);
+		button.setCaption("Login with Twitter");
+		button.addListener(new OAuthListener() {
+			@Override
+			public void authSuccessful(String accessToken, String accessTokenSecret) {
+				Twitter twitter = TwitterFactory.getSingleton();
+				twitter.setOAuthConsumer(key, secret);
+				twitter.setOAuthAccessToken(new AccessToken(accessToken, accessTokenSecret));
+			    try {
+			    	User user = User.newUser(twitter.getScreenName());
+			    	user.setToken(Service.TWITTER, accessToken, accessTokenSecret);
+					login(user);
+				} catch (TwitterException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				
+			}
+			
+			@Override
+			public void authFailed(String reason) {
+				Notification.show("Not authenticated.");
+			}
+		});
+		return button;
+	}
+	
+	private GitHubButton createGitHubButton() {
+		String key = MideaasConfig.getProperty(Prop.GITHUB_KEY);
+		String secret = MideaasConfig.getProperty(Prop.GITHUB_SECRET);
+		if (key==null || secret==null) {
+			return null;
+		}
+
+		GitHubButton button = new GitHubButton(key, secret);
+		button.setCaption("Login with GitHub");
+		button.addListener(new OAuthListener() {
+			@Override
+			public void authSuccessful(String accessToken, String accessTokenSecret) {
+				try {
+					GitHub client = GitHub.connectUsingOAuth(accessToken);
+					GHMyself me = client.getMyself();
+					User user = User.newUser(me.getName());
+					user.setToken(Service.GITHUB, accessToken, accessTokenSecret);
+					login(user);
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+			
+			@Override
+			public void authFailed(String reason) {
+				Notification.show("Not authenticated.");
+			}
+		});
+		return button;
 	}
 
-	public void setLoggedInUser(User user) {
-		if (user == null && this.user != null) {
-			this.user = null;
-			attach();
-		} else if (user != null
-				&& (this.user == null || this.user.getUserId() != user
-						.getUserId())) {
-			this.user = user;
-			drawLoggedIn();
-		}
+	private void login(User user) {
+		ui.loggedIn(user);
 	}
 
-	@Override
-	public void userAuthenticated(org.vaadin.oauth.OAuthButton.User fbuser) {
-		FBUser user= FBUser.newFBUser(fbuser);
-		if (user!=null){
-			setLoggedInUser(user);
-			ui.loggedIn(user);
-		}else{
-			failed("User already logged in...");
-		}
-	}
-
-	@Override
-	public void failed(String reason) {
-		ui.logout();
-		if(Page.getCurrent()!=null) { // ???
-			Notification.show(reason);
-		}
-	}
 }

@@ -2,10 +2,13 @@ package org.vaadin.mideaas.app;
 
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.vaadin.addon.oauthpopupbuttons.OAuthListener;
+import org.vaadin.mideaas.app.MideaasConfig.Prop;
 import org.vaadin.mideaas.frontend.MideaasEditorPlugin;
 import org.vaadin.mideaas.model.GitRepository;
 import org.vaadin.mideaas.model.SharedProject;
 import org.vaadin.mideaas.model.User;
+import org.vaadin.mideaas.model.UserToken;
+import org.vaadin.mideaas.model.UserToken.Service;
 
 import com.vaadin.server.Sizeable.Unit;
 import com.vaadin.ui.Button;
@@ -24,8 +27,8 @@ import com.vaadin.ui.Window;
 @SuppressWarnings("serial")
 public class GitPlugin implements MideaasEditorPlugin {
 	
-	private static final String GITHUB_KEY = "97a7e251c538106e7922";
-	private static final String GITHUB_SECRET = "6a36b0992e5e2b00a38c44c21a6e0dc8ae01d83b";
+	private static final String GITHUB_KEY = MideaasConfig.getProperty(Prop.GITHUB_KEY);
+	private static final String GITHUB_SECRET = MideaasConfig.getProperty(Prop.GITHUB_SECRET);
 	
 	public class PushWindow extends Window {
 		
@@ -41,8 +44,9 @@ public class GitPlugin implements MideaasEditorPlugin {
 			layout.setMargin(true);
 			setContent(layout);
 			
-			if (user.getOAuthToken()!=null) {
-				pushable();
+			UserToken token = user.getToken(UserToken.Service.GITHUB);
+			if (token!=null) {
+				pushable(token);
 			}
 			else {
 				notPushable();
@@ -60,20 +64,19 @@ public class GitPlugin implements MideaasEditorPlugin {
 			ghb.addListener(new OAuthListener() {
 				@Override
 				public void authSuccessful(String accessToken, String accessTokenSecret) {
-					user.setOAuthToken(accessToken);
-					pushable();
+					user.setToken(Service.GITHUB, accessToken, accessTokenSecret);
+					pushable(user.getToken(Service.GITHUB));
 				}
 				
 				@Override
 				public void authFailed(String reason) {
-					// TODO Auto-generated method stub
-					
+					Notification.show("Not authorized.");
 				}
 			});
 			layout.addComponent(ghb);
 		}
 
-		private void pushable() {
+		private void pushable(final UserToken token) {
 			layout.removeAllComponents();
 			
 			layout.addComponent(new Label("Authorized with GitHub"));
@@ -84,7 +87,7 @@ public class GitPlugin implements MideaasEditorPlugin {
 				@Override
 				public void buttonClick(ClickEvent event) {
 					try {
-						gitPush(user.getOAuthToken());
+						gitPush(token.getToken());
 					} catch (GitAPIException e) {
 						Notification.show(e.getMessage(), Notification.Type.ERROR_MESSAGE);
 						e.printStackTrace();
@@ -124,6 +127,10 @@ public class GitPlugin implements MideaasEditorPlugin {
 
 	
 	private Command createPushCommand() {
+		if (GITHUB_KEY==null || GITHUB_SECRET==null) {
+			return null;
+		}
+		
 		return new Command() {
 			@Override
 			public void menuSelected(MenuItem selectedItem) {

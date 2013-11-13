@@ -8,16 +8,17 @@ public class User implements Comparable<User> {
 
 	private static Integer latestUserId = 0;
 
-	protected final String userId;
-	protected final String name;
+	private final String userId;
+	private final String name;
 
-	private String oauthToken = null;
+	private HashMap<UserToken.Service, UserToken> tokens =
+			new HashMap<UserToken.Service, UserToken>();
 	
 	synchronized protected void putUser(User u) {
 		users.put(u.getUserId(), u);
 	}
 
-	synchronized public static User getUser(String userId) {
+	synchronized static public User getUser(String userId) {
 		return users.get(userId);
 	}
 
@@ -43,6 +44,14 @@ public class User implements Comparable<User> {
 	public String getName() {
 		return name;
 	}
+	
+	synchronized public void setToken(UserToken.Service service, String token, String secret) {
+		tokens.put(service, new UserToken(service, token, secret));
+	}
+	
+	synchronized public UserToken getToken(UserToken.Service service) {
+		return tokens.get(service);
+	}
 
 	@Override
 	public boolean equals(Object obj) {
@@ -55,14 +64,6 @@ public class User implements Comparable<User> {
 	@Override
 	public int hashCode() {
 		return userId.hashCode();
-	}
-
-	public String getOAuthToken() {
-		return oauthToken;
-	}
-
-	public void setOAuthToken(String value1) {
-		oauthToken = value1;
 	}
 
 	@Override
@@ -80,4 +81,6 @@ public class User implements Comparable<User> {
 		}
 		return c;
 	}
+	
+	
 }
