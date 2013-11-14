@@ -7,8 +7,9 @@ import org.vaadin.mideaas.frontend.MideaasEditorPlugin;
 import org.vaadin.mideaas.model.GitRepository;
 import org.vaadin.mideaas.model.SharedProject;
 import org.vaadin.mideaas.model.User;
-import org.vaadin.mideaas.model.UserToken;
-import org.vaadin.mideaas.model.UserToken.Service;
+import org.vaadin.mideaas.social.UserProfile;
+import org.vaadin.mideaas.social.UserToken;
+import org.vaadin.mideaas.social.OAuthService.Service;
 
 import com.vaadin.server.Sizeable.Unit;
 import com.vaadin.ui.Button;
@@ -44,9 +45,9 @@ public class GitPlugin implements MideaasEditorPlugin {
 			layout.setMargin(true);
 			setContent(layout);
 			
-			UserToken token = user.getToken(UserToken.Service.GITHUB);
-			if (token!=null) {
-				pushable(token);
+			UserProfile profile = user.getProfile(Service.GITHUB);
+			if (profile!=null) {
+				pushable(profile.getToken());
 			}
 			else {
 				notPushable();
