@@ -1,23 +1,16 @@
 package org.vaadin.mideaas.app;
 
-import java.io.IOException;
-
-import org.kohsuke.github.GHMyself;
-import org.kohsuke.github.GitHub;
 import org.vaadin.addon.oauthpopupbuttons.OAuthListener;
+import org.vaadin.addon.oauthpopupbuttons.OAuthPopupButton;
 import org.vaadin.addon.oauthpopupbuttons.buttons.FacebookButton;
 import org.vaadin.addon.oauthpopupbuttons.buttons.TwitterButton;
 import org.vaadin.mideaas.app.MideaasConfig.Prop;
 import org.vaadin.mideaas.model.User;
-import org.vaadin.mideaas.model.UserToken.Service;
+import org.vaadin.mideaas.social.OAuthService;
+import org.vaadin.mideaas.social.UserProfile;
+import org.vaadin.mideaas.social.UserToken;
+import org.vaadin.mideaas.social.OAuthService.Service;
 
-import twitter4j.Twitter;
-import twitter4j.TwitterException;
-import twitter4j.TwitterFactory;
-import twitter4j.auth.AccessToken;
-
-import com.restfb.DefaultFacebookClient;
-import com.restfb.FacebookClient;
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
 import com.vaadin.shared.ui.label.ContentMode;
@@ -76,85 +69,45 @@ public class LoginView extends VerticalLayout implements View {
 		
 		addComponent(new Label("&nbsp;", ContentMode.HTML));
 		
-		FacebookButton fbButton = createFacebookButton();
+		OAuthPopupButton fbButton = createFacebookButton();
 		if (fbButton!=null) {
 			addComponent(fbButton);
 		}
 		
-		TwitterButton twButton = createTwitterButton();
+		OAuthPopupButton twButton = createTwitterButton();
 		if (twButton!=null) {
 			addComponent(twButton);
 		}
 		
-		GitHubButton ghButton = createGitHubButton();
+		OAuthPopupButton ghButton = createGitHubButton();
 		if (ghButton!=null) {
 			addComponent(ghButton);
 		}
 	}
-
-
-	private FacebookButton createFacebookButton() {
+	
+	private OAuthPopupButton createFacebookButton() {
 		String key = MideaasConfig.getProperty(Prop.FACEBOOK_KEY);
 		String secret = MideaasConfig.getProperty(Prop.FACEBOOK_SECRET);
 		if (key==null || secret==null) {
 			return null;
 		}
-
 		FacebookButton button = new FacebookButton(key, secret);
 		button.setCaption("Login with Facebook");
-		button.addListener(new OAuthListener() {
-			@Override
-			public void authSuccessful(String accessToken, String accessTokenSecret) {
-				FacebookClient client = new DefaultFacebookClient(accessToken);
-				com.restfb.types.User me = client.fetchObject("me", com.restfb.types.User.class);
-				User user = User.newUser(me.getName());
-				user.setToken(Service.FACEBOOK, accessToken, accessTokenSecret);
-				login(user);
-			}
-			
-			@Override
-			public void authFailed(String reason) {
-				Notification.show("Not authenticated.");
-			}
-		});
-		return button;
+		return initButton(button, Service.FACEBOOK, key, secret);
 	}
 	
-	private TwitterButton createTwitterButton() {
+	private OAuthPopupButton createTwitterButton() {
 		final String key = MideaasConfig.getProperty(Prop.TWITTER_KEY);
 		final String secret = MideaasConfig.getProperty(Prop.TWITTER_SECRET);
 		if (key==null || secret==null) {
 			return null;
 		}
-
 		TwitterButton button = new TwitterButton(key, secret);
 		button.setCaption("Login with Twitter");
-		button.addListener(new OAuthListener() {
-			@Override
-			public void authSuccessful(String accessToken, String accessTokenSecret) {
-				Twitter twitter = new TwitterFactory().getInstance();
-				twitter.setOAuthConsumer(key, secret);
-				twitter.setOAuthAccessToken(new AccessToken(accessToken, accessTokenSecret));
-			    try {
-			    	User user = User.newUser(twitter.getScreenName());
-			    	user.setToken(Service.TWITTER, accessToken, accessTokenSecret);
-					login(user);
-				} catch (TwitterException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-				
-			}
-			
-			@Override
-			public void authFailed(String reason) {
-				Notification.show("Not authenticated.");
-			}
-		});
-		return button;
+		return initButton(button, Service.TWITTER, key, secret);
 	}
 	
-	private GitHubButton createGitHubButton() {
+	private OAuthPopupButton createGitHubButton() {
 		String key = MideaasConfig.getProperty(Prop.GITHUB_KEY);
 		String secret = MideaasConfig.getProperty(Prop.GITHUB_SECRET);
 		if (key==null || secret==null) {
@@ -163,21 +116,23 @@ public class LoginView extends VerticalLayout implements View {
 
 		GitHubButton button = new GitHubButton(key, secret);
 		button.setCaption("Login with GitHub");
+		return initButton(button, Service.GITHUB, key, secret);
+	}
+	
+	private OAuthPopupButton initButton(OAuthPopupButton button, final Service service, final String key, final String secret) {
 		button.addListener(new OAuthListener() {
 			@Override
 			public void authSuccessful(String accessToken, String accessTokenSecret) {
-				try {
-					GitHub client = GitHub.connectUsingOAuth(accessToken);
-					GHMyself me = client.getMyself();
-					User user = User.newUser(me.getName());
-					user.setToken(Service.GITHUB, accessToken, accessTokenSecret);
-					login(user);
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+				UserToken token = new UserToken(accessToken, accessTokenSecret);
+				OAuthService serv = OAuthService.createService(service, key, secret, token);
+				UserProfile profile = serv.getUserProfile();
+				if (profile != null) {
+					login(User.newUser(profile));
+				}
+				else {
+					Notification.show("Not authenticated.");
 				}
 			}
-			
 			@Override
 			public void authFailed(String reason) {
 				Notification.show("Not authenticated.");
@@ -185,6 +140,8 @@ public class LoginView extends VerticalLayout implements View {
 		});
 		return button;
 	}
+	
+	
 
 	private void login(User user) {
 		ui.setUser(user);
