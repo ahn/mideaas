@@ -2,6 +2,7 @@ package org.vaadin.mideaas.model;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -59,6 +60,18 @@ public class LobbyBroadcaster {
             public void run() {
                 for (LobbyBroadcastListener listener : listenersCopy) {
                     listener.projectsChanged();
+                }
+            }
+        });
+	}
+
+	public static void broadcastLoggedInUsersChanged(final Set<User> users) {
+        final Collection<LobbyBroadcastListener> listenersCopy = getListeners();
+        pool.submit(new Runnable() {
+            @Override
+            public void run() {
+                for (LobbyBroadcastListener listener : listenersCopy) {
+                    listener.loggedInUsersChanged(users);
                 }
             }
         });

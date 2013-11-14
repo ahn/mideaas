@@ -2,6 +2,8 @@ package org.vaadin.mideaas.app;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Set;
+import java.util.TreeSet;
 
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.vaadin.mideaas.app.MideaasConfig.Prop;
@@ -31,6 +33,28 @@ import com.vaadin.ui.UI;
 @Push
 public class MideaasUI extends UI {
 
+	private static TreeSet<User> loggedInUsers = new TreeSet<User>();
+	static void addUser(User user) {
+		synchronized (MideaasUI.class) {
+			loggedInUsers.add(user);
+		}
+		LobbyView.getLobbyChat().addLine(user.getName()+" logged in");
+		LobbyBroadcaster.broadcastLoggedInUsersChanged(getLoggedInUsers());
+	}
+	
+	static void removeUser(User user) {
+		synchronized (MideaasUI.class) {
+			loggedInUsers.remove(user);
+		}
+		SharedProject.removeFromProjects(user);
+		LobbyView.getLobbyChat().addLine(user.getName()+" left");
+		LobbyBroadcaster.broadcastLoggedInUsersChanged(getLoggedInUsers());
+	}
+	
+	synchronized static Set<User> getLoggedInUsers() {
+		return new TreeSet<User>(loggedInUsers);
+	}
+	
 	private Navigator navigator;
 	
 	private User user;
@@ -147,7 +171,7 @@ public class MideaasUI extends UI {
 	
 	private void broadcastNewProject(String projectName) {
 		LobbyBroadcaster.broadcastProjectsChanged();
-		LobbyView.getLobbyChat().addLine(user.getName()+" created project "+projectName);
+		LobbyView.getLobbyChat().addLine(getUser().getName()+" created project "+projectName);
 	}
 
 	/**
@@ -158,7 +182,7 @@ public class MideaasUI extends UI {
 	 *            the name of the project to be destroyer
 	 */
 	public void removeProject(String projectName) {
-		RemoveProjectWindow window = new RemoveProjectWindow(user, projectName);
+		RemoveProjectWindow window = new RemoveProjectWindow(getUser(), projectName);
 		UI.getCurrent().addWindow(window);
 	}
 
@@ -190,12 +214,11 @@ public class MideaasUI extends UI {
 			return;
 		}
 		if (this.user!=null) {
-			SharedProject.removeFromProjects(this.user);
-			LobbyView.getLobbyChat().addLine(this.user.getName()+" left");
+			removeUser(this.user);
 		}
 		this.user = user;
 		if (user!=null) {
-			LobbyView.getLobbyChat().addLine(user.getName()+" logged in");
+			addUser(user);
 		}
 		else {
 			navigateTo("");

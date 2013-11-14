@@ -36,6 +36,7 @@ public class LoginView extends VerticalLayout implements View {
     	this.ui = ui;
     	this.nextView = nextView;
         setMargin(true);
+        setSpacing(true);
         initLogin();
     }
     
@@ -48,7 +49,6 @@ public class LoginView extends VerticalLayout implements View {
 	 * Inits the loginscreen.
 	 */
 	private void initLogin() {
-		System.out.println("initLogin");
 		loginField = new TextField("Nick:");
 		addComponent(loginField);
 		
