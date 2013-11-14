@@ -1,8 +1,11 @@
 package org.vaadin.mideaas.app;
 
+import java.util.Set;
+
 import org.vaadin.chatbox.ChatBox;
 import org.vaadin.chatbox.SharedChat;
 import org.vaadin.chatbox.client.ChatUser;
+import org.vaadin.mideaas.frontend.HorizontalUserList;
 import org.vaadin.mideaas.model.LobbyBroadcastListener;
 import org.vaadin.mideaas.model.LobbyBroadcaster;
 import org.vaadin.mideaas.model.User;
@@ -32,6 +35,8 @@ public class LobbyView extends VerticalLayout implements View, LobbyBroadcastLis
 	private User user;
 	
 	private SelectProjectPanel selectProjectPanel;
+	
+	private HorizontalUserList userList;
 
 	public LobbyView(MideaasUI ui) {
 		this.ui = ui;
@@ -86,6 +91,11 @@ public class LobbyView extends VerticalLayout implements View, LobbyBroadcastLis
 			rightLayout.addComponent(initUploadPanel());
 			rightLayout.addComponent(initGitProjectPanel());
 		}
+		
+		userList = new HorizontalUserList(MideaasUI.getLoggedInUsers());
+		
+		addComponent(userList);
+		
 		ChatBox box = new ChatBox(chat);
 		box.setSizeFull();
 		box.setWidth("100%");
@@ -151,6 +161,17 @@ public class LobbyView extends VerticalLayout implements View, LobbyBroadcastLis
 			@Override
 			public void run() {
 				selectProjectPanel.update();
+			}
+		});
+	}
+
+	@Override
+	public void loggedInUsersChanged(final Set<User> users) {
+		System.out.println("loggedInUsersChanged! " + users.size());
+		getUI().access(new Runnable() {
+			@Override
+			public void run() {
+				userList.setUsers(users);
 			}
 		});
 	}

@@ -1,6 +1,5 @@
 package org.vaadin.mideaas.social;
 
-import org.vaadin.mideaas.model.TwitterService;
 
 public abstract class OAuthService {
 	

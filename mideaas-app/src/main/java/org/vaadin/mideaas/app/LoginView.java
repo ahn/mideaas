@@ -36,6 +36,7 @@ public class LoginView extends VerticalLayout implements View {
     	this.ui = ui;
     	this.nextView = nextView;
         setMargin(true);
+        setSpacing(true);
         initLogin();
     }
     
