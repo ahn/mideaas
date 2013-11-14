@@ -7,6 +7,8 @@ import org.vaadin.mideaas.model.LobbyBroadcastListener;
 import org.vaadin.mideaas.model.LobbyBroadcaster;
 import org.vaadin.mideaas.model.User;
 
+import com.vaadin.navigator.View;
+import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Button.ClickListener;
@@ -17,7 +19,7 @@ import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.BaseTheme;
 
 @SuppressWarnings("serial")
-public class LobbyPanel extends Panel implements LobbyBroadcastListener {
+public class LobbyView extends VerticalLayout implements View, LobbyBroadcastListener {
 
 	// XXX Is this the right place to store this?
 	private static SharedChat chat = new SharedChat();
@@ -28,24 +30,26 @@ public class LobbyPanel extends Panel implements LobbyBroadcastListener {
 
 	final private MideaasUI ui;
 	private User user;
-
-	private VerticalLayout layout = new VerticalLayout();
-
+	
 	private SelectProjectPanel selectProjectPanel;
 
-	public LobbyPanel(MideaasUI ui, User user) {
+	public LobbyView(MideaasUI ui) {
 		this.ui = ui;
-		this.user = user;
-		this.setContent(layout);
-		layout.setMargin(true);
-		layout.setSizeFull();
+		setSizeFull();
 	}
-
+	
 	@Override
-	public void attach() {
-		super.attach();
-		initLobbyPanel();
-		LobbyBroadcaster.register(this);
+	public void enter(ViewChangeEvent event) {
+		user = ui.getUser();
+		if (user!=null) {
+			setMargin(true);
+			initLobbyPanel();
+			LobbyBroadcaster.register(this);
+		}
+		else {
+			setMargin(false);
+			addComponent(new LoginView(ui, "lobby"));
+		}
 	}
 
 	@Override
@@ -56,15 +60,15 @@ public class LobbyPanel extends Panel implements LobbyBroadcastListener {
 
 	private void initLobbyPanel() {
 
-		layout.removeAllComponents();
+		removeAllComponents();
 
 		HorizontalLayout horizLayout = new HorizontalLayout();
 		horizLayout.setWidth("100%");
 
-		layout.addComponent(initLogoutButton(user));
+		addComponent(initLogoutButton(user));
 
-		layout.addComponent(horizLayout);
-		layout.setExpandRatio(horizLayout, 1);
+		addComponent(horizLayout);
+		setExpandRatio(horizLayout, 1);
 
 		VerticalLayout leftLayout = new VerticalLayout();
 		VerticalLayout rightLayout = new VerticalLayout();
@@ -88,7 +92,7 @@ public class LobbyPanel extends Panel implements LobbyBroadcastListener {
 		box.setHeight("200px");
 		box.setUser(new ChatUser(user.getUserId(), user.getName(), "user1"));
 		box.setShowSendButton(false);
-		layout.addComponent(new Panel("Lobby Chat", box));
+		addComponent(new Panel("Lobby Chat", box));
 	}
 
 	private Panel initGitProjectPanel() {
@@ -142,6 +146,7 @@ public class LobbyPanel extends Panel implements LobbyBroadcastListener {
 
 	@Override
 	public void projectsChanged() {
+		System.out.println("projects changed!");
 		getUI().access(new Runnable() {
 			@Override
 			public void run() {
@@ -149,4 +154,6 @@ public class LobbyPanel extends Panel implements LobbyBroadcastListener {
 			}
 		});
 	}
+
+	
 }

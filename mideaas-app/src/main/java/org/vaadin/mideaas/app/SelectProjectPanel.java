@@ -84,7 +84,8 @@ public class SelectProjectPanel extends Panel implements
 	}
 	
 	public void update() {
-		// adds items to table
+		table.removeAllItems();
+		
 		Collection<String> projects = SharedProject.getProjectNames();
 		for (String projectName : projects) {
 			List<User> users = SharedProject.getProjectUsers(projectName);

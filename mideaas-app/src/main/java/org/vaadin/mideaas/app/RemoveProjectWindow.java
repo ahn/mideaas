@@ -1,7 +1,6 @@
 package org.vaadin.mideaas.app;
 
 import org.vaadin.mideaas.frontend.Icons;
-import org.vaadin.mideaas.model.LobbyBroadcaster;
 import org.vaadin.mideaas.model.SharedProject;
 import org.vaadin.mideaas.model.User;
 

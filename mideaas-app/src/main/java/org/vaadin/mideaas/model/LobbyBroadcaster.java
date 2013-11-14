@@ -5,8 +5,6 @@ import java.util.Collection;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import org.vaadin.mideaas.app.MideaasUI;
-
 
 // TODO: Auto-generated Javadoc
 /**

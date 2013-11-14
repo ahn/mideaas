@@ -11,6 +11,8 @@ import com.vaadin.ui.Notification;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.TextField;
 
+// TODO: this is not used in all cases even if enabled in config
+
 @SuppressWarnings("serial")
 public class ExperimentLoginPanel extends Panel {
 
@@ -43,7 +45,8 @@ public class ExperimentLoginPanel extends Panel {
 					Notification.show("Please fill both fields.");
 				}
 				else {
-					ui.loggedIn(ExperimentUser.newUser(nick, code));
+					ui.setUser(ExperimentUser.newUser(nick, code));
+					ui.navigateTo("lobby");
 				}
 			}
 		});

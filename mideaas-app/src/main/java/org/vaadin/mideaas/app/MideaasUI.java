@@ -2,45 +2,37 @@ package org.vaadin.mideaas.app;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.LinkedList;
-import java.util.List;
 
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.vaadin.mideaas.app.MideaasConfig.Prop;
 import org.vaadin.mideaas.frontend.ClaraEditor;
 import org.vaadin.mideaas.frontend.JettyUtil;
 import org.vaadin.mideaas.frontend.MavenUtil;
-import org.vaadin.mideaas.frontend.MideaasEditor;
-import org.vaadin.mideaas.frontend.MideaasEditorPlugin;
 import org.vaadin.mideaas.model.GitRepository;
 import org.vaadin.mideaas.model.LobbyBroadcaster;
 import org.vaadin.mideaas.model.ProjectLog;
 import org.vaadin.mideaas.model.SharedProject;
 import org.vaadin.mideaas.model.User;
-import org.vaadin.mideaas.model.UserSettings;
 import org.vaadin.mideaas.model.ZipUtils;
 
 import com.vaadin.annotations.PreserveOnRefresh;
 import com.vaadin.annotations.Push;
 import com.vaadin.annotations.Theme;
+import com.vaadin.navigator.Navigator;
 import com.vaadin.server.VaadinRequest;
-import com.vaadin.shared.ui.label.ContentMode;
-import com.vaadin.ui.Component;
-import com.vaadin.ui.Label;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.UI;
-import com.vaadin.ui.VerticalLayout;
 
 
 @PreserveOnRefresh
 @SuppressWarnings("serial")
 @Theme("reindeer")
 @Push
-public class MideaasUI extends UI implements MideaasEditor.CloseHandler {
+public class MideaasUI extends UI {
 
+	private Navigator navigator;
+	
 	private User user;
-
-	private final VerticalLayout mainLayout = new VerticalLayout();
 
 	static {
 		applyConfig();
@@ -79,9 +71,15 @@ public class MideaasUI extends UI implements MideaasEditor.CloseHandler {
 
 	@Override
 	protected void init(VaadinRequest request) {
-		mainLayout.setSizeFull();
-		setContent(mainLayout);
-		drawLobby();
+		
+		navigator = new Navigator(this, this);
+		
+		navigator.addView("", new LoginView(this, "lobby"));
+		navigator.addView("lobby", new LobbyView(this));
+		
+		navigator.addProvider(new EditorViewProvider(this));
+		
+		navigator.setErrorView(new LobbyView(this));
 	}
 
 	@Override
@@ -89,30 +87,13 @@ public class MideaasUI extends UI implements MideaasEditor.CloseHandler {
 		logout();
 		super.detach();
 	}
-
-	private void drawLobby() {
-		mainLayout.removeAllComponents();
-		Component content;
-		if (this.user == null) {
-			content = createLoginPanel();
-		} else {
-			content = new LobbyPanel(this, user);
-		}
-		mainLayout.addComponent(content);
-		mainLayout.setExpandRatio(content, 1);
-		mainLayout
-				.addComponent(new Label(
-						"Some icons by <a href=\"http://p.yusukekamiyamane.com/\">Yusuke Kamiyamane</a>.",
-						ContentMode.HTML));
+	
+	public void logout() {
+		setUser(null);
 	}
 
-	private Component createLoginPanel() {
-		if (MideaasConfig.isExperiment()) {
-			return new ExperimentLoginPanel(this);
-		}
-		else {
-			return new LoginPanel(this);
-		}
+	public User getUser() {
+		return user;
 	}
 
 	/**
@@ -163,7 +144,7 @@ public class MideaasUI extends UI implements MideaasEditor.CloseHandler {
 	
 	private void broadcastNewProject(String projectName) {
 		LobbyBroadcaster.broadcastProjectsChanged();
-		LobbyPanel.getLobbyChat().addLine(user.getName()+" created project "+projectName);
+		LobbyView.getLobbyChat().addLine(user.getName()+" created project "+projectName);
 	}
 
 	/**
@@ -178,58 +159,9 @@ public class MideaasUI extends UI implements MideaasEditor.CloseHandler {
 		UI.getCurrent().addWindow(window);
 	}
 
-	/**
-	 * Opens MideaasEditor.
-	 * 
-	 * @param projectName
-	 *            of the project to be opened
-	 */
+
 	public void openMideaasEditor(String projectName) {
-
-		SharedProject project = SharedProject.getProject(projectName);
-		project.addUser(user);
-		
-		List<MideaasEditorPlugin> plugins = new LinkedList<MideaasEditorPlugin>();
-		plugins.add(new ZipPlugin(project, user));
-		try {
-			plugins.add(new GitPlugin(project, user, GitRepository.fromExistingGitDir(project.getProjectDir())));
-		} catch (IOException e) {
-			System.err.println("WARNING: could not add git plugin!");
-		}
-		
-
-		UserSettings settings = MideaasConfig.getDefaultUserSettings();
-		plugins.add(new SettingsPlugin(settings));
-		
-		File fbf = MideaasConfig.getFeedbackFile();
-		if (fbf != null) {
-			plugins.add(new FeedbackPlugin(fbf));
-		}
-		
-		plugins.add(new TestPlugin());
-		
-		MideaasEditor editor = new MideaasEditor(user, project, settings, plugins);
-		editor.setTestingEnabled(!MideaasConfig.isExperiment());
-		editor.setCloseHandler(this);
-		setContent(editor);
-		
-		LobbyPanel.getLobbyChat().addLine(user.getName() + " opened " + projectName);
-		LobbyBroadcaster.broadcastProjectsChanged();
-	}
-
-	public void logout() {
-		if (user != null) {
-			SharedProject.removeFromProjects(user);
-			LobbyPanel.getLobbyChat().addLine(user.getName() + " logged out");
-			user = null;
-			drawLobby();
-		}
-	}
-
-	public void loggedIn(User user) {
-		this.user = user;
-		drawLobby();
-		LobbyPanel.getLobbyChat().addLine(user.getName() + " logged in");
+		navigator.navigateTo("edit/"+projectName);
 	}
 
 	public void uploadProject(File file) {
@@ -251,11 +183,26 @@ public class MideaasUI extends UI implements MideaasEditor.CloseHandler {
 		}
 	}
 
-	@Override
-	public void closeRequested(SharedProject project) {
-		project.removeFromProject(user);
-		LobbyBroadcaster.broadcastProjectsChanged();
-		setContent(mainLayout);
-		drawLobby();
+	public void setUser(User user) {
+		if (user==null ? this.user==null : user.equals(this.user)) {
+			return;
+		}
+		if (this.user!=null) {
+			SharedProject.removeFromProjects(this.user);
+			LobbyView.getLobbyChat().addLine(this.user.getName()+" left");
+		}
+		this.user = user;
+		if (user!=null) {
+			LobbyView.getLobbyChat().addLine(user.getName()+" logged in");
+		}
+		else {
+			navigateTo("");
+		}
 	}
+
+	public void navigateTo(String nextView) {
+		navigator.navigateTo(nextView);
+	}
+
+	
 }
