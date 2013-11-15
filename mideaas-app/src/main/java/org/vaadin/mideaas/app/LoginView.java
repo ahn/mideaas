@@ -49,7 +49,6 @@ public class LoginView extends VerticalLayout implements View {
 	 * Inits the loginscreen.
 	 */
 	private void initLogin() {
-		System.out.println("initLogin");
 		loginField = new TextField("Nick:");
 		addComponent(loginField);
 		

@@ -156,7 +156,6 @@ public class LobbyView extends VerticalLayout implements View, LobbyBroadcastLis
 
 	@Override
 	public void projectsChanged() {
-		System.out.println("projects changed!");
 		getUI().access(new Runnable() {
 			@Override
 			public void run() {
@@ -167,7 +166,6 @@ public class LobbyView extends VerticalLayout implements View, LobbyBroadcastLis
 
 	@Override
 	public void loggedInUsersChanged(final Set<User> users) {
-		System.out.println("loggedInUsersChanged! " + users.size());
 		getUI().access(new Runnable() {
 			@Override
 			public void run() {

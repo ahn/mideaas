@@ -24,7 +24,6 @@ public class LobbyBroadcaster {
      * @param listener the listener
      */
     public synchronized static void register(LobbyBroadcastListener listener) {
-    	System.out.println("addlis " + listener);
         listeners.add(listener);
     }
 
@@ -34,7 +33,6 @@ public class LobbyBroadcaster {
      * @param listener the listener
      */
     public synchronized static void unregister(LobbyBroadcastListener listener) {
-    	System.out.println("remlis " + listener);
         listeners.remove(listener);
     }
 

@@ -24,7 +24,6 @@ public class HorizontalUserList extends HorizontalLayout {
 
 	public void addUser(User user) {
 		if (boxes.containsKey(user)) {
-			System.out.println("Already has user " +user);
 			return;
 		}
 		boxes.put(user, new UserBox(user));
@@ -37,7 +36,6 @@ public class HorizontalUserList extends HorizontalLayout {
 	}
 
 	private void draw() {
-		System.out.println ("drawing " + boxes.size());
 		removeAllComponents();
 		for (UserBox ub : boxes.values()) {
 			addComponent(ub);
