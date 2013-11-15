@@ -3,6 +3,7 @@ package org.vaadin.mideaas.app;
 import org.vaadin.addon.oauthpopupbuttons.OAuthListener;
 import org.vaadin.addon.oauthpopupbuttons.OAuthPopupButton;
 import org.vaadin.addon.oauthpopupbuttons.buttons.FacebookButton;
+import org.vaadin.addon.oauthpopupbuttons.buttons.GitHubButton;
 import org.vaadin.addon.oauthpopupbuttons.buttons.TwitterButton;
 import org.vaadin.mideaas.app.MideaasConfig.Prop;
 import org.vaadin.mideaas.model.User;

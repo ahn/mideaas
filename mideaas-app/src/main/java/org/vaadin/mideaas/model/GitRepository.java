@@ -128,10 +128,10 @@ public class GitRepository {
 	 * @throws GitAPIException the git api exception
 	 */
 	public void addSourceFilesToGit() throws GitAPIException {
-		git.add().addFilepattern("src/main/java");
-		git.add().addFilepattern("src/main/resources");
-		git.add().addFilepattern("src/main/webapp/WEB-INF");
-		git.add().addFilepattern("src/main/webapp/META-INF");
+		git.add().addFilepattern("src/main/java").call();
+		git.add().addFilepattern("src/main/resources").call();
+		git.add().addFilepattern("src/main/webapp/WEB-INF").call();
+		git.add().addFilepattern("src/main/webapp/META-INF").call();
 		git.add().addFilepattern("pom.xml").call();
 	}
 
