@@ -3,23 +3,24 @@ package org.vaadin.mideaas.app;
 import java.io.IOException;
 
 import org.eclipse.jgit.api.errors.GitAPIException;
-import org.kohsuke.github.GHRepository;
 import org.vaadin.addon.oauthpopupbuttons.OAuthListener;
 import org.vaadin.addon.oauthpopupbuttons.buttons.GitHubButton;
 import org.vaadin.mideaas.model.GitRepository;
 import org.vaadin.mideaas.model.User;
 import org.vaadin.mideaas.social.GitHubService;
+import org.vaadin.mideaas.social.OAuthService.Service;
 import org.vaadin.mideaas.social.UserProfile;
 import org.vaadin.mideaas.social.UserToken;
-import org.vaadin.mideaas.social.OAuthService.Service;
 
+import com.vaadin.server.ExternalResource;
 import com.vaadin.ui.Button;
+import com.vaadin.ui.Button.ClickEvent;
+import com.vaadin.ui.Button.ClickListener;
 import com.vaadin.ui.Label;
+import com.vaadin.ui.Link;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
-import com.vaadin.ui.Button.ClickEvent;
-import com.vaadin.ui.Button.ClickListener;
 
 
 @SuppressWarnings("serial")
@@ -32,6 +33,9 @@ public class GitHubWindow extends Window {
 	private final User user;
 	private final GitRepository repo;
 	private final String projectName;
+
+
+	protected GitHubService service;
 	
 	public GitHubWindow(User user, GitRepository repo, String projectName) {
 		super("GitHub");
@@ -59,17 +63,14 @@ public class GitHubWindow extends Window {
 		else {
 			redrawConnected(profile);
 		}
-		
-		
-		
 	}
 	
 	private void redrawConnected(UserProfile profile) {
-		String origin = repo.getOrigin();
-		if (origin==null) {
+		String remote = repo.getRemote(remoteName(profile));
+		if (remote==null) {
 			drawNewProject(profile);
 		}
-		else if (isGitHubOrigin(origin)) {
+		else if (isGitHubOrigin(remote)) {
 			drawPush(profile);
 		}
 		else {
@@ -87,7 +88,7 @@ public class GitHubWindow extends Window {
 		ghb.addListener(new OAuthListener() {
 			@Override
 			public void authSuccessful(String accessToken, String accessTokenSecret) {
-				GitHubService service = new GitHubService(key, secret, new UserToken(accessToken, accessTokenSecret));
+				service = new GitHubService(key, secret, new UserToken(accessToken, accessTokenSecret));
 				UserProfile profile = service.getUserProfile();
 				user.addProfile(profile);
 				redraw();
@@ -116,14 +117,23 @@ public class GitHubWindow extends Window {
 		});
 	}
 	
+	private GitHubService getService() {
+		if (service==null) {
+			final String key = GitPlugin.GITHUB_KEY;
+			final String secret = GitPlugin.GITHUB_SECRET;
+			UserToken t = user.getProfile(Service.GITHUB).getToken();
+			service = new GitHubService(key, secret, new UserToken(t.getToken(), t.getSecret()));
+		}
+		return service;
+	}
+	
 	protected void newProject(UserProfile profile) {
-		final String key = GitPlugin.GITHUB_KEY;
-		final String secret = GitPlugin.GITHUB_SECRET;
-		UserToken t = profile.getToken();
-		GitHubService service = new GitHubService(key, secret, new UserToken(t.getToken(), t.getSecret()));
+		
+		service = getService();
+		
 		try {
 			String origin = service.createRepository(projectName);
-			repo.setOrigin(origin);
+			repo.addRemote(remoteName(profile), origin);
 			Notification.show("Project created");
 			redraw();
 			
@@ -131,9 +141,17 @@ public class GitHubWindow extends Window {
 			Notification.show(e.getMessage(), Notification.Type.ERROR_MESSAGE);
 		}
 	}
+	
+	private static String remoteName(UserProfile profile) {
+		return "github-"+profile.getIdentifier();
+	}
 
 	private void drawPush(final UserProfile profile) {
-		layout.addComponent(new Label("Authorized with GitHub"));
+		
+		final String remote = remoteName(profile);
+		
+		String url = githubLinkFromOrigin(repo.getRemote(remote));
+		layout.addComponent(new Link(url, new ExternalResource(url)));
 		
 		Button b = new Button("Push to GitHub");
 		b.addClickListener(new ClickListener() {
@@ -141,7 +159,7 @@ public class GitHubWindow extends Window {
 			@Override
 			public void buttonClick(ClickEvent event) {
 				try {
-					gitPush(profile.getToken().getToken());
+					gitPush(profile.getToken().getToken(), remote);
 				} catch (GitAPIException e) {
 					Notification.show(e.getMessage(), Notification.Type.ERROR_MESSAGE);
 					e.printStackTrace();
@@ -152,7 +170,11 @@ public class GitHubWindow extends Window {
 	}
 	
 	
-	/**
+	private String githubLinkFromOrigin(String origin) {
+		return origin.replaceFirst(".git$", "");
+	}
+
+	/*
 	 * Push to Gitrepository using OAuth token.
 	 * 
 	 * Token can be acquired for example by writing:
@@ -181,19 +203,8 @@ public class GitHubWindow extends Window {
 	 * @param oauthToken the oauth token
 	 * @throws GitAPIException the git api exception
 	 */
-	private void gitPush(String oauthToken) throws GitAPIException {
-		gitPush(oauthToken,"");
+	private void gitPush(String oauthToken, String remoteName) throws GitAPIException {
+		repo.pushAll(oauthToken, "", remoteName);
 	}
 	
-	/**
-	 * Push to Gitrepository using userName and password (maybe not so secure :) ).
-	 *
-	 * @param userName the user name
-	 * @param passWord the pass word
-	 * @throws GitAPIException the git api exception
-	 */
-	private void gitPush(String userName, String passWord)
-			throws GitAPIException {
-		repo.pushAll(userName, passWord);
-	}
 }

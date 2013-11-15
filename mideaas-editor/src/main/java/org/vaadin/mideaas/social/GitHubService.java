@@ -32,10 +32,11 @@ public class GitHubService extends OAuthService {
 		
 		try {
 			GHMyself me = gh.getMyself();
+			String id = me.getLogin();
 			String name = me.getName();
 			String email = me.getEmail();
 			String imgUrl = me.getAvatarUrl();
-			return new UserProfile(Service.GITHUB, getUserToken(), name, email, imgUrl);
+			return new UserProfile(Service.GITHUB, getUserToken(), id, name, email, imgUrl);
 		} catch (IOException e) {
 			e.printStackTrace();
 			return null;
@@ -45,6 +46,13 @@ public class GitHubService extends OAuthService {
 
 	public String createRepository(String projectName) throws IOException {
 		connect();
+		String name = gh.getMyself().getLogin()+"/"+projectName;
+		try {
+			GHRepository r = gh.getRepository(name);
+			return getHttpsUrl(r);
+		} catch (IOException e) {
+			// No such repo found. No prob, we create it.
+		}
 		String descr = projectName + " created by MIDEaaS";
 		GHRepository r = gh.createRepository(projectName, descr, null, true);
 		return getHttpsUrl(r);

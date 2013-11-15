@@ -20,10 +20,11 @@ public class FacebookService extends OAuthService {
 	@Override
 	protected UserProfile fetchUserProfile() {
 		com.restfb.types.User me = client.fetchObject("me", com.restfb.types.User.class);
+		String id = me.getId();
 		String name = me.getName();
 		String email = me.getEmail();
 		String imgUrl =  "https://graph.facebook.com/" + me.getId() + "/picture";
-		return new UserProfile(Service.FACEBOOK, getUserToken(), name, email, imgUrl);
+		return new UserProfile(Service.FACEBOOK, getUserToken(), id, name, email, imgUrl);
 	   
 	}
 

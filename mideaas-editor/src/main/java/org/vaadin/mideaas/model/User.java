@@ -46,7 +46,7 @@ public class User implements Comparable<User> {
 	}
 	
 	protected User(String userId, String name, String email) {
-		this(userId, createDefaultProfile(name, email));
+		this(userId, createDefaultProfile(userId, name, email));
 	}
 
 	protected User(String userId, UserProfile profile) {
@@ -56,9 +56,8 @@ public class User implements Comparable<User> {
 		putUser(this);
 	}
 	
-
-	private static UserProfile createDefaultProfile(String name, String email) {
-		return new UserProfile(Service.DEFAULT, null, name, email, null);
+	private static UserProfile createDefaultProfile(String id, String name, String email) {
+		return new UserProfile(Service.DEFAULT, null, id, name, email, null);
 	}
 
 	public String getUserId() {

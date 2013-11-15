@@ -1,30 +1,16 @@
 package org.vaadin.mideaas.app;
 
-import org.eclipse.jgit.api.errors.GitAPIException;
-import org.vaadin.addon.oauthpopupbuttons.OAuthListener;
-import org.vaadin.addon.oauthpopupbuttons.buttons.GitHubButton;
 import org.vaadin.mideaas.app.MideaasConfig.Prop;
 import org.vaadin.mideaas.frontend.MideaasEditorPlugin;
 import org.vaadin.mideaas.model.GitRepository;
 import org.vaadin.mideaas.model.SharedProject;
 import org.vaadin.mideaas.model.User;
-import org.vaadin.mideaas.social.GitHubService;
-import org.vaadin.mideaas.social.UserProfile;
-import org.vaadin.mideaas.social.UserToken;
-import org.vaadin.mideaas.social.OAuthService.Service;
 
-import com.vaadin.server.Sizeable.Unit;
-import com.vaadin.ui.Button;
-import com.vaadin.ui.Button.ClickEvent;
-import com.vaadin.ui.Button.ClickListener;
-import com.vaadin.ui.Label;
+import com.vaadin.server.ClassResource;
 import com.vaadin.ui.MenuBar;
 import com.vaadin.ui.MenuBar.Command;
 import com.vaadin.ui.MenuBar.MenuItem;
-import com.vaadin.ui.Notification;
-import com.vaadin.ui.TextField;
 import com.vaadin.ui.UI;
-import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 
 @SuppressWarnings("serial")
@@ -36,6 +22,7 @@ public class GitPlugin implements MideaasEditorPlugin {
 	private final SharedProject project;
 	private final User user;
 	private final GitRepository repo;
+	private MenuItem gitHubItem;
 	
 	public GitPlugin(SharedProject project, User user, GitRepository repo) {
 		this.project = project;
@@ -54,9 +41,11 @@ public class GitPlugin implements MideaasEditorPlugin {
 		if (commit != null) {
 			gitItem.addItem("Commit", commit);
 		}
-
+		
 		if (github != null) {
-			gitItem.addItem("GitHub", github);
+			gitHubItem = gitItem.addItem("GitHub", github);
+			gitHubItem.setIcon(new ClassResource("/org/vaadin/addon/oauthpopupbuttons/icons/github16.png"));
+			gitHubItem.setEnabled(repo.hasCommit());
 		}
 	}
 
@@ -70,6 +59,7 @@ public class GitPlugin implements MideaasEditorPlugin {
 			@Override
 			public void menuSelected(MenuItem selectedItem) {
 				GitHubWindow w = new GitHubWindow(user, repo, project.getName());
+				w.center();
 				UI.getCurrent().addWindow(w);
 			}
 		};
@@ -80,42 +70,17 @@ public class GitPlugin implements MideaasEditorPlugin {
 		return new Command() {
 			@Override
 			public void menuSelected(MenuItem selectedItem) {
-				final Window window = new Window();
-				window.setCaption("Commit");
-				window.center();
-				window.setWidth(200, Unit.PIXELS);
-				VerticalLayout layout = new VerticalLayout();
-				final TextField field = new TextField("Commit Message:");
-				Button button = new Button("Commit");
-				layout.addComponent(field);
-				layout.addComponent(button);
-
-				window.setContent(layout);
-				UI.getCurrent().addWindow(window);
-
-				button.addClickListener(new ClickListener() {
-					@Override
-					public void buttonClick(ClickEvent event) {
-						try {
-							commitAll(project.getName(), (String) field.getValue());
-							window.close();
-						} catch (GitAPIException e) {
-							Notification.show(e.getMessage());
-						}
-					}
-				});
+				Window w = new GitCommitWindow(GitPlugin.this, repo, project.getName());
+				w.center();
+				UI.getCurrent().addWindow(w);
 			}
 		};
 	}
-	
-	protected void commitAll(String projectName, String msg)
-			throws GitAPIException {
-		gitCommitAll(msg);
-	}
 
-	public void gitCommitAll(String msg) throws GitAPIException {
-		repo.addSourceFilesToGit();
-		repo.commitAll(msg);
+	public MenuItem getGitHubItem() {
+		return gitHubItem;
 	}
+	
+
 
 }

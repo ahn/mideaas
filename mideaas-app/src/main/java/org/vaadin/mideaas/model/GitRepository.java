@@ -20,8 +20,6 @@ import org.eclipse.jgit.revwalk.RevCommit;
 import org.eclipse.jgit.storage.file.FileRepository;
 import org.eclipse.jgit.transport.CredentialsProvider;
 import org.eclipse.jgit.transport.PushResult;
-import org.eclipse.jgit.transport.RemoteRefUpdate;
-import org.eclipse.jgit.transport.RemoteRefUpdate.Status;
 import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
 
 import com.vaadin.ui.Notification;
@@ -152,20 +150,18 @@ public class GitRepository {
 		}	
 	}
 	
-	public void pushAll(String userName, String passWord) throws GitAPIException { 
+	public void pushAll(String userName, String password, String remoteName) throws GitAPIException { 
         // credentials
         CredentialsProvider credentials = null;
-        credentials = new UsernamePasswordCredentialsProvider(userName, passWord);
+        credentials = new UsernamePasswordCredentialsProvider(userName, password);
         
         try{
-	        PushCommand command = git.push();
+	        PushCommand command = git.push().setRemote(remoteName);
 			command.setCredentialsProvider(credentials);
 			Iterable<PushResult> results = command.call();
 			int updates = 0;
 			for (PushResult result:results){
-				for (RemoteRefUpdate r : result.getRemoteUpdates()) {
-					updates++;
-				}
+				updates += result.getRemoteUpdates().size();
 			}
 			if (updates==0){
 				Notification.show("No updates pushed. Something maybe failed?",  Notification.Type.WARNING_MESSAGE);
@@ -183,25 +179,25 @@ public class GitRepository {
         } 
 	}
 
-	/**
-	 * Get origin if project has been initialized from remote git repository.
-	 *
-	 * @return the string
-	 */
-	public String getOrigin(){
+
+	public String getRemote(String name){
 		StoredConfig config = this.git.getRepository().getConfig();
-		String url = config.getString("remote", "origin", "url");
+		String url = config.getString("remote", name, "url");
 		return url;
+	}
+	
+	public boolean hasCommit(){
+		return !git.getRepository().getAllRefs().isEmpty();
 	}
 
 	
-	public void setOrigin(String url) {
+	public void addRemote(String name, String url) {
 		Repository repo = this.git.getRepository();
 		StoredConfig config = repo.getConfig();
-		config.setString("remote", "origin", "url", url);
+		config.setString("remote", name, "url", url);
 		try {
 			config.save();
-        	Notification.show("Origin set to: " + url);
+        	Notification.show("Remote "+name+" set to: " + url);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
         	Notification.show("Set origin failed.");
