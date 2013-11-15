@@ -7,6 +7,7 @@ import org.vaadin.mideaas.frontend.MideaasEditorPlugin;
 import org.vaadin.mideaas.model.GitRepository;
 import org.vaadin.mideaas.model.SharedProject;
 import org.vaadin.mideaas.model.User;
+import org.vaadin.mideaas.social.GitHubService;
 import org.vaadin.mideaas.social.UserProfile;
 import org.vaadin.mideaas.social.UserToken;
 import org.vaadin.mideaas.social.OAuthService.Service;
@@ -65,8 +66,10 @@ public class GitPlugin implements MideaasEditorPlugin {
 			ghb.addListener(new OAuthListener() {
 				@Override
 				public void authSuccessful(String accessToken, String accessTokenSecret) {
-					user.setToken(Service.GITHUB, accessToken, accessTokenSecret);
-					pushable(user.getToken(Service.GITHUB));
+					GitHubService service = new GitHubService(GITHUB_KEY, GITHUB_SECRET, new UserToken(accessToken, accessTokenSecret));
+					UserProfile profile = service.getUserProfile();
+					user.addProfile(profile);
+					pushable(user.getProfile(Service.GITHUB).getToken());
 				}
 				
 				@Override
