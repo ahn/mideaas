@@ -1,15 +1,16 @@
 package org.vaadin.mideaas.app;
 
-import org.vaadin.addon.oauthpopupbuttons.OAuthListener;
-import org.vaadin.addon.oauthpopupbuttons.OAuthPopupButton;
-import org.vaadin.addon.oauthpopupbuttons.buttons.FacebookButton;
-import org.vaadin.addon.oauthpopupbuttons.buttons.TwitterButton;
+import org.vaadin.addon.oauthpopup.OAuthListener;
+import org.vaadin.addon.oauthpopup.OAuthPopupButton;
+import org.vaadin.addon.oauthpopup.buttons.FacebookButton;
+import org.vaadin.addon.oauthpopup.buttons.GitHubButton;
+import org.vaadin.addon.oauthpopup.buttons.TwitterButton;
 import org.vaadin.mideaas.app.MideaasConfig.Prop;
 import org.vaadin.mideaas.model.User;
 import org.vaadin.mideaas.social.OAuthService;
+import org.vaadin.mideaas.social.OAuthService.Service;
 import org.vaadin.mideaas.social.UserProfile;
 import org.vaadin.mideaas.social.UserToken;
-import org.vaadin.mideaas.social.OAuthService.Service;
 
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
@@ -120,7 +121,7 @@ public class LoginView extends VerticalLayout implements View {
 	}
 	
 	private OAuthPopupButton initButton(OAuthPopupButton button, final Service service, final String key, final String secret) {
-		button.addListener(new OAuthListener() {
+		button.addOAuthListener(new OAuthListener() {
 			@Override
 			public void authSuccessful(String accessToken, String accessTokenSecret) {
 				UserToken token = new UserToken(accessToken, accessTokenSecret);
@@ -134,7 +135,7 @@ public class LoginView extends VerticalLayout implements View {
 				}
 			}
 			@Override
-			public void authFailed(String reason) {
+			public void authDenied(String reason) {
 				Notification.show("Not authenticated.");
 			}
 		});

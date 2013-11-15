@@ -15,12 +15,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.vaadin.mideaas.model.ServerContainer;
 import org.vaadin.mideaas.model.XmlRpcContact;
+import org.vaadin.mideaas.model.XmlTestWriter;
 import org.vaadin.mideaas.test.Script;
 import org.vaadin.mideaas.test.ScriptContainer;
-import org.vaadin.mideaas.model.Server;
-import org.vaadin.mideaas.model.ServerContainer;
-import org.vaadin.mideaas.model.XmlTestWriter;
 
 import com.vaadin.data.Property;
 import com.vaadin.event.Action;
@@ -36,7 +35,6 @@ import com.vaadin.ui.Table;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
-import org.vaadin.mideaas.app.XmlRpcServerDetails;
 
 public class MideaasTest extends CustomComponent {
 

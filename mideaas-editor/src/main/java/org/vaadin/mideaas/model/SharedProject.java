@@ -133,8 +133,11 @@ public class SharedProject {
 	}
 
 	private static String getProjectPackageFor(String projectName) {
-		projectName.replace("-", "");
-		return projectRootPackage + "." + projectName;
+		return projectRootPackage + "." + projectPackageName(projectName);
+	}
+	
+	private static String projectPackageName(String projectName) {
+		return projectName.toLowerCase().replaceAll("[^a-z0-9]", "");
 	}
 	
 	static private File createNewProjectDir(String projectName)

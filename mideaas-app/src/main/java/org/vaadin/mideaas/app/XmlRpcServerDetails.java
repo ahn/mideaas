@@ -2,14 +2,12 @@ package org.vaadin.mideaas.app;
 
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
-import org.vaadin.mideaas.model.ServerContainer;
 import org.vaadin.mideaas.model.Server;
+import org.vaadin.mideaas.model.ServerContainer;
 import org.vaadin.mideaas.model.XmlRpcContact;
 
 import com.vaadin.data.Property;

@@ -92,8 +92,8 @@
 		
 		<dependency>
 			<groupId>org.vaadin.addon</groupId>
-			<artifactId>oauthpopupbuttons</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
+			<artifactId>oauthpopup</artifactId>
+			<version>0.0.3-SNAPSHOT</version>
 		</dependency>
 			            
 	</dependencies>

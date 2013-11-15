@@ -9,17 +9,16 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import org.apache.xmlrpc.client.XmlRpcClient;
 import org.apache.xmlrpc.client.XmlRpcClientConfigImpl;
 import org.vaadin.mideaas.app.MideaasConfig;
-import org.vaadin.mideaas.test.ScriptContainer;
 import org.vaadin.mideaas.test.Script;
+import org.vaadin.mideaas.test.ScriptContainer;
 
 import com.vaadin.ui.Notification;
-
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 public class XmlRpcContact {
 	

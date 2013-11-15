@@ -25,11 +25,12 @@ public class TwitterService extends OAuthService {
 	@Override
 	protected UserProfile fetchUserProfile() {
 	    try {
-	    	String name = twitter.getScreenName();
-	    	User u = twitter.showUser(name);
+	    	String id = twitter.getScreenName();
+	    	User u = twitter.showUser(id);
+	    	String name = u.getName();
 	    	String email = null;
 	    	String imgUrl = u.getMiniProfileImageURL();
-	    	return new UserProfile(Service.TWITTER, getUserToken(), name, email, imgUrl);
+	    	return new UserProfile(Service.TWITTER, getUserToken(), id, name, email, imgUrl);
 		} catch (TwitterException e) {
 			e.printStackTrace();
 			return null;
