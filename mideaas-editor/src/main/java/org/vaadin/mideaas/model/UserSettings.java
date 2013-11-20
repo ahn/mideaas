@@ -7,4 +7,6 @@ package org.vaadin.mideaas.model;
  */
 public class UserSettings {
 	public String userAgent;
+	public Boolean easiCloudsFeaturesTurnedOn;
+	public boolean gaeDeployTurnedOn;
 }

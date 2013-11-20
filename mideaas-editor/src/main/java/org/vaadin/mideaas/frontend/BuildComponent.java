@@ -27,7 +27,7 @@ public class BuildComponent extends CustomComponent implements BuildListener {
 	private final VerticalLayout layout = new VerticalLayout();
 	
 	private final LogView logView = new LogView();
-
+	
 	private Button buildButton = new Button("Build");
 	private Button cancelButton = new Button("Cancel");
 	private Button showLogButton = new ShowLogButton("Build Log", logView);
@@ -38,6 +38,7 @@ public class BuildComponent extends CustomComponent implements BuildListener {
 	private static final List<String> GOALS_PACKAGE = Arrays
 			.asList(new String[] { "vaadin:update-widgetset", "vaadin:compile", "package" });
 
+	
 //	private List<String> goals = GOALS_PACKAGE;
 
 //	private boolean firstBuild = true;
@@ -50,11 +51,15 @@ public class BuildComponent extends CustomComponent implements BuildListener {
 		this.user = user;
 		this.settings = settings;
 
+		if (settings.gaeDeployTurnedOn){
+			buildButton.setCaption("Build GAE");
+		}
+		
 		Panel p = new Panel("Build");
 		p.setContent(layout);
 		setCompositionRoot(p);
 		layout.setMargin(true);
-
+		
 		layout.addComponent(buildButton);
 		layout.addComponent(resultLayout);
 		layout.addComponent(loadingImg);

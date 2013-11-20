@@ -25,6 +25,7 @@ public class MideaasConfig {
         JETTY_STOP_PORT_MIN,
         JETTY_STOP_PORT_MAX,
         EASICLOUDS_FEATURES,
+        GAE_DEPLOY,
         EXPERIMENT,
         LOG_DIR,
         DEFAULT_WIDGETSET_USER_AGENT,
@@ -104,6 +105,10 @@ public class MideaasConfig {
     public static boolean easiCloudsFeaturesTurnedOn(){
     	return "on".equals(MideaasConfig.getProperty(Prop.EASICLOUDS_FEATURES));
     }
+
+    public static boolean gaeDeployTurnedOn(){
+    	return "on".equals(MideaasConfig.getProperty(Prop.GAE_DEPLOY));
+    }
     
     public static boolean isExperiment() {
     	return "on".equals(MideaasConfig.getProperty(Prop.EXPERIMENT));
@@ -117,6 +122,8 @@ public class MideaasConfig {
 	public static UserSettings getDefaultUserSettings() {
 		UserSettings settings = new UserSettings();
 		settings.userAgent = getProperty(Prop.DEFAULT_WIDGETSET_USER_AGENT);
+		settings.easiCloudsFeaturesTurnedOn=MideaasConfig.easiCloudsFeaturesTurnedOn();
+		settings.gaeDeployTurnedOn=MideaasConfig.gaeDeployTurnedOn();
 		return settings;
 	}
 

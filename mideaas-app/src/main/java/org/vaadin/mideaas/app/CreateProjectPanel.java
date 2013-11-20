@@ -94,10 +94,10 @@ public class CreateProjectPanel extends Panel {
 		
 		projectTypeGroup.select("Vaadin");
 		
-		if (MideaasConfig.easiCloudsFeaturesTurnedOn()){
+/*		if (MideaasConfig.easiCloudsFeaturesTurnedOn()){
 			la.addComponent(projectTypeGroup);
 			la.addComponent(skBox);
-		}
+		}*/
 		
 		initNewProjectButton(tf, skBox);
 		cnpButton.setWidth("100%");

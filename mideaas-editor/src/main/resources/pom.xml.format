@@ -15,7 +15,7 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <vaadin.version>7.1.2</vaadin.version>
+        <vaadin.version>7.1.6</vaadin.version>
         <vaadin.plugin.version>${vaadin.version}</vaadin.plugin.version>
         <gwt.persistentunitcachedir>${project.basedir}/gwtcache</gwt.persistentunitcachedir>
     </properties>
@@ -46,23 +46,34 @@
             <artifactId>vaadin-client-compiled</artifactId>
             <version>${vaadin.version}</version>
         </dependency>
-        <dependency>
+<!--        <dependency>
             <groupId>com.vaadin</groupId>
             <artifactId>vaadin-client</artifactId>
             <version>${vaadin.version}</version>
             <scope>provided</scope>
-        </dependency>
+        </dependency>-->
         <dependency>
             <groupId>com.vaadin</groupId>
             <artifactId>vaadin-themes</artifactId>
             <version>${vaadin.version}</version>
         </dependency>
         <dependency>
+			<groupId>com.vaadin.external.slf4j</groupId>
+			<artifactId>vaadin-slf4j-jdk14</artifactId>
+			<version>1.6.1</version>
+        </dependency>
+        <dependency>
+			<groupId>com.vaadin</groupId>
+			<artifactId>vaadin-push</artifactId>
+            <version>${vaadin.version}</version>
+        </dependency>
+            <!--google appengine does not support servler 3.0-->
+<!--        <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>servlet-api</artifactId>
             <version>2.4</version>
             <scope>provided</scope>
-        </dependency>
+        </dependency>-->
         <dependency>
             <groupId>org.vaadin.addons</groupId>
             <artifactId>clara</artifactId>
@@ -70,13 +81,11 @@
         </dependency>
         
         <!-- ... -->
-        
         <dependency>
             <groupId>org.vaadin.addons</groupId>
             <artifactId>ratingstars</artifactId>
             <version>2.1</version>
         </dependency>
-        
     </dependencies>
 
     <build>
@@ -86,6 +95,7 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.1</version>
                 <configuration>
+                	<!--google appengine does not support 1.7--> 
                     <source>1.6</source>
                     <target>1.6</target>
                     <failOnError>true</failOnError>
@@ -121,7 +131,7 @@
                     <noServer>true</noServer>
                     <!-- Remove draftCompile when project is ready -->
                     <draftCompile>true</draftCompile>
-                    <compileReport>true</compileReport>
+                    <compileReport>false</compileReport>
                     <style>OBF</style>
                     <strict>true</strict>
                 </configuration>
@@ -207,6 +217,68 @@
                         </configuration>
                     </plugin>
                 </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>GAECompile</id>
+            <activation>
+                <property>
+                    <name>GAECompile</name>
+                </property>
+            </activation>
+    		<dependencies>        
+				<dependency>
+		    		<groupId>com.google.appengine</groupId>
+		    		<artifactId>appengine-api-1.0-sdk</artifactId>
+		    		<version>1.8.5</version>
+				</dependency>
+			</dependencies>
+            <build>
+                <directory>${project.basedir}/war/WEB-INF/</directory>
+          	    <plugins>
+			      <plugin>
+			        <artifactId>maven-resources-plugin</artifactId>
+			        <version>2.6</version>
+			        <executions>
+			          <execution>
+			            <id>copy-resources</id>
+			            <!-- here the phase you need -->
+			            <phase>validate</phase>
+			            <goals>
+			              <goal>copy-resources</goal>
+			            </goals>
+			            <configuration>
+			              <outputDirectory>${project.basedir}/war</outputDirectory>
+			              <resources>          
+			                <resource>
+			                  <directory>/src/main/webapp</directory>
+			                  <filtering>true</filtering>
+			                </resource>
+			              </resources>              
+			            </configuration>            
+			          </execution>
+			        </executions>
+			      </plugin>
+		        <plugin>
+				    <groupId>org.apache.maven.plugins</groupId>
+				    <artifactId>maven-dependency-plugin</artifactId>
+				    <executions>
+				      <execution>
+				        <id>copy-dependencies</id>
+				        <phase>package</phase>
+				        <goals>
+				          <goal>copy-dependencies</goal>
+				        </goals>
+				        <configuration>
+				          <outputDirectory>${basedir}/war/WEB-INF/lib/</outputDirectory>
+				          <overWriteReleases>false</overWriteReleases>
+				          <overWriteSnapshots>false</overWriteSnapshots>
+				          <overWriteIfNewer>true</overWriteIfNewer>
+				        </configuration>
+				      </execution>
+				    </executions>
+				  </plugin>
+			    </plugins>
             </build>
         </profile>
     </profiles>

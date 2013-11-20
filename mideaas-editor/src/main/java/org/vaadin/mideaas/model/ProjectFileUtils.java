@@ -37,6 +37,10 @@ public class ProjectFileUtils {
 		return MavenUtil.getClassPath(dir);
 	}
 	
+	public static void 	writeAppengineWebXml(File dir, String content) throws IOException {
+		FileUtils.write(new File(getWebInfDir(dir),"appengine-web.xml"), content);
+	}
+	
 	public static void writeWebXml(File dir, String content) throws IOException {
 		FileUtils.write(new File(getWebInfDir(dir),"web.xml"), content);
 	}
@@ -134,16 +138,44 @@ public class ProjectFileUtils {
 		getMideaasSourceDir(dir).mkdirs();
 	}
 	
-	public static void writeInitialFilesToDisk(File dir, String projPackage) throws IOException {
+	public static void writeInitialFilesToDisk(File dir, String projPackage,UserSettings settings) throws IOException {
 		createProjectDirs(dir, projPackage);
 		//writeApp(dir, projPackage, generateApp(projPackage));
+		if (settings.gaeDeployTurnedOn){
+			writeTheme(dir,projPackage);
+			writeAppengineWebXml(dir, generateAppengineWebXml(projPackage));
+			writeLoggingProperties(dir, generateLoggingProperties());
+			writeManifestMF(dir, generateManifestMF());
+		}
 		writeWebXml(dir, generateWebXml(projPackage));
 		writeWidgetset(dir, projPackage, generateWidgetset());
 		writeMideaasComponentCode(dir);
     }
 	
-	
+	private static void writeLoggingProperties(File dir,String content) throws IOException{
+			FileUtils.write(new File(getWebInfDir(dir),"logging.properties"), content);
+	}
 
+	private static String generateLoggingProperties() throws IOException {
+		return String.format(readResource("logging.properties.format"));
+	}
+
+	private static void writeTheme(File dir,String projPackage) throws IOException {
+		String appName = projPackage.substring(projPackage.lastIndexOf(".")+1);
+		dir = FileUtils.getFile(dir, "src", "main", "webapp", "VAADIN","themes",appName);
+		String filename=appName+".scss";
+		FileUtils.write(new File(getWebInfDir(dir),"addons.scss"), "@mixin addons {/n}");
+		FileUtils.write(new File(getWebInfDir(dir),filename), "@import \"../reindeer/reindeer.scss\";/n@mixin gaetestvaadin7 {/n@include reindeer;/n}");
+		FileUtils.write(new File(getWebInfDir(dir),"styles.scss"), "@import \"addons.scss\";@import \"" + filename +"\";");
+	}
+
+	private static void writeManifestMF(File dir, String content) throws IOException {
+		FileUtils.write(new File(getMetaInfDir(dir),"MANIFEST.MF"), content);
+	}
+
+	private static String generateManifestMF() throws IOException {
+		return String.format(readResource("MANIFEST.MF.format"));
+	}
 	public static String getFirstViewName() {
 		return "Main";
 	}
@@ -191,8 +223,14 @@ public class ProjectFileUtils {
 	private static String generateWebXml(String projPackage) throws IOException {
 		String app = projPackage + "." + getAppClassName();
 		return String.format(readResource("web.xml.format"),
-				app, getWidgetSetName(projPackage));
+				"com.vaadin.server.GAEVaadinServlet", app, getWidgetSetName(projPackage));
 	}
+
+	private static String generateAppengineWebXml(String projPackage) throws IOException {
+		return String.format(readResource("appengine-web.xml.format"),
+				"jannehellotest","1");
+	}
+
 	
 	public static String generateApp(String projPackage) {
 		return String.format(APP_FORMAT,

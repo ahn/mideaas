@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.List;
 
 import org.vaadin.mideaas.frontend.Icons;
+import org.vaadin.mideaas.model.ProjectFileUtils;
 import org.vaadin.mideaas.model.SharedProject;
 import org.vaadin.mideaas.model.User;
 
@@ -15,6 +16,7 @@ import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Button.ClickListener;
 import com.vaadin.ui.HorizontalLayout;
+import com.vaadin.ui.Notification;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.VerticalLayout;
@@ -160,7 +162,11 @@ public class SelectProjectPanel extends Panel implements
 	 * @param projectName of the project to be opened
 	 */
 	private void fireOpenEditor(String projectName) {
-		ui.openMideaasEditor(projectName);
+		if (!ProjectFileUtils.isValidProjectName(projectName)){
+			Notification.show("Illigal project name " + projectName + ".");
+		}else{
+			ui.openMideaasEditor(projectName);
+		}
 	}
 	
 	/**

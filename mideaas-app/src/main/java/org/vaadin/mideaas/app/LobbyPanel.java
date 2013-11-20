@@ -67,10 +67,8 @@ public class LobbyPanel extends Panel {
         leftLayout.addComponent(getSelectProjectPanel());
         
         rightLayout.addComponent(initCreateProjectPanel());
-		if (MideaasConfig.easiCloudsFeaturesTurnedOn()){
-			rightLayout.addComponent(initUploadPanel());
-			rightLayout.addComponent(initGitProjectPanel());
-		}
+		rightLayout.addComponent(initUploadPanel());
+		rightLayout.addComponent(initGitProjectPanel());
 		ChatBox box = new ChatBox(chat);
 		box.setSizeFull();
 		box.setWidth("100%");

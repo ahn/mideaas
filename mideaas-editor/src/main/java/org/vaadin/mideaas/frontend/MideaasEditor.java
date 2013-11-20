@@ -70,7 +70,7 @@ public class MideaasEditor extends CustomComponent implements Listener {
 		this.settings = settings;
 		this.plugins = plugins;
 
-		builder = new Builder(project);
+		builder = new Builder(project,settings);
 		componentTree = new ProjectItemList(project, user);
 		
 		layout.setSizeFull();
@@ -120,7 +120,7 @@ public class MideaasEditor extends CustomComponent implements Listener {
 
 		sideBar.addComponent(componentTree);
 		sideBar.addComponent(buildComponent);
-		sideBar.addComponent(new JettyComponent(project, user));
+		sideBar.addComponent(new JettyComponent(project, user, settings));
 
 		ChatBox cb = new ChatBox(project.getChat());
 		cb.setUser(new ChatUser(user.getUserId(), user.getName(), "user1"));

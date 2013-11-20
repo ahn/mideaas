@@ -15,6 +15,7 @@ import org.vaadin.mideaas.frontend.MideaasEditorPlugin;
 import org.vaadin.mideaas.model.GitRepository;
 import org.vaadin.mideaas.model.LobbyBroadcastListener;
 import org.vaadin.mideaas.model.LobbyBroadcaster;
+import org.vaadin.mideaas.model.ProjectFileUtils;
 import org.vaadin.mideaas.model.ProjectLog;
 import org.vaadin.mideaas.model.SharedProject;
 import org.vaadin.mideaas.model.User;
@@ -47,7 +48,10 @@ public class MideaasUI extends UI implements LobbyBroadcastListener, MideaasEdit
 
 	/** The main layout. */
 	private final VerticalLayout mainLayout = new VerticalLayout();
+	private final UserSettings settings = MideaasConfig.getDefaultUserSettings();
 
+	
+	
 	static {
 		applyConfig();
 	}
@@ -189,7 +193,7 @@ public class MideaasUI extends UI implements LobbyBroadcastListener, MideaasEdit
 					Notification.Type.HUMANIZED_MESSAGE);
 			return false;
 		} else {
-			SharedProject project = SharedProject.createNewProject(projectName);
+			SharedProject project = SharedProject.createNewProject(projectName,settings);
 			if (project == null) {
 				return false;
 			}
@@ -244,22 +248,20 @@ public class MideaasUI extends UI implements LobbyBroadcastListener, MideaasEdit
 	 * 
 	 * @param projectName
 	 *            of the project to be opened
+	 * @throws Exception 
 	 */
-	public void openMideaasEditor(String projectName) {
-
+	public void openMideaasEditor(String projectName) {		
 		SharedProject project = SharedProject.getProject(projectName);
 		project.addUser(user);
 		
 		List<MideaasEditorPlugin> plugins = new LinkedList<MideaasEditorPlugin>();
-		plugins.add(new ZipPlugin(project, user));
+		plugins.add(new ZipPlugin(project, user,settings));
 		try {
 			plugins.add(new GitPlugin(project, user, GitRepository.fromExistingGitDir(project.getProjectDir())));
 		} catch (IOException e) {
 			System.err.println("WARNING: could not add git plugin!");
 		}
 		
-
-		UserSettings settings = MideaasConfig.getDefaultUserSettings();
 		plugins.add(new SettingsPlugin(settings));
 		
 		File fbf = MideaasConfig.getFeedbackFile();

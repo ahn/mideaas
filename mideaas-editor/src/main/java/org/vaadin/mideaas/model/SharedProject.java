@@ -133,6 +133,7 @@ public class SharedProject {
 	}
 
 	private static String getProjectPackageFor(String projectName) {
+		projectName.replace("-", "");
 		return projectRootPackage + "." + projectName;
 	}
 	
@@ -169,7 +170,7 @@ public class SharedProject {
 	/**
 	 * Creates a new project with default initial files.
 	 */
-	public static SharedProject createNewProject(String name) {
+	public static SharedProject createNewProject(String name, UserSettings settings) {
 
 		SharedProject s = createEmptyProject(name);
 		if (s == null) {
@@ -179,7 +180,7 @@ public class SharedProject {
 		try {
 			s.log.logCreated();
 			ProjectFileUtils.writeInitialFilesToDisk(s.getProjectDir(),
-					s.getPackageName());
+					s.getPackageName(), settings);
 			s.pomXml = new PomXml(ProjectFileUtils.generatePomXml(s
 					.getPackageName()));
 			s.writePomXml();
@@ -454,8 +455,8 @@ public class SharedProject {
 		}
 	}
 	
-	public synchronized void writeToDiskIncludingInitial(File dir) throws IOException {
-		ProjectFileUtils.writeInitialFilesToDisk(dir, getPackageName());
+	public synchronized void writeToDiskIncludingInitial(File dir, 	UserSettings settings) throws IOException {
+		ProjectFileUtils.writeInitialFilesToDisk(dir, getPackageName(), settings);
 		writeToDisk(dir);
 	}
 	

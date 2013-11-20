@@ -10,6 +10,7 @@ import java.util.concurrent.Executors;
 import org.apache.maven.shared.invoker.InvocationResult;
 import org.vaadin.mideaas.frontend.MavenTask.LogListener;
 import org.vaadin.mideaas.model.SharedProject;
+import org.vaadin.mideaas.model.UserSettings;
 
 public class Builder {
 
@@ -23,10 +24,12 @@ public class Builder {
 	private MavenTask task;
 
 	private final SharedProject project;
+	private final UserSettings settings;
 	private CopyOnWriteArrayList<BuildListener> listeners = new CopyOnWriteArrayList<>();
 
-	public Builder(SharedProject project) {
+	public Builder(SharedProject project, UserSettings settings) {
 		this.project = project;
+		this.settings=settings;
 	}
 	
 	public synchronized void addBuildListener(BuildListener li) {
@@ -65,13 +68,27 @@ public class Builder {
 		Properties props = new Properties();
 		props.setProperty("projectDirectory", project.getProjectDir()
 				.getAbsolutePath());
-		if (buildDir!=null) {
-			props.setProperty("alt.build.dir", buildDir);
-		}
-		if (userAgent!=null) {
-			props.setProperty("mideaas.user.agent", userAgent);
-		}
+		//compiles google appengine war
+		if (settings.gaeDeployTurnedOn){
+			
+			//Downloads all the maven dependencies
+			//mvn dependency:copy-dependencies			
 
+			//goals.add(0,"dependency:copy-dependencies");
+			
+			props.setProperty("GAECompile", "true");
+			if (userAgent!=null) {
+				props.setProperty("mideaas.user.agent", userAgent);
+			}
+		}else{
+			if (buildDir!=null) {
+				props.setProperty("alt.build.dir", buildDir);
+			}
+			if (userAgent!=null) {
+				props.setProperty("mideaas.user.agent", userAgent);
+			}
+		}
+		
 		task = new MavenTask(project.getPomXmlFile(), goals, props, listener);
 //		task.setLoggingEnabled(true);
 
@@ -86,7 +103,7 @@ public class Builder {
 	}
 	
 	private void fireBuildFinished(boolean success) {
-		// Don't need to fire in a different thread because this is always
+		// Doesn't need to fire in a different thread because this is always
 		// triggered by a background thread, never a Vaadin UI server visit.
 		for (BuildListener li : listeners) {
 			li.buildFinished(success);
