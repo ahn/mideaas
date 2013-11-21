@@ -8,10 +8,14 @@
 		<version>0.0.2-SNAPSHOT</version>
 		<relativePath>..</relativePath>
 	</parent>
+	<artifactId>mideaas-codeeditor</artifactId>
+	<packaging>jar</packaging>
 
-	<artifactId>mideaas-app</artifactId>
-	<packaging>war</packaging>
-	<name>MIDEaaS Application</name>
+	<name>MIDEaaS Code Editor</name>
+
+	<prerequisites>
+		<maven>3.0.0</maven>
+	</prerequisites>
 
 	<repositories>
 		<repository>
@@ -28,7 +32,9 @@
 				<enabled>true</enabled>
 			</snapshots>
 		</repository>
+
 	</repositories>
+
 	<pluginRepositories>
 		<pluginRepository>
 			<id>vaadin-snapshots</id>
@@ -48,54 +54,75 @@
 			<version>${vaadin.version}</version>
 		</dependency>
 		<dependency>
-			<groupId>com.vaadin</groupId>
-			<artifactId>vaadin-client-compiled</artifactId>
-			<version>${vaadin.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>com.vaadin</groupId>
-			<artifactId>vaadin-client</artifactId>
-			<version>${vaadin.version}</version>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>com.vaadin</groupId>
-			<artifactId>vaadin-themes</artifactId>
-			<version>${vaadin.version}</version>
-		</dependency>
-		<dependency>
 			<groupId>javax.servlet</groupId>
-			<artifactId>javax.servlet-api</artifactId>
-			<version>3.0.1</version>
+			<artifactId>servlet-api</artifactId>
+			<version>2.4</version>
 			<scope>provided</scope>
 		</dependency>
+
 		<dependency>
-			<groupId>com.vaadin</groupId>
-			<artifactId>vaadin-push</artifactId>
-			<version>${vaadin.version}</version>
+			<groupId>commons-io</groupId>
+			<artifactId>commons-io</artifactId>
+			<version>2.4</version>
 		</dependency>
+
 		<dependency>
-			<groupId>org.vaadin.mideaas</groupId>
-			<artifactId>mideaas-ide</artifactId>
-            <version>${version}</version>
+			<groupId>org.eclipse.jgit</groupId>
+			<artifactId>org.eclipse.jgit</artifactId>
+			<version>2.3.1.201302201838-r</version>
 		</dependency>
+
 		<dependency>
-			<groupId>org.scribe</groupId>
-			<artifactId>scribe</artifactId>
-			<version>1.3.3</version>
+			<groupId>org.vaadin.addons</groupId>
+			<artifactId>aceeditor</artifactId>
+			<version>0.8.10-SNAPSHOT</version>
 		</dependency>
+
 		<dependency>
-			<groupId>com.google.code.gson</groupId>
-			<artifactId>gson</artifactId>
-			<version>2.2.4</version>
+			<groupId>org.apache.maven.shared</groupId>
+			<artifactId>maven-invoker</artifactId>
+			<version>2.1.1</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.vaadin.addons</groupId>
+			<artifactId>clara</artifactId>
+			<version>1.0.0</version>
+		</dependency>
+
+		<!-- <dependency> <groupId>com.vaadin.addon</groupId> <artifactId>vaadin-touchkit-agpl</artifactId> 
+			<version>3.0.0-alpha5</version> </dependency> -->
+
+		<dependency>
+			<groupId>com.google.code.javaparser</groupId>
+			<artifactId>javaparser</artifactId>
+			<version>1.0.9</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.xmlrpc</groupId>
+			<artifactId>xmlrpc-common</artifactId>
+			<version>3.1.3</version>
 		</dependency>
 		
 		<dependency>
-			<groupId>org.vaadin.addon</groupId>
-			<artifactId>oauthpopup</artifactId>
-			<version>0.0.3-SNAPSHOT</version>
+			<groupId>org.apache.xmlrpc</groupId>
+			<artifactId>xmlrpc-client</artifactId>
+			<version>3.1.3</version>
 		</dependency>
-			            
+
+		<dependency>
+			<groupId>org.jvnet.sorcerer</groupId>
+			<artifactId>sorcerer-javac</artifactId>
+			<version>0.8</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.vaadin.addons</groupId>
+			<artifactId>chatbox</artifactId>
+			<version>0.7.3-SNAPSHOT</version>
+		</dependency>
+
 	</dependencies>
 
 	<build>
@@ -125,64 +152,53 @@
 				</configuration>
 			</plugin>
 			<plugin>
-				<groupId>com.vaadin</groupId>
-				<artifactId>vaadin-maven-plugin</artifactId>
-				<version>${vaadin.plugin.version}</version>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jar-plugin</artifactId>
+				<version>2.3.2</version>
 				<configuration>
-					<extraJvmArgs>-Xmx512M -Xss1024k</extraJvmArgs>
-					<!-- <runTarget>mobilemail</runTarget> -->
-					<!-- We are doing "inplace" but into subdir VAADIN/widgetsets. This 
-						way compatible with Vaadin eclipse plugin. -->
-					<webappDirectory>${basedir}/src/main/webapp/VAADIN/widgetsets
-					</webappDirectory>
-					<hostedWebapp>${basedir}/src/main/webapp/VAADIN/widgetsets
-					</hostedWebapp>
-					<noServer>true</noServer>
-					<!-- Remove draftCompile when project is ready -->
-					<draftCompile>false</draftCompile>
-					<compileReport>true</compileReport>
-					<style>OBF</style>
-					<strict>true</strict>
-					<runTarget>http://localhost:8080/</runTarget>
-				</configuration>
-				<executions>
-					<execution>
-						<configuration>
-							<!-- if you don't specify any modules, the plugin will find them -->
-							<!-- <modules> <module>com.vaadin.demo.mobilemail.gwt.ColorPickerWidgetSet</module> 
-								</modules> -->
-						</configuration>
-						<goals>
-							<goal>resources</goal>
-							<goal>update-widgetset</goal>
-							<goal>compile</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
-			<plugin>
-				<groupId>org.mortbay.jetty</groupId>
-				<artifactId>jetty-maven-plugin</artifactId>
-				<configuration>
-					<webApp>
-						<contextPath>/mideaas</contextPath>
-					</webApp>
-					<stopPort>9967</stopPort>
-					<stopKey>mideaas-app</stopKey>
-					<scanIntervalSeconds>2</scanIntervalSeconds>
+					<archive>
+						<index>true</index>
+						<addMavenDescriptor>false</addMavenDescriptor>
+						<manifest>
+							<addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+						</manifest>
+						<manifestEntries>
+							<Vaadin-Package-Version>1</Vaadin-Package-Version>
+						</manifestEntries>
+					</archive>
 				</configuration>
 			</plugin>
 			<plugin>
-				<groupId>org.apache.tomcat.maven</groupId>
-				<artifactId>tomcat6-maven-plugin</artifactId>
-				<version>2.1</version>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.tomcat.maven</groupId>
-				<artifactId>tomcat7-maven-plugin</artifactId>
-				<version>2.1</version>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-assembly-plugin</artifactId>
+				<version>2.3</version>
+				<configuration>
+					<finalName>clara-${project.version}</finalName>
+					<appendAssemblyId>false</appendAssemblyId>
+					<descriptors>
+						<descriptor>assembly.xml</descriptor>
+					</descriptors>
+				</configuration>
 			</plugin>
 		</plugins>
+		<resources>
+			<resource>
+				<directory>src/main/resources</directory>
+				<includes>
+					<include>*.format</include>
+					<include>MideaasComponent.java</include>
+					<include>jettyutil/**</include>
+					<include>java-classes.txt</include>
+				</includes>
+			</resource>
+			<!-- Including css files in the package. -->
+			<resource>
+				<directory>src/main/java</directory>
+				<includes>
+					<include>**/*.css</include>
+				</includes>
+			</resource>
+		</resources>
 		<pluginManagement>
 			<plugins>
 				<!--This plugin's configuration is used to store Eclipse m2e settings 
@@ -201,7 +217,7 @@
 											vaadin-maven-plugin
 										</artifactId>
 										<versionRange>
-											[7.0.4,)
+											[7.0.2,)
 										</versionRange>
 										<goals>
 											<goal>resources</goal>
