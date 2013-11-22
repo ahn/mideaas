@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Random;
 
 import org.vaadin.mideaas.app.MideaasTest;
-import org.vaadin.mideaas.model.ServerContainer;
 import org.vaadin.mideaas.model.XmlTestWriter;
 
 import com.vaadin.data.util.BeanItemContainer;

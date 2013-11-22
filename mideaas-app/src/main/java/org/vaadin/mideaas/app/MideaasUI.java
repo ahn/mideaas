@@ -2,20 +2,16 @@ package org.vaadin.mideaas.app;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.vaadin.mideaas.app.MideaasConfig.Prop;
 import org.vaadin.mideaas.frontend.ClaraEditor;
 import org.vaadin.mideaas.frontend.JettyUtil;
 import org.vaadin.mideaas.frontend.MavenUtil;
-import org.vaadin.mideaas.frontend.MideaasEditor;
-import org.vaadin.mideaas.frontend.MideaasEditorPlugin;
 import org.vaadin.mideaas.model.GitRepository;
-import org.vaadin.mideaas.model.LobbyBroadcastListener;
 import org.vaadin.mideaas.model.LobbyBroadcaster;
-import org.vaadin.mideaas.model.ProjectFileUtils;
 import org.vaadin.mideaas.model.ProjectLog;
 import org.vaadin.mideaas.model.SharedProject;
 import org.vaadin.mideaas.model.User;
@@ -25,49 +21,50 @@ import org.vaadin.mideaas.model.ZipUtils;
 import com.vaadin.annotations.PreserveOnRefresh;
 import com.vaadin.annotations.Push;
 import com.vaadin.annotations.Theme;
+import com.vaadin.navigator.Navigator;
 import com.vaadin.server.VaadinRequest;
-import com.vaadin.shared.ui.label.ContentMode;
-import com.vaadin.ui.Component;
-import com.vaadin.ui.Label;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.UI;
-import com.vaadin.ui.VerticalLayout;
 
-// TODO: Auto-generated Javadoc
-/**
- * The Class MideaasUI.
- */
+
 @PreserveOnRefresh
 @SuppressWarnings("serial")
 @Theme("reindeer")
 @Push
-public class MideaasUI extends UI implements LobbyBroadcastListener, MideaasEditor.CloseHandler {
+public class MideaasUI extends UI {
 
-	/** The user. */
+	private static TreeSet<User> loggedInUsers = new TreeSet<User>();
+	static void addUser(User user) {
+		synchronized (MideaasUI.class) {
+			loggedInUsers.add(user);
+		}
+		LobbyView.getLobbyChat().addLine(user.getName()+" logged in");
+		LobbyBroadcaster.broadcastLoggedInUsersChanged(getLoggedInUsers());
+	}
+	
+	static void removeUser(User user) {
+		synchronized (MideaasUI.class) {
+			loggedInUsers.remove(user);
+		}
+		SharedProject.removeFromProjects(user);
+		LobbyView.getLobbyChat().addLine(user.getName()+" left");
+		LobbyBroadcaster.broadcastLoggedInUsersChanged(getLoggedInUsers());
+	}
+	
+	synchronized static Set<User> getLoggedInUsers() {
+		return new TreeSet<User>(loggedInUsers);
+	}
+	
+	private Navigator navigator;
+	
 	private User user;
-
-	/** The main layout. */
-	private final VerticalLayout mainLayout = new VerticalLayout();
+	
 	private final UserSettings settings = MideaasConfig.getDefaultUserSettings();
 
-	
-	
 	static {
 		applyConfig();
 	}
 
-	public class DownloadUI extends UI {
-
-		@Override
-		protected void init(VaadinRequest request) {
-			setContent(new Label("DownloadProject"));
-		}
-
-	}
-
-	/**
-	 * Apply config.
-	 */
 	private static void applyConfig() {
 		
 		ProjectLog.setLogDir(MideaasConfig.getLogDir());
@@ -100,94 +97,37 @@ public class MideaasUI extends UI implements LobbyBroadcastListener, MideaasEdit
 	}
 
 	@Override
-	public void attach() {
-		super.attach();
-		mainLayout.setSizeFull();
-	}
-
-	@Override
 	protected void init(VaadinRequest request) {
-		drawLobby();
-		LobbyBroadcaster.register(this);
+		
+		navigator = new Navigator(this, this);
+		
+		navigator.addView("", new LoginView(this, "lobby"));
+		navigator.addView("lobby", new LobbyView(this));
+		
+		navigator.addProvider(new EditorViewProvider(this, settings));
+		
+		navigator.setErrorView(new LobbyView(this));
 	}
 
 	@Override
 	public void detach() {
 		logout();
-		LobbyBroadcaster.unregister(this);
 		super.detach();
 	}
-
-	/*
-	 * (non-Javadoc) If component has registered as a listener, then this
-	 * function eceives broadcasts. If user has logged in, then lobby is redrawn
-	 * and a notification is shown
-	 * 
-	 * @see
-	 * org.vaadin.mideaas.app.LobbyBroadcastListener#receiveLobbyBroadcast(java
-	 * .lang.String)
-	 */
-	@Override
-	public void receiveLobbyBroadcast(final String message) {
-		access(new Runnable() {
-			@Override
-			public void run() {
-				if (user != null) {
-					drawLobby();
-					Notification.show(message,
-							Notification.Type.HUMANIZED_MESSAGE);
-				}
-			}
-		});
+	
+	public void logout() {
+		setUser(null);
 	}
 
-	/**
-	 * Draws lobby if user has logged in.
-	 */
-	private void drawLobby() {
-		// user is collaborating in one of the projects
-		if (user != null && SharedProject.isInProject(user)) {
-			return;
-		} else {
-			// if not, then components are removed and redrawn
-			mainLayout.removeAllComponents();
-			this.setContent(mainLayout);
-			Component content;
-			if (this.user == null) {
-				content = createLoginPanel();
-			} else {
-				content = new LobbyPanel(this, user);
-			}
-			mainLayout.addComponent(content);
-			mainLayout.setExpandRatio(content, 1);
-			mainLayout
-					.addComponent(new Label(
-							"Some icons by <a href=\"http://p.yusukekamiyamane.com/\">Yusuke Kamiyamane</a>.",
-							ContentMode.HTML));
-		}
-	}
-
-	private Component createLoginPanel() {
-		if (MideaasConfig.isExperiment()) {
-			return new ExperimentLoginPanel(this);
-		}
-		else {
-			return new LoginPanel(this, user);
-		}
+	public User getUser() {
+		return user;
 	}
 
 	/**
 	 * Creates new project and returns false if fails.
 	 * 
-	 * @param projectName
-	 *            the project name
-	 * @param type
-	 *            the type
-	 * @param createSkeleton
-	 *            the create skeleton
-	 * @return true, if successful
 	 */
-	public boolean newProject(String projectName, Boolean createSkeleton) {
+	public boolean newProject(String projectName, boolean createSkeleton) {
 		if (SharedProject.getProjectNames().contains(projectName)) {
 			Notification.show(projectName + " already exists",
 					Notification.Type.HUMANIZED_MESSAGE);
@@ -205,8 +145,7 @@ public class MideaasUI extends UI implements LobbyBroadcastListener, MideaasEdit
 				System.err.println("WARNING: could not initialize Git repository at " + project.getProjectDir());
 			}
 
-			LobbyBroadcaster.broadcast(user.getName() + " created project: "
-					+ projectName);
+			broadcastNewProject(projectName);
 			return true;
 		}
 	}
@@ -223,12 +162,16 @@ public class MideaasUI extends UI implements LobbyBroadcastListener, MideaasEdit
 		if (project != null) {
 			GitRepository.cloneFrom(gitUrl, project.getProjectDir());
 			project.refreshFromDisk();
-			LobbyBroadcaster.broadcast(user.getName() + " created project: " + projectName);
+			broadcastNewProject(projectName);
 		}
 		else {
 			Notification.show("Could not clone project from Git :(");
 		}
-
+	}
+	
+	private void broadcastNewProject(String projectName) {
+		LobbyBroadcaster.broadcastProjectsChanged();
+		LobbyView.getLobbyChat().addLine(getUser().getName()+" created project "+projectName);
 	}
 
 	/**
@@ -239,75 +182,14 @@ public class MideaasUI extends UI implements LobbyBroadcastListener, MideaasEdit
 	 *            the name of the project to be destroyer
 	 */
 	public void removeProject(String projectName) {
-		RemoveProjectWindow window = new RemoveProjectWindow(user, projectName);
+		RemoveProjectWindow window = new RemoveProjectWindow(getUser(), projectName);
 		UI.getCurrent().addWindow(window);
 	}
 
-	/**
-	 * Opens MideaasEditor.
-	 * 
-	 * @param projectName
-	 *            of the project to be opened
-	 * @throws Exception 
-	 */
-	public void openMideaasEditor(String projectName) {		
-		SharedProject project = SharedProject.getProject(projectName);
-		project.addUser(user);
-		
-		List<MideaasEditorPlugin> plugins = new LinkedList<MideaasEditorPlugin>();
-		plugins.add(new ZipPlugin(project, user,settings));
-		try {
-			plugins.add(new GitPlugin(project, user, GitRepository.fromExistingGitDir(project.getProjectDir())));
-		} catch (IOException e) {
-			System.err.println("WARNING: could not add git plugin!");
-		}
-		
-		plugins.add(new SettingsPlugin(settings));
-		
-		File fbf = MideaasConfig.getFeedbackFile();
-		if (fbf != null) {
-			plugins.add(new FeedbackPlugin(fbf));
-		}
-		
-		plugins.add(new TestPlugin());
-		
-		MideaasEditor editor = new MideaasEditor(user, project, settings, plugins);
-		editor.setTestingEnabled(!MideaasConfig.isExperiment());
-		editor.setCloseHandler(this);
-		setContent(editor);
-		LobbyBroadcaster.broadcast(user.getName() + " entered to project: " + projectName + "!");
+	public void openMideaasEditor(String projectName) {
+		navigator.navigateTo("edit/"+projectName);
 	}
 
-	/**
-	 * Logs user out from the system.
-	 */
-	public void logout() {
-		if (user != null) {
-			SharedProject.removeFromProjects(user);
-			String name = user.getName();
-			user = null;
-			drawLobby();
-			LobbyBroadcaster.broadcast(name + " logged out!");
-		}
-	}
-
-	/**
-	 * Logs user in to system.
-	 * 
-	 * @param user
-	 *            the user
-	 */
-	public void loggedIn(User user) {
-		this.user = user;
-		LobbyBroadcaster.broadcast(user.getName() + " logged in!");
-	}
-
-	/**
-	 * Upload project file.
-	 * 
-	 * @param file
-	 *            the file
-	 */
 	public void uploadProject(File file) {
 		try {
 			String name = ZipUtils.projectNameInZip(file);
@@ -319,8 +201,7 @@ public class MideaasUI extends UI implements LobbyBroadcastListener, MideaasEdit
 					MideaasConfig.getProperty(Prop.PROJECTS_DIR));
 			File projectDir = ZipUtils.unzip(file, projectsRootDir);
 			SharedProject.addProjectFromFiles(projectDir);
-			LobbyBroadcaster.broadcast(user.getName() + " created project: "
-					+ projectDir.getName());
+			broadcastNewProject(projectDir.getName());
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -328,9 +209,25 @@ public class MideaasUI extends UI implements LobbyBroadcastListener, MideaasEdit
 		}
 	}
 
-	@Override
-	public void closeRequested(SharedProject project) {
-		project.removeFromProject(user);
-		drawLobby();
+	public void setUser(User user) {
+		if (user==null ? this.user==null : user.equals(this.user)) {
+			return;
+		}
+		if (this.user!=null) {
+			removeUser(this.user);
+		}
+		this.user = user;
+		if (user!=null) {
+			addUser(user);
+		}
+		else {
+			navigateTo("");
+		}
 	}
+
+	public void navigateTo(String nextView) {
+		navigator.navigateTo(nextView);
+	}
+
+	
 }

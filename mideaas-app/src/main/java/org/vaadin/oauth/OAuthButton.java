@@ -20,7 +20,6 @@ import com.vaadin.server.VaadinResponse;
 import com.vaadin.server.VaadinSession;
 import com.vaadin.shared.MouseEventDetails;
 import com.vaadin.shared.ui.BorderStyle;
-
 import com.vaadin.ui.Button;
 
 /**

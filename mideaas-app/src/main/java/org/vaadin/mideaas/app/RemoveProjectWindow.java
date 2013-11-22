@@ -41,7 +41,8 @@ public class RemoveProjectWindow extends Window {
 					boolean removed = SharedProject.removeProject(projectName);
 					if (removed) {
 						SharedProject.removeProject(projectName);
-				        LobbyBroadcaster.broadcast(user.getName() + " removed project: " + projectName);
+						LobbyView.getLobbyChat().addLine(user.getName() + " removed project " + projectName);
+				        LobbyBroadcaster.broadcastProjectsChanged();
 					}
 					else {
 						Notification.show("Failed to remove "+projectName+"!");

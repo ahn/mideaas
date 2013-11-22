@@ -1,25 +1,6 @@
 package org.vaadin.mideaas.model;
 
 import java.io.File;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
-
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-
-import org.vaadin.mideaas.test.ScriptContainer;
-import org.vaadin.mideaas.test.Script;
-
-import org.vaadin.mideaas.app.MideaasConfig;
-import org.vaadin.mideaas.model.ServerContainer;
-import org.vaadin.mideaas.model.Server;
-
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -27,8 +8,22 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.util.Arrays;
 
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+
+import org.vaadin.mideaas.app.MideaasConfig;
+import org.vaadin.mideaas.test.Script;
+import org.vaadin.mideaas.test.ScriptContainer;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;

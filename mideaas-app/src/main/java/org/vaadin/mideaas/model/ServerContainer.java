@@ -4,8 +4,6 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.vaadin.mideaas.test.Script;
-
 import com.vaadin.data.util.BeanItemContainer;
 
 public class ServerContainer extends BeanItemContainer<Server> implements

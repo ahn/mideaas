@@ -29,7 +29,16 @@ public class MideaasConfig {
         EXPERIMENT,
         LOG_DIR,
         DEFAULT_WIDGETSET_USER_AGENT,
-        FEEDBACK_FILE
+        FEEDBACK_FILE,
+
+        GITHUB_KEY,
+        GITHUB_SECRET,
+        
+        FACEBOOK_KEY,
+        FACEBOOK_SECRET,
+        
+        TWITTER_KEY,
+        TWITTER_SECRET
     }
 
     public static final String MIDEAAS_CONFIG_FILE_IN_CLASSPATH = "mideaas.properties";
