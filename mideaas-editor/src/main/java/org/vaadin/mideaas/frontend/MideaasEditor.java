@@ -131,6 +131,14 @@ public class MideaasEditor extends CustomComponent implements Listener {
 		split.setSplitPosition(20.0f);
 
 		setActiveFile(project.getFile("App.java"));
+		
+		if (settings.easiCloudsFeaturesTurnedOn){
+			MenuItem root = this.menu.addItem("Deploy to...",null);
+			MenuItem item = root.addItem("Jetty", null);
+			root.addItem("Gae", null);
+			item.setChecked(true);
+		}
+		
 	}
 
 	private void initMenuBar() {
