@@ -135,8 +135,11 @@ public class MideaasEditor extends CustomComponent implements Listener {
 		if (settings.easiCloudsFeaturesTurnedOn){
 			MenuItem root = this.menu.addItem("Deploy to...",null);
 			MenuItem item = root.addItem("Jetty", null);
-			root.addItem("Gae", null);
+			item.setCheckable(true);
 			item.setChecked(true);
+			item = root.addItem("Gae", null);
+			item.setCheckable(true);
+			item.setChecked(false);
 		}
 		
 	}
