@@ -1,5 +1,7 @@
 package org.vaadin.mideaas.app;
 
+import java.net.URI;
+
 import org.vaadin.addon.oauthpopup.OAuthListener;
 import org.vaadin.addon.oauthpopup.OAuthPopupButton;
 import org.vaadin.addon.oauthpopup.buttons.FacebookButton;
@@ -43,7 +45,31 @@ public class LoginView extends VerticalLayout implements View {
     
     @Override
 	public void enter(ViewChangeEvent event) {
-    	
+		if (MideaasConfig.easiCloudsFeaturesTurnedOn()) {
+			// lets collect possible openID Token ?openId=EC-D-DD-000815%7Cunity
+			URI location = getUI().getPage().getLocation();
+			String value = location.getQuery();
+			if (value != null) {
+				// so there is a querystring
+				int separator = value.indexOf('|');
+				if (separator != -1) {
+					// separator finded
+					String oauthToken = value.substring(0, separator);
+					String userName = value.substring(separator + 1);
+					if (userName != null && oauthToken != null) {
+						// username and token OK
+						ui.setUser(User.newUser(userName));
+						resetPath();
+					}
+				}
+			}
+		}
+	}
+
+	public void resetPath() {
+		String path = getUI().getPage().getLocation().getPath();
+		// Going to lobby, a bit of a hack...
+		getUI().getPage().setLocation(path+"#!lobby");
 	}
 
 	/**

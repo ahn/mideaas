@@ -93,7 +93,7 @@ public class JettyComponent extends CustomComponent {
 		layout.addComponent(link);
 		link.setVisible(false);
 
-		if (settings.easiCloudsFeaturesTurnedOn){
+		if (settings.gaeDeployTurnedOn){
 			this.startButton.addClickListener(new Button.ClickListener() {				
 				@Override
 				public void buttonClick(ClickEvent event) {

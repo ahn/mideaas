@@ -134,7 +134,9 @@ public class CreateProjectPanel extends Panel {
 //				type = ProjectType.generic;
 //			}
 
-			ui.newProject(name,skBox.getValue());
+		//ui.newProject(name,skBox.getValue());
+		ui.newProject(name,true);
+
 		} else {
 			Notification.show("Not a valid project name.");
 		}
