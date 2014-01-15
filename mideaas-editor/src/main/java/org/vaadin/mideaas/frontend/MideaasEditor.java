@@ -120,7 +120,12 @@ public class MideaasEditor extends CustomComponent implements Listener {
 
 		sideBar.addComponent(componentTree);
 		sideBar.addComponent(buildComponent);
-		sideBar.addComponent(new JettyComponent(project, user, settings));
+		//adds delpoy component to view
+		if (settings.paasDeployTurnedOn){
+			sideBar.addComponent(new DeployComponent(project, settings));
+		}
+		
+		sideBar.addComponent(new JettyComponent(project, user));
 
 		ChatBox cb = new ChatBox(project.getChat());
 		cb.setUser(new ChatUser(user.getUserId(), user.getName(), "user1"));
@@ -131,7 +136,8 @@ public class MideaasEditor extends CustomComponent implements Listener {
 		split.setSplitPosition(20.0f);
 
 		setActiveFile(project.getFile("App.java"));
-		
+
+		//adds new menuitem (that does not do anything)
 		if (settings.easiCloudsFeaturesTurnedOn){
 			MenuItem root = this.menu.addItem("Deploy to...",null);
 			MenuItem item = root.addItem("Jetty", null);

@@ -5,7 +5,7 @@
     <groupId>%s</groupId>
     <artifactId>%s</artifactId>
     <version>%s</version>
-    <packaging>jar</packaging>
+    <packaging>%s</packaging>
 
     <name>MIDEaaS Application</name>
     
