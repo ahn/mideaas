@@ -141,13 +141,13 @@ public class ProjectFileUtils {
 	public static void writeInitialFilesToDisk(File dir, String projPackage,UserSettings settings) throws IOException {
 		createProjectDirs(dir, projPackage);
 		//writeApp(dir, projPackage, generateApp(projPackage));
-		if (settings.gaeDeployTurnedOn){
-			writeTheme(dir,projPackage);
+		if (settings.compileGae){
+			writeTheme(dir,projPackage,settings);
 			writeAppengineWebXml(dir, generateAppengineWebXml(projPackage));
 			writeLoggingProperties(dir, generateLoggingProperties());
 			writeManifestMF(dir, generateManifestMF());
 		}
-		writeWebXml(dir, generateWebXml(projPackage));
+		writeWebXml(dir, generateWebXml(projPackage,settings));
 		writeWidgetset(dir, projPackage, generateWidgetset());
 		writeMideaasComponentCode(dir);
     }
@@ -160,12 +160,14 @@ public class ProjectFileUtils {
 		return String.format(readResource("logging.properties.format"));
 	}
 
-	private static void writeTheme(File dir,String projPackage) throws IOException {
+	private static void writeTheme(File dir,String projPackage, UserSettings settings) throws IOException {
 		String appName = projPackage.substring(projPackage.lastIndexOf(".")+1);
 		dir = FileUtils.getFile(dir, "src", "main", "webapp", "VAADIN","themes",appName);
 		String filename=appName+".scss";
 		FileUtils.write(new File(getWebInfDir(dir),"addons.scss"), "@mixin addons {/n}");
-		FileUtils.write(new File(getWebInfDir(dir),filename), "@import \"../reindeer/reindeer.scss\";/n@mixin gaetestvaadin7 {/n@include reindeer;/n}");
+		if (settings.compileGae){
+			FileUtils.write(new File(getWebInfDir(dir),filename), "@import \"../reindeer/reindeer.scss\";/n@mixin gaetestvaadin7 {/n@include reindeer;/n}");
+		}
 		FileUtils.write(new File(getWebInfDir(dir),"styles.scss"), "@import \"addons.scss\";@import \"" + filename +"\";");
 	}
 
@@ -211,19 +213,28 @@ public class ProjectFileUtils {
 				"</module>\n";
 	}
 	
-	public static String generatePomXml(String projPackage) throws IOException {
+	public static String generatePomXml(String projPackage, UserSettings settings) throws IOException {
 		int lastDot = projPackage.lastIndexOf(".");
 		String groupId = projPackage.substring(0, lastDot);
 		String artifactId = projPackage.substring(lastDot+1);
 		String version = "0.1-SNAPSHOT"; // ?
+		String packaging="war";
+		
 		return String.format(readResource("pom.xml.format"),
-				groupId, artifactId, version);
+				groupId, artifactId, version, packaging);
 	}
 	
-	private static String generateWebXml(String projPackage) throws IOException {
+	private static String generateWebXml(String projPackage,UserSettings settings) throws IOException {
 		String app = projPackage + "." + getAppClassName();
-		return String.format(readResource("web.xml.format"),
+		String s= "";
+		if (settings.compileGae){
+			s= String.format(readResource("web.xml.format"),
 				"com.vaadin.server.GAEVaadinServlet", app, getWidgetSetName(projPackage));
+		}else{
+			s = String.format(readResource("web.xml.format"),
+				"com.vaadin.server.VaadinServlet", app, getWidgetSetName(projPackage));
+		}
+		return s;
 	}
 
 	private static String generateAppengineWebXml(String projPackage) throws IOException {

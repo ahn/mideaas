@@ -69,7 +69,7 @@ public class Builder {
 		props.setProperty("projectDirectory", project.getProjectDir()
 				.getAbsolutePath());
 		//compiles google appengine war
-		if (settings.gaeDeployTurnedOn){
+		if (settings.compileGae){
 			
 			//Downloads all the maven dependencies
 			//mvn dependency:copy-dependencies			

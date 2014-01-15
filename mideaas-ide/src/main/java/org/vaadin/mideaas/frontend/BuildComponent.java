@@ -50,10 +50,6 @@ public class BuildComponent extends CustomComponent implements BuildListener {
 		this.builder = builder;
 		this.user = user;
 		this.settings = settings;
-
-		if (settings.gaeDeployTurnedOn){
-			buildButton.setCaption("Build GAE");
-		}
 		
 		Panel p = new Panel("Build");
 		p.setContent(layout);

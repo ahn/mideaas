@@ -185,7 +185,7 @@ public class SharedProject {
 			ProjectFileUtils.writeInitialFilesToDisk(s.getProjectDir(),
 					s.getPackageName(), settings);
 			s.pomXml = new PomXml(ProjectFileUtils.generatePomXml(s
-					.getPackageName()));
+					.getPackageName(),settings));
 			s.writePomXml();
 			s.addUiClass();
 			s.addHelloWorldSkeleton();
