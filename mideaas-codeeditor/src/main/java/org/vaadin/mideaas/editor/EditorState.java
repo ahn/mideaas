@@ -1,6 +1,12 @@
 package org.vaadin.mideaas.editor;
 
 
+/** 
+ * The state of MultiUserEditor.
+ * 
+ * The editor can show my code, other peoples code, or the error-free base code.
+ *
+ */
 public class EditorState {
 	
 	public enum DocType {

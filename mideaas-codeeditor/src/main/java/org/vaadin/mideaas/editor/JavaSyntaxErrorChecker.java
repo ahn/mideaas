@@ -25,7 +25,6 @@ public class JavaSyntaxErrorChecker implements ErrorChecker {
 			latestValid = getCu(initial);
 		} catch (ParseException | TokenMgrError e) {
 			// TokenMgrError is thrown eg. when incomplete string literal (single ")
-			// why that's not a parse error?
 			System.err.println("WARNING: initial java code has syntax errors.");
 			throw new IllegalStateException("Initial java code has syntax errors. That shouldn't be!");
 		}
@@ -38,7 +37,6 @@ public class JavaSyntaxErrorChecker implements ErrorChecker {
 			return Collections.emptyList();
 		} catch (ParseException | TokenMgrError e) {
 			// TokenMgrError is thrown eg. when incomplete string literal (single ")
-			// why that's not a parse error?
 			return Collections.singletonList(new Error("error",0,0) /* TODO */);
 		}
 	}

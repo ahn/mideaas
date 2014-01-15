@@ -68,7 +68,6 @@ public class MultiUserEditorUserGroup extends CustomComponent
 	@Override
 	public void attach() {
 		super.attach();
-//		setData(Collections.singleton(user));
 		setDifferingUsers(doc.getDifferingUsers());
 		doc.addDifferingUsersChangedListener(this);
 		group.addValueChangeListener(this);
