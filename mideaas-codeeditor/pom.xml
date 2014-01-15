@@ -75,7 +75,7 @@
 		<dependency>
 			<groupId>org.vaadin.addons</groupId>
 			<artifactId>aceeditor</artifactId>
-			<version>0.8.10-SNAPSHOT</version>
+			<version>0.8.10</version>
 		</dependency>
 
 		<dependency>
@@ -115,12 +115,6 @@
 			<groupId>org.jvnet.sorcerer</groupId>
 			<artifactId>sorcerer-javac</artifactId>
 			<version>0.8</version>
-		</dependency>
-
-		<dependency>
-			<groupId>org.vaadin.addons</groupId>
-			<artifactId>chatbox</artifactId>
-			<version>0.7.3-SNAPSHOT</version>
 		</dependency>
 
 	</dependencies>
