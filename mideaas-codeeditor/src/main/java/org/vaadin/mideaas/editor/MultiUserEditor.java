@@ -315,7 +315,9 @@ public class MultiUserEditor extends CustomComponent
 	public void diff(DiffEvent e) {
 		if (activeDoc!=null) {
 			AceDoc doc = editor.getDoc().withoutMarkers();
-			checker.checkErrors(doc.getText(), this);
+			if (checker!=null) {
+				checker.checkErrors(doc.getText(), this);
+			}
 			activeDoc.editorChanged(doc);
 		}
 	}
