@@ -187,7 +187,7 @@ public class MultiUserEditor extends CustomComponent
 
 
 	protected void syncDoc() {
-		if (activeDoc!=null) {
+		if (activeDoc!=null && currentState.type==EditorState.DocType.MINE) {
 			activeDoc.syncDoc(editor.getDoc().withoutMarkers());
 		}
 	}
@@ -212,7 +212,7 @@ public class MultiUserEditor extends CustomComponent
 
 		currentState = state;
 		if (state.type==DocType.OTHERS || state.type==DocType.MINE) {
-			setActiveDocToUser(state.userId);
+			setActiveDocToUser(state.diff.getUserId());
 		}
 		else {
 			setActiveDocToBase();

@@ -5,7 +5,7 @@ import java.util.EventObject;
 import java.util.Set;
 
 import org.vaadin.mideaas.editor.EditorState.DocType;
-import org.vaadin.mideaas.editor.MultiUserDoc.DifferingUsersChangedListener;
+import org.vaadin.mideaas.editor.MultiUserDoc.DifferingChangedListener;
 
 import com.vaadin.data.Property.ValueChangeEvent;
 import com.vaadin.data.Property.ValueChangeListener;
@@ -15,7 +15,7 @@ import com.vaadin.util.ReflectTools;
 
 @SuppressWarnings("serial")
 public class MultiUserEditorUserGroup extends CustomComponent
-		implements DifferingUsersChangedListener, ValueChangeListener {
+		implements DifferingChangedListener, ValueChangeListener {
 	
 	public interface EditorStateChangedListener {
 		public void stateChanged(EditorStateChangedEvent event);
@@ -36,7 +36,7 @@ public class MultiUserEditorUserGroup extends CustomComponent
 
 	private final String userId;
 	private final MultiUserDoc doc;
-	private final EditorState mine;
+	private final EditorState mineThatEqualsBase;
 	
 	
 	private EditorState currentState;
@@ -45,8 +45,8 @@ public class MultiUserEditorUserGroup extends CustomComponent
 	public MultiUserEditorUserGroup(String userId, MultiUserDoc doc) {
 		this.userId = userId;
 		this.doc = doc;
-		mine = new EditorState(DocType.MINE, userId);
-		currentState = mine;
+		mineThatEqualsBase = new EditorState(DocType.MINE, new DocDifference(userId, null, null));
+		currentState = mineThatEqualsBase;
 		group.setImmediate(true);
 		group.setNullSelectionAllowed(false);
 		setCompositionRoot(group);
@@ -68,8 +68,8 @@ public class MultiUserEditorUserGroup extends CustomComponent
 	@Override
 	public void attach() {
 		super.attach();
-		setDifferingUsers(doc.getDifferingUsers());
-		doc.addDifferingUsersChangedListener(this);
+		setDifferences(doc.getDifferences());
+		doc.addDifferingChangedListener(this);
 		group.addValueChangeListener(this);
 	}
 	
@@ -77,40 +77,45 @@ public class MultiUserEditorUserGroup extends CustomComponent
 	public void detach() {
 		super.detach();
 		
-		doc.removeDifferingUsersChangedListener(this);
+		doc.removeDifferingChangedListener(this);
 	}
 	
 	@Override
-	public void differingUsersChanged(final Set<String> users) {
+	public void differencesChanged(final Set<DocDifference> diffs) {
 		getUI().access(new Runnable() {
 			@Override
 			public void run() {
-				setDifferingUsers(users);
+				setDifferences(diffs);
 			}
 		});
 	}
 
-	private void setDifferingUsers(Set<String> users) {
+	private void setDifferences(Set<DocDifference> diffs) {
 		group.removeAllItems();
 		
-		if (users.isEmpty()) {
-			group.addItem(mine);
-			group.select(mine);
-			setCurrentState(mine);
+		if (diffs.isEmpty()) {
+			group.addItem(mineThatEqualsBase);
+			group.select(mineThatEqualsBase);
+			setCurrentState(mineThatEqualsBase);
 			return;
 		}
 		
 		EditorState base = new EditorState(DocType.BASE, null);
 		
-		group.addItem(mine);
-		
-		if (users.contains(userId)) {
-			group.addItem(base);
+		DocDifference my = myDifference(diffs);
+		EditorState myState;
+		if (my==null) {
+			myState = mineThatEqualsBase;
 		}
+		else {
+			group.addItem(base);
+			myState = new EditorState(DocType.MINE, my);
+		}
+		group.addItem(myState);
 		
-		for (String uid : users) {
-			if (!uid.equals(userId)) {
-				group.addItem(new EditorState(DocType.OTHERS, uid));
+		for (DocDifference d : diffs) {
+			if (!d.getUserId().equals(userId)) {
+				group.addItem(new EditorState(DocType.OTHERS, d));
 			}
 		}
 		
@@ -118,12 +123,22 @@ public class MultiUserEditorUserGroup extends CustomComponent
 			group.select(currentState);
 		}
 		else {
-			group.select(mine); //
-			setCurrentState(mine);
+			group.select(myState);
+			setCurrentState(myState);
 		}
+		
 		
 	}
 	
+	private DocDifference myDifference(Set<DocDifference> diffs) {
+		for (DocDifference d : diffs) {
+			if (d.getUserId().equals(userId)) {
+				return d;
+			}
+		}
+		return null;
+	}
+
 	private void setCurrentState(EditorState state) {
 		if (state.equals(currentState)) {
 			return;
@@ -141,8 +156,10 @@ public class MultiUserEditorUserGroup extends CustomComponent
 	public void valueChange(ValueChangeEvent event) {
 		EditorState st = (EditorState)event.getProperty().getValue();
 		if (st==null) {
-			st = mine;
+			st = mineThatEqualsBase;
 		}
 		setCurrentState(st);
 	}
+	
+	
 }

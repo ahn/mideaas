@@ -32,5 +32,5 @@
 
     <inherits name="org.vaadin.aceeditor.AceEditorWidgetSet" />
 
-    <inherits name="org.vaadin.chatbox.WidgetSet" />
+    
 </module>

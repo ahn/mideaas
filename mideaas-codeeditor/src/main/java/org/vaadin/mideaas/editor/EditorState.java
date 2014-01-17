@@ -16,22 +16,27 @@ public class EditorState {
 	}
 	
 	public final DocType type;
-	public final String userId;
-	public EditorState(DocType type, String userId) {
+	public final DocDifference diff;
+	public EditorState(DocType type, DocDifference diff) {
 		this.type = type;
-		this.userId = userId;
+		this.diff = diff;
 	}
 	@Override public boolean equals(Object o) {
 		if (o instanceof EditorState) {
 			EditorState oe = (EditorState)o;
-			return oe.type==type && (userId==null ? oe.userId==null : userId.equals(oe.userId));
+			return oe.type==type && (diff==null ? oe.diff==null : diff.getUserId().equals(oe.diff.getUserId()));
 		}
 		return false;
 	}
 	@Override public int hashCode() {
-		return type.hashCode() * (userId==null ? 1 : userId.hashCode()); // ?
+		return type.hashCode() * (diff==null ? 1 : diff.getUserId().hashCode()); // ?
 	}
 	@Override public String toString() {
-		return userId==null ? type.toString() : type.toString()+":"+userId;
+		if (diff==null || !diff.isChanged()) {
+			return "Shared";
+		}
+		else {
+			return diff.getUserId() + " (+"+diff.getInserts()+" -"+diff.getDeletes()+")";
+		}
 	}
 }

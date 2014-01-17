@@ -27,17 +27,18 @@ public class MultiUserDoc {
 	private CopyOnWriteArrayList<WeakReference<BaseChangedListener>> listeners =
 			new CopyOnWriteArrayList<WeakReference<BaseChangedListener>>();
 	
-	public interface DifferingUsersChangedListener {
-		public void differingUsersChanged(Set<String> userIds);
+	public interface DifferingChangedListener {
+		public void differencesChanged(Set<DocDifference> diffs);
 	}
-	private CopyOnWriteArrayList<DifferingUsersChangedListener> ducListeners =
-			new CopyOnWriteArrayList<DifferingUsersChangedListener>();
+	private CopyOnWriteArrayList<DifferingChangedListener> ducListeners =
+			new CopyOnWriteArrayList<DifferingChangedListener>();
 		
 	private AceDoc base;
 	private final HashMap<String, UserDoc> userDocs = new HashMap<String, UserDoc>();
 	private final ErrorChecker checker;
 
-	private Set<String> differing = new HashSet<String>();
+	//private Set<String> differing = new HashSet<String>();
+	private HashMap<String,DocDifference> differences = new HashMap<String,DocDifference>();
 	
 	private final File saveBaseTo;
 	
@@ -61,7 +62,7 @@ public class MultiUserDoc {
 		}
 		
 		if (userId!=null) {
-			addDiffering(userId);
+			addDiffering(byUserDoc);
 		}
 		
 	}
@@ -107,7 +108,7 @@ public class MultiUserDoc {
 		}
 		else {
 			if (userId!=null) {
-				addDiffering(userId);
+				addDiffering(byUserDoc);
 			}
 		}
 		
@@ -141,44 +142,55 @@ public class MultiUserDoc {
 	}
 
 
-	private void addDiffering(String userId) {
-		boolean added;
+	private void addDiffering(UserDoc userDoc) {
 		synchronized (this) {
-			added = differing.add(userId);
+			String uid = userDoc.getUserId();
+			differences.put(uid, new DocDifference(uid, getBase(), userDoc.getDoc()));
 		}
-		if (added) {
-			fireDifferingChanged();
-		}
+		fireDifferingChanged();
 	}
 	
 	public void removeDiffering(String userId) {
-		boolean removed;
+		DocDifference removed;
 		synchronized (this) {
-			removed = differing.remove(userId);
+			removed = differences.remove(userId);
 		}
-		if (removed) {
+		if (removed!=null) {
 			fireDifferingChanged();
 		}
 	}
-
-	private void fireDifferingChanged() {
-		final HashSet<String> dus = new HashSet<String>(getDifferingUsersNoCopy());
-		final List<DifferingUsersChangedListener> listeners
-				= new LinkedList<DifferingUsersChangedListener>(ducListeners);
-
-        for (DifferingUsersChangedListener li : listeners) {
-        	li.differingUsersChanged(dus);
-        }
-
-	}
-
-	public synchronized Set<String> getDifferingUsers() {
-		return new HashSet<String>(differing);
+	
+	synchronized public Set<DocDifference> getDifferences() {
+		return new HashSet<DocDifference>(differences.values());
 	}
 	
-	private synchronized Set<String> getDifferingUsersNoCopy() {
-		return differing;
+	private void fireDifferingChanged() {
+		Set<DocDifference> diffs = getDifferences();
+		final List<DifferingChangedListener> listeners
+				= new LinkedList<DifferingChangedListener>(ducListeners);
+		for (DifferingChangedListener li : listeners) {
+        	li.differencesChanged(diffs);
+        }
 	}
+
+//	private void fireDifferingChanged() {
+//		final HashSet<String> dus = new HashSet<String>(getDifferingUsersNoCopy());
+//		final List<DifferingUsersChangedListener> listeners
+//				= new LinkedList<DifferingUsersChangedListener>(ducListeners);
+//
+//        for (DifferingUsersChangedListener li : listeners) {
+//        	li.differingUsersChanged(dus);
+//        }
+
+//	}
+
+//	public synchronized Set<String> getDifferingUsers() {
+//		return new HashSet<String>(differing);
+//	}
+//	
+//	private synchronized Set<String> getDifferingUsersNoCopy() {
+//		return differing;
+//	}
 	
 
 	public synchronized AceDoc getBase() {
@@ -258,11 +270,11 @@ public class MultiUserDoc {
 		}
 	}
 	
-	public void addDifferingUsersChangedListener(DifferingUsersChangedListener li) {
+	public void addDifferingChangedListener(DifferingChangedListener li) {
 		ducListeners.add(li);
 	}
 	
-	public void removeDifferingUsersChangedListener(DifferingUsersChangedListener li) {
+	public void removeDifferingChangedListener(DifferingChangedListener li) {
 		ducListeners.remove(li);
 	}
 
