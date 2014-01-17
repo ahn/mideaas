@@ -12,7 +12,9 @@ Source code license: [Apache 2.0](https://raw.github.com/ahn/mideaas/master/LICE
 
 ## QuickStart
 
-To run MIDEaaS, you need Java 7 SDK and [Maven](http://maven.apache.org/).
+To run MIDEaaS, you need Java 7 JDK and [Maven](http://maven.apache.org/). For all the Java features to work you need to set JAVA_HOME to point to a **JDK**, not JRE. Or if you use Eclipse, configure the project to use JDK ([instructions](http://stackoverflow.com/a/4440223)).
+
+When the prerequisites are set, do the following:
 
 1. Edit config file at `mideaas-app/src/main/resources/mideaas.properties` to setup the project dirs etc. See the file for more instructions.
 2. In the mideaas root folder run `mvn install`.
