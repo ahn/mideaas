@@ -22,6 +22,7 @@ import org.vaadin.mideaas.editor.EditorState.DocType;
 import org.vaadin.mideaas.editor.ErrorChecker.Error;
 import org.vaadin.mideaas.editor.MultiUserEditorUserGroup.EditorStateChangedEvent;
 import org.vaadin.mideaas.editor.MultiUserEditorUserGroup.EditorStateChangedListener;
+import org.w3c.dom.stylesheets.DocumentStyle;
 
 import com.vaadin.annotations.StyleSheet;
 import com.vaadin.data.Property.ValueChangeEvent;
@@ -56,6 +57,7 @@ public class MultiUserEditor extends CustomComponent
 	
 	private final CheckBox autoSync = new CheckBox("Autopush");
 	private final Button syncButton = new Button("Push");
+	private final Button useThisButton = new Button("Use this Code");
 	
 	private UserDoc myDoc;
 
@@ -172,9 +174,27 @@ public class MultiUserEditor extends CustomComponent
 			@Override
 			public void stateChanged(EditorStateChangedEvent e) {
 				setEditorState(e.state);
+				useThisButton.setEnabled(e.state.type != DocType.MINE);
 				editor.focus();
 			}
 		});
+		
+		useThisButton.addClickListener(new ClickListener() {
+			@Override
+			public void buttonClick(ClickEvent event) {
+				if (activeDoc!=null) {
+					if (!activeDoc.getUserId().equals(userId)) {
+						mud.createUserDoc(userId).setDoc(activeDoc.getDoc());
+					}
+				}
+				else if (currentState.type==EditorState.DocType.BASE){
+					mud.createUserDoc(userId).setDoc(mud.getBase());
+				}
+			}
+		});
+		useThisButton.setEnabled(false);
+		
+		hBar.addComponent(useThisButton);
 		
 		editor.addDiffListener(this);
 		
