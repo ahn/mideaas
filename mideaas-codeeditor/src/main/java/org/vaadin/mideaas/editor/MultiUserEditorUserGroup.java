@@ -75,9 +75,10 @@ public class MultiUserEditorUserGroup extends CustomComponent
 	
 	@Override
 	public void detach() {
-		super.detach();
 		
 		doc.removeDifferingChangedListener(this);
+		
+		super.detach();
 	}
 	
 	@Override

@@ -57,7 +57,7 @@ public class MultiUserEditor extends CustomComponent
 	
 	private final CheckBox autoSync = new CheckBox("Autopush");
 	private final Button syncButton = new Button("Push");
-	private final Button useThisButton = new Button("Use this Code");
+	private final Button useThisButton = new Button("Use this code");
 	
 	private UserDoc myDoc;
 
@@ -147,10 +147,9 @@ public class MultiUserEditor extends CustomComponent
 		autoSync.addValueChangeListener(new ValueChangeListener() {
 			@Override
 			public void valueChange(ValueChangeEvent event) {
-				if (activeDoc!=null) {
-					boolean on = autoSync.getValue();
-					activeDoc.setSyncMode(on ? SyncMode.ASAP : SyncMode.MANUAL);
-					syncButton.setEnabled(!on);
+				myDoc.setSyncMode(autoSync.getValue() ? SyncMode.ASAP : SyncMode.MANUAL);
+				updateSyncButtonEnabled();
+				if (activeDoc==myDoc) {
 					activeDoc.syncDoc(editor.getDoc().withoutMarkers());
 				}
 			}
@@ -164,7 +163,7 @@ public class MultiUserEditor extends CustomComponent
 				syncDoc();
 			}
 		});
-		syncButton.setEnabled(false);
+		updateSyncButtonEnabled();
 		hBar.addComponent(syncButton);
 		
 		group = new MultiUserEditorUserGroup(userId, mud);
@@ -175,6 +174,7 @@ public class MultiUserEditor extends CustomComponent
 			public void stateChanged(EditorStateChangedEvent e) {
 				setEditorState(e.state);
 				useThisButton.setEnabled(e.state.type != DocType.MINE);
+				updateSyncButtonEnabled();
 				editor.focus();
 			}
 		});
@@ -182,13 +182,11 @@ public class MultiUserEditor extends CustomComponent
 		useThisButton.addClickListener(new ClickListener() {
 			@Override
 			public void buttonClick(ClickEvent event) {
-				if (activeDoc!=null) {
-					if (!activeDoc.getUserId().equals(userId)) {
-						mud.createUserDoc(userId).setDoc(activeDoc.getDoc());
-					}
+				if (activeDoc!=null && activeDoc!=myDoc) {
+					myDoc.setDoc(activeDoc.getDoc());
 				}
 				else if (currentState.type==EditorState.DocType.BASE){
-					mud.createUserDoc(userId).setDoc(mud.getBase());
+					myDoc.setDoc(mud.getBase());
 				}
 			}
 		});
@@ -204,6 +202,10 @@ public class MultiUserEditor extends CustomComponent
 		//checkErrors();
 
 	}
+	
+	private void updateSyncButtonEnabled() {
+		syncButton.setEnabled(activeDoc==myDoc && !autoSync.getValue());
+	}
 
 
 	protected void syncDoc() {
@@ -213,6 +215,8 @@ public class MultiUserEditor extends CustomComponent
 	}
 	@Override
 	public void detach() {
+		super.detach();
+		
 		if (activeDoc!=null) {
 			activeDoc.removeListener(this);
 		}
@@ -221,7 +225,7 @@ public class MultiUserEditor extends CustomComponent
 		
 		myDoc.editorDetached();
 		
-		super.detach();
+		
 	}
 	
 
@@ -270,6 +274,7 @@ public class MultiUserEditor extends CustomComponent
 			@Override
 			public void run() {
 				setEditorDoc(doc);
+				updateSyncButtonEnabled(); // is this the right place?
 			}
 		});
 		if (checker!=null) {
@@ -339,6 +344,9 @@ public class MultiUserEditor extends CustomComponent
 				checker.checkErrors(doc.getText(), this);
 			}
 			activeDoc.editorChanged(doc);
+			if (activeDoc==myDoc) {
+				updateSyncButtonEnabled();
+			}
 		}
 	}
 
