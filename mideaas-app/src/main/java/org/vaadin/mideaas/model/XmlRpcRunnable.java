@@ -38,9 +38,12 @@ public class XmlRpcRunnable implements Runnable {
 			
 			Map<String, String> newmap = this.setupTest(this.map, this.testName);
         	
+			System.out.println(newmap);
 			result = client.execute("executeTestCase", new Object[] {newmap});
 			
-			ScriptContainer.updateResult((HashMap<String, String>) result, this.testName);
+			for(String test : this.testName.split(", ")){
+				ScriptContainer.updateResult((HashMap<String, String>) result, test);
+			}
 			
 			MideaasTest.updateTable();
 		}
@@ -54,9 +57,9 @@ public class XmlRpcRunnable implements Runnable {
 	}
 	
 	
-	private Map<String, String> setupTest(Map<String, String>map, String testName) {
+	private Map<String, String> setupTest(Map<String, String> map, String testName) {
 		
-		testName = testName + ".txt";
+		//testName = testName + ".txt";
 		String name = map.get("testCaseName");
 		System.out.println("testcasename: " + name);
 		name = name + Integer.toString(i);
@@ -66,7 +69,7 @@ public class XmlRpcRunnable implements Runnable {
 		}
 		newmap.remove("testCaseName");
 		newmap.put("testCaseName", name);
-		newmap.put("scripts", testName);  	// script file names
+		newmap.put("scriptNames", testName);  	// script file names
 		newmap.put("script", this.script);	// the test script
 		
 		return newmap;

@@ -11,6 +11,7 @@ public class Script implements Serializable {
     private String description = "";    
     private String result = "";    
     private String location = "";
+    private String engine = "";
     private CheckBox checkbox = new CheckBox("");
     private String notes = "";
     
@@ -41,6 +42,12 @@ public class Script implements Serializable {
     }
     public void setLocation(String location) {
         this.location = location;
+    }
+    public String getEngine() {
+        return engine;
+    }
+    public void setEngine(String engine) {
+        this.engine = engine;
     }
     public CheckBox getCheck() {
     	//boolean checked = checkbox.getValue();

@@ -5,7 +5,7 @@ import java.util.List;
 
 
 public class Server implements Serializable {
-	// class to preserve known FNTS servers temporarily
+	// class to preserve known FNTS servers during runtime
     private String ip = "";
     private List<String> engines = null;
     

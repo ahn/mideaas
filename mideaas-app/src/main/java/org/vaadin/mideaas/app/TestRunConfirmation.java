@@ -11,14 +11,12 @@ import org.vaadin.mideaas.model.Server;
 import org.vaadin.mideaas.model.ServerContainer;
 import org.vaadin.mideaas.model.XmlRpcContact;
 import org.vaadin.mideaas.test.Script;
-import org.vaadin.mideaas.test.ScriptContainer;
 
 import com.vaadin.data.Property;
 import com.vaadin.data.Property.ValueChangeEvent;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.HorizontalLayout;
-import com.vaadin.ui.Notification;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
@@ -33,7 +31,7 @@ public class TestRunConfirmation extends Window {
 	
     final com.vaadin.ui.TextArea listTests = new com.vaadin.ui.TextArea("Selected tests");
 	final com.vaadin.ui.TextField textCaseName = new com.vaadin.ui.TextField("Test run name");
-    final com.vaadin.ui.ComboBox cmbEngine = new com.vaadin.ui.ComboBox("Testing engine");
+    //final com.vaadin.ui.ComboBox cmbEngine = new com.vaadin.ui.ComboBox("Testing engine");
 	final com.vaadin.ui.TextField textTolerance = new com.vaadin.ui.TextField("Tolerance");
     final com.vaadin.ui.TextField textRuntimes = new com.vaadin.ui.TextField("Run # of times");
     final com.vaadin.ui.ComboBox cmbServer = new com.vaadin.ui.ComboBox("XMLRPC Server");
@@ -53,6 +51,7 @@ public class TestRunConfirmation extends Window {
         
         try {
         	//set the first server at startup
+        	//cmbEngine.setEnabled(true);
         	String first = ServerContainer.getFirstServer().getIP();
         	if (XmlRpcContact.ping(first).matches("pong")) {
         		cmbServer.addItem(first);
@@ -70,11 +69,15 @@ public class TestRunConfirmation extends Window {
         	}
         	
         	System.out.println(cmbServer.getValue().toString());
-        	for (String engine : ServerContainer.getServerEngines((String)cmbServer.getValue())){
-        		cmbEngine.addItem(engine);
-        	}
+        	/*for (String engine : ServerContainer.getServerEngines((String)cmbServer.getValue())){
+        		if (!cmbEngine.containsId(engine.trim())) {
+        			cmbEngine.addItem(engine.trim());
+        		}
+        	}*/
         } catch (NullPointerException e) {
         	//no servers to connect to, leaving the options empty
+        	//cmbEngine.addItem("no engines available");
+        	//cmbEngine.setEnabled(false);
         } catch (Exception e) {
         	e.printStackTrace();
         }
@@ -82,7 +85,7 @@ public class TestRunConfirmation extends Window {
         
         listTests.setReadOnly(true);
         cmbServer.setImmediate(true);
-        cmbServer.addListener(new Property.ValueChangeListener() {
+        /*cmbServer.addListener(new Property.ValueChangeListener() {
 			
 			@Override
 			public void valueChange(ValueChangeEvent event) {
@@ -92,10 +95,10 @@ public class TestRunConfirmation extends Window {
 					}
 				} catch (NullPointerException e) {
 					//...why are you doing this to me, Jens?
-					e.printStackTrace();
+					//e.printStackTrace();
 				}
 			}
-		});
+		});*/
         
         //buttons for confirmation window
         Button btnAccept = new Button("Run tests", new Button.ClickListener() {
@@ -118,14 +121,14 @@ public class TestRunConfirmation extends Window {
 						}
 					}
 			        	
-					map.put("scripts", tests);
+					map.put("scriptNames", tests);
 					System.out.println(tests);
-					map.put("engine", (String)cmbEngine.getValue());
+					//map.put("testingEngine", (String)cmbEngine.getValue());
 					map.put("tolerance", (String)textTolerance.getValue());
 					map.put("runtimes", (String)textRuntimes.getValue());
-					map.put("gitRepository", "ironclad.labranet.jamk.fi:robot_testing_scripts");
-					map.put("tag", "");
-			       	
+					//map.put("gitRepository", "ironclad.labranet.jamk.fi:robot_testing_scripts");
+					//map.put("tag", "");
+					
 					XmlRpcContact.executeParallelTests((String)cmbServer.getValue(), map, MideaasConfig.getExecutorNumber());
 					UI.getCurrent().removeWindow(confirmTests);
 				}
@@ -141,7 +144,7 @@ public class TestRunConfirmation extends Window {
         //create the confirmation window layout
         VerticalLayout textAreaLayout = new VerticalLayout();
         textAreaLayout.addComponent(textCaseName);
-        textAreaLayout.addComponent(cmbEngine);
+        //textAreaLayout.addComponent(cmbEngine);
         textAreaLayout.addComponent(textTolerance);
         textAreaLayout.addComponent(textRuntimes);
         textAreaLayout.addComponent(cmbServer);
@@ -203,7 +206,7 @@ public class TestRunConfirmation extends Window {
 		}
 			
 		try {
-			cmbEngine.setValue(ServerContainer.getFirstServer().getEngines().get(0));
+			//cmbEngine.setValue(ServerContainer.getFirstServer().getEngines().get(0));
 			textTolerance.setValue("80");
 			textRuntimes.setValue("1");
 			cmbServer.setValue(ServerContainer.getFirstServer().getIP());

@@ -59,6 +59,10 @@ public class XmlWriter {
         	this.characters(script.getNotes());
         	this.endElement("notes");
         	
+        	this.startElement("testengine", "", "");
+        	this.characters(script.getEngine());
+        	this.endElement("testengine");
+        	
         	this.endElement("test");
         }
         this.endElement("tests");

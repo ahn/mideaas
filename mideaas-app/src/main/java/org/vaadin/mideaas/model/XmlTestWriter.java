@@ -25,7 +25,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
@@ -78,6 +80,10 @@ public class XmlTestWriter{
 				Element notes = doc.createElement("notes");
 				notes.appendChild(doc.createTextNode(p.getNotes()));
 				test.appendChild(notes);
+				
+				Element testengine = doc.createElement("testengine");
+				testengine.appendChild(doc.createTextNode(p.getEngine().trim()));
+				test.appendChild(testengine);
 				
 				tests.appendChild(test);
 			}
@@ -137,11 +143,13 @@ public class XmlTestWriter{
   	      		boolean testresult = false;
   	      		boolean testcheck = false;
   	      		boolean testnotes = false;
+  	      		boolean testengine = false;
   	      		boolean servers = false;
   	      		boolean server = false;
   	      		boolean serverengines = false;
   	      		Script scr;
   	      		Server serv;
+  	      		String notes = "";
 
   	      		public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
   	      			if (qName.equalsIgnoreCase("project")) {
@@ -162,6 +170,8 @@ public class XmlTestWriter{
 	      				testcheck = true;
 	      			} else if (qName.equalsIgnoreCase("notes")) {
 	      				testnotes = true;
+	      			} else if (qName.equalsIgnoreCase("testengine")) {
+	      				testengine = true;
 	      			} else if (qName.equalsIgnoreCase("servers")) {
 	      				servers = true;
 	      			} else if (qName.equalsIgnoreCase("server")) {
@@ -179,6 +189,8 @@ public class XmlTestWriter{
   	      			} else if (qName.equalsIgnoreCase("tests")) {
   	      				tests = false;
   	      			} else if (qName.equalsIgnoreCase("test")) {
+  	      			    scr.setNotes(notes);
+  	      			    notes = "";
   	      				ScriptContainer.addTestObjectToContainer(scr);
   	      				test = false;
   	      			} else if (qName.equalsIgnoreCase("location")) {
@@ -191,6 +203,8 @@ public class XmlTestWriter{
   	      				testcheck = false;
   	      			} else if (qName.equalsIgnoreCase("notes")) {
   	      				testnotes = false;
+  	      			} else if (qName.equalsIgnoreCase("testengine")) {
+	      				testengine = false;
   	      			} else if (qName.equalsIgnoreCase("servers")) {
   	      				servers = false;
   	      			} else if (qName.equalsIgnoreCase("server")) {
@@ -211,9 +225,17 @@ public class XmlTestWriter{
 	      			} else if (testcheck) {
 	      				scr.setCheck(Boolean.valueOf(new String(ch, start, length).trim()));
 	      			} else if (testnotes) {
-	      				scr.setNotes(new String(ch, start, length).trim());
+	      				notes = notes + new String(ch, start, length).trim() + "\n";
+	      				//System.out.println("Got notes from file: " + scr.getNotes());
+	      			} else if (testengine) {
+	      				scr.setEngine(new String(ch, start, length).trim());
 	      			} else if (serverengines) {
-	      				serv.setEngines(Arrays.asList(new String(ch, start, length).split(",")));
+	      				List<String> engines = Arrays.asList(new String(ch, start, length).split(","));
+	      				List<String> trimmedEngines = new ArrayList<String>();
+	      				for(String engine : engines){
+	      					trimmedEngines.add(engine.trim());
+	      				}
+	      				serv.setEngines(trimmedEngines);
 	      			}
   	      		}
   	      	};

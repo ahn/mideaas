@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Random;
 
 import org.vaadin.mideaas.app.MideaasTest;
-import org.vaadin.mideaas.model.ServerContainer;
 import org.vaadin.mideaas.model.XmlTestWriter;
 
 import com.vaadin.data.util.BeanItemContainer;
@@ -37,6 +36,7 @@ public class ScriptContainer extends BeanItemContainer<Script> implements
                 p.setLocation(locations[r.nextInt(locations.length)]);
                 p.setDescription(descriptions[r.nextInt(descriptions.length)]);
                 p.setResult("NOT RUN");
+                p.setEngine("robotEngine");
                 p.setCheck(false);
                 p.setNotes("This test has not been executed yet");
                 c.addItem(p);
@@ -57,6 +57,7 @@ public class ScriptContainer extends BeanItemContainer<Script> implements
     	p.setName((String)testData.get(0));
         p.setLocation((String)testData.get(1));
         p.setDescription((String)testData.get(2));
+        p.setEngine((String)testData.get(3));
         p.setResult("NOT RUN");
         p.setCheck(false);
         p.setNotes("This test has not been executed yet");
@@ -78,6 +79,10 @@ public class ScriptContainer extends BeanItemContainer<Script> implements
             }
     	}
     	c.addItem(script);
+    	
+    	//Script item = getScriptFromContainer(script.getName());
+    	//System.out.println("notes given: " + script.getNotes());
+    	//System.out.println("notes written in the container: " + item.getNotes());
     }
     
     public static void setScriptContainer(ScriptContainer container) {

@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -68,8 +69,10 @@ public class XmlRpcContact {
 		 * they are finished
 		 * NTHREADS is the number of possible threads 
 		 */
-		List<String> list = Arrays.asList(map.get("scripts").split("\\s*,\\s*"));
-		map.remove("scripts");
+		List<String> list = Arrays.asList(map.get("scriptNames").split("\\s*,\\s*"));
+		map.remove("scriptNames");
+		
+		List<HashMap<String, String>> blocks = CreateTestBlocks(list);
 		
 		//commented just in case it's needed for some reason
 		/*if (list.size()/NTHREADS > 1) {
@@ -102,7 +105,20 @@ public class XmlRpcContact {
 		ExecutorService executor = Executors.newFixedThreadPool(NTHREADS);
 		ScriptContainer.SetRunnableTests(list);
 		int i = 1;
-		for (String test : list) {
+		for (HashMap<String, String> block : blocks) {
+
+			System.out.println("index is " + i);
+			//String script = getScriptFromFile(test);
+			String script = " ";
+			
+			map.put("testingEngine", block.get("engine"));
+			
+			Runnable worker = new XmlRpcRunnable(server, block.get("scriptNames"), script, map, i);
+		    executor.execute(worker);
+			i++;
+			
+		}
+		/*for (String test : list) {
 
 			System.out.println("index is " + i);
 			String script = getScriptFromFile(test);
@@ -111,8 +127,8 @@ public class XmlRpcContact {
 		    executor.execute(worker);
 			i++;
 			
-		}
-		// This will make the executor accept no new threads
+		}*/
+		// This will make the executor to not accept new threads
 	    // and finish all existing threads in the queue
 	    executor.shutdown();
 	}
@@ -169,6 +185,45 @@ public class XmlRpcContact {
 		}
 		
 		return script;
+	}
+	
+	private static List<HashMap<String, String>> CreateTestBlocks(List<String> list) {
+		Script script;
+		String engine;
+		boolean engineFound = false;
+		List<HashMap<String, String>> maps = new ArrayList<HashMap<String, String>>();
+		
+		for(String scriptName : list){
+			script = ScriptContainer.getScriptFromContainer(scriptName);
+			engine = script.getEngine();
+			
+			if(maps.isEmpty()) {
+				HashMap<String, String> map = new HashMap<String, String>();
+				map.put("engine", engine);
+				map.put("scriptNames", script.getName());
+				maps.add(map);
+			} else {
+				for(HashMap<String, String> map: maps){
+					if(map.get("engine").matches(engine)) {
+						String scriptNames = map.get("scriptNames");
+						map.remove("scriptNames");
+						scriptNames = scriptNames + ", " + script.getName();
+						map.put("scriptNames", scriptNames);
+						engineFound = true;
+						break;
+					}
+				}
+				if(engineFound == false){
+					HashMap<String, String> map = new HashMap<String, String>();
+					map.put("engine", engine);
+					map.put("scriptNames", script.getName());
+					maps.add(map);
+				}
+				engineFound = false;
+			}
+		}
+		System.out.println(maps);
+		return maps;
 	}
 }
 

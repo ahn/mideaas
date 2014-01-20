@@ -51,7 +51,7 @@ public class XmlRpcServerDetails extends Window {
         	listEngines.setReadOnly(false);
         	listEngines.setValue("");
         	for (String engine : ServerContainer.getServerEngines(first)){
-        		listEngines.setValue(listEngines.getValue() + engine + "\n");
+        		listEngines.setValue(listEngines.getValue() + engine.trim() + "\n");
         	}
         	listEngines.setReadOnly(true);
         } catch (NullPointerException e) {
@@ -79,7 +79,7 @@ public class XmlRpcServerDetails extends Window {
             				listEngines.setReadOnly(false);
         					listEngines.setValue("");
         					for (String engine : ServerContainer.getServerEngines((String)cmbServers.getValue())){
-        						listEngines.setValue(listEngines.getValue() + engine + "\n");
+        						listEngines.setValue(listEngines.getValue() + engine.trim() + "\n");
         					}
         					listEngines.setReadOnly(true);
             				newServer.setValue("");
