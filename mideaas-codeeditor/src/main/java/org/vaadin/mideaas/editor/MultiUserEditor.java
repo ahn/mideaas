@@ -199,7 +199,7 @@ public class MultiUserEditor extends CustomComponent
 		setActiveDocToUser(user);
 		
 		// Should we always check errors on attach?
-		//checkErrors();
+		checkErrors();
 
 	}
 	

@@ -90,8 +90,8 @@ public class LobbyView extends VerticalLayout implements View, LobbyBroadcastLis
 		rightLayout.addComponent(initCreateProjectPanel());
 		if (MideaasConfig.easiCloudsFeaturesTurnedOn()) {
 			rightLayout.addComponent(initUploadPanel());
-			rightLayout.addComponent(initGitProjectPanel());
 		}
+		rightLayout.addComponent(initGitProjectPanel());
 		
 		userList = new HorizontalUserList(MideaasUI.getLoggedInUsers());
 		
@@ -111,7 +111,7 @@ public class LobbyView extends VerticalLayout implements View, LobbyBroadcastLis
 
 		VerticalLayout layout = new VerticalLayout();
 
-		final TextField field = new TextField("https://github.com/ahn/hehe.git");
+		final TextField field = new TextField();
 		field.setWidth("100%");
 
 		final Button button = new Button("Project from Git");

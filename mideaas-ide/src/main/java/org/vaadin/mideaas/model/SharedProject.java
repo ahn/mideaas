@@ -66,10 +66,6 @@ public class SharedProject {
 	private final CopyOnWriteArrayList<ProjectListener> listeners = new CopyOnWriteArrayList<ProjectListener>();
 	private final CopyOnWriteArrayList<ClasspathListener> cpListeners = new CopyOnWriteArrayList<ClasspathListener>();
 
-
-	private static/* XXX static or not? */final ExecutorService pool = Executors
-			.newSingleThreadExecutor();
-
 	/**
 	 * The dir where all the projects are saved.
 	 */
@@ -357,26 +353,16 @@ public class SharedProject {
 	}
 
 	private void fireChanged() {
-		pool.submit(new Runnable() {
-			@Override
-			public void run() {
-				for (ProjectListener listener : listeners) {
-					listener.changed();
-				}
-			}
-		});
+		for (ProjectListener listener : listeners) {
+			listener.changed();
+		}
 	}
 
-	private void fireClasspathChanged() {
+	private void recheckClasspath() {
 		classPath = null;
-		pool.submit(new Runnable() {
-			@Override
-			public void run() {
-				for (ClasspathListener listener : cpListeners) {
-					listener.classpathChanged();
-				}
-			}
-		});
+		for (ClasspathListener listener : cpListeners) {
+			listener.classpathChanged();
+		}
 	}
 
 	/**
@@ -411,7 +397,7 @@ public class SharedProject {
 		}
 
 		fireChanged();
-		fireClasspathChanged();
+		recheckClasspath();
 
 		return c;
 	}
@@ -622,7 +608,7 @@ public class SharedProject {
 			pomXml.addDependency(xmlSnippet);
 			writePomXml();
 		}
-		fireClasspathChanged();
+		recheckClasspath();
 		fireChanged(); // TODO should we fire this changed, too(?)
 	}
 	
@@ -630,7 +616,7 @@ public class SharedProject {
 		synchronized (this) {
 			pomXml.removeDependency(dep);
 		}
-		fireClasspathChanged();
+		recheckClasspath();
 		fireChanged();
 		// TODO Auto-generated method stub
 		

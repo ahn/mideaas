@@ -94,10 +94,6 @@ public class ProjectItemList extends CustomComponent implements ItemClickListene
 	private void delete() {
 		final String sel = (String) tree.getValue();
 		if (TITLE_VIEWS.equals(tree.getParent(sel))) {
-//			if (ProjectFileUtils.getFirstViewName().equals(sel)) {
-//				Notification.show("Can't delete " +sel);
-//				return;
-//			}
 			final String msg = "Delete View "+sel+"?";
 			ConfirmDialog.show(ui, msg, msg, "Yes", "No",  new ConfirmDialog.Listener() {
 				@Override
@@ -110,7 +106,7 @@ public class ProjectItemList extends CustomComponent implements ItemClickListene
 			
 		}
 		else if (TITLE_OTHER_FILES.equals(tree.getParent(sel))) {
-			// XXX hard-code App.java, should get the name from somewhere else
+			// TODO hard-code App.java, should get the name from somewhere else
 			if ("App.java".equals(sel)) {
 				Notification.show("Can't delete " +sel);
 				return;
@@ -145,7 +141,8 @@ public class ProjectItemList extends CustomComponent implements ItemClickListene
 		project.addListener(this);
 	}
 	
-	@Override public void detach() {
+	@Override
+	public void detach() {
 		
 		project.removeListener(this);
 		
