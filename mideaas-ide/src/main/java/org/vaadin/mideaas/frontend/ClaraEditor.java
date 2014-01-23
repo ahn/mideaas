@@ -16,6 +16,7 @@ import org.vaadin.aceeditor.AceEditor;
 import org.vaadin.aceeditor.AceEditor.SelectionChangeListener;
 import org.vaadin.aceeditor.AceMode;
 import org.vaadin.aceeditor.client.AceDoc;
+import org.vaadin.mideaas.editor.EditorUser;
 import org.vaadin.mideaas.editor.MultiUserDoc;
 import org.vaadin.mideaas.editor.MultiUserEditor;
 import org.vaadin.mideaas.editor.XmlAsyncErrorChecker;
@@ -91,7 +92,7 @@ public class ClaraEditor extends CustomComponent implements
 		super();
 		this.user = user;
 		mud = modelMud;
-		editor = new MultiUserEditor(user.getUserId(), mud);
+		editor = new MultiUserEditor(user.getEditorUser(), mud);
 		editor.setMode(AceMode.xml);
 		editor.setSizeFull();
 		editor.setWordWrap(true);
@@ -156,7 +157,7 @@ public class ClaraEditor extends CustomComponent implements
 	}
 	
 	public void setXml(String xml) {
-		mud.createUserDoc(user.getUserId()).setDoc(new AceDoc(xml));
+		mud.createUserDoc(user.getEditorUser()).setDoc(new AceDoc(xml));
 	}
 
 	private ClaraXmlHandler parseDocument(InputStream is) {
@@ -207,7 +208,7 @@ public class ClaraEditor extends CustomComponent implements
 	}
 
 	@Override
-	public void baseChanged(AceDoc doc, String userId) {
+	public void baseChanged(AceDoc doc, EditorUser user) {
 		storeModel(doc.getText());
 	}
 	

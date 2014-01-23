@@ -8,20 +8,20 @@ import org.vaadin.aceeditor.ServerSideDocDiff;
 import org.vaadin.aceeditor.client.AceDoc;
 
 public class DocDifference {
-	private final String userId;
+	private final EditorUser user;
 	private final AceDoc baseDoc;
 	private final AceDoc userDoc;
 	private int inserts = -1;
 	private int deletes = -1;
 
-	public DocDifference(String userId, AceDoc baseDoc, AceDoc userDoc) {
-		this.userId = userId;
+	public DocDifference(EditorUser user, AceDoc baseDoc, AceDoc userDoc) {
+		this.user = user;
 		this.baseDoc = baseDoc;
 		this.userDoc = userDoc;
 	}
 	
-	public String getUserId() {
-		return userId;
+	public EditorUser getUser() {
+		return user;
 	}
 
 	public int getInserts() {
@@ -66,6 +66,6 @@ public class DocDifference {
 	
 	@Override
 	public String toString() {
-		return "DD "+userId+" +" + getInserts() + " -" + getDeletes();
+		return "DD "+user+" +" + getInserts() + " -" + getDeletes();
 	}
 }

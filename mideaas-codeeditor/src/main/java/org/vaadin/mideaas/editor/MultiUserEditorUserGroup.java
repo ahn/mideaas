@@ -34,7 +34,7 @@ public class MultiUserEditorUserGroup extends CustomComponent
 
 	private final HorizontalOptionGroup group = new HorizontalOptionGroup();
 
-	private final String userId;
+	private final EditorUser user;
 	private final MultiUserDoc doc;
 	private final EditorState mineThatEqualsBase;
 	
@@ -42,10 +42,10 @@ public class MultiUserEditorUserGroup extends CustomComponent
 	private EditorState currentState;
 
 	
-	public MultiUserEditorUserGroup(String userId, MultiUserDoc doc) {
-		this.userId = userId;
+	public MultiUserEditorUserGroup(EditorUser user, MultiUserDoc doc) {
+		this.user = user;
 		this.doc = doc;
-		mineThatEqualsBase = new EditorState(DocType.MINE, new DocDifference(userId, null, null));
+		mineThatEqualsBase = new EditorState(DocType.MINE, new DocDifference(user, null, null));
 		currentState = mineThatEqualsBase;
 		group.setImmediate(true);
 		group.setNullSelectionAllowed(false);
@@ -115,7 +115,7 @@ public class MultiUserEditorUserGroup extends CustomComponent
 		group.addItem(myState);
 		
 		for (DocDifference d : diffs) {
-			if (!d.getUserId().equals(userId)) {
+			if (!d.getUser().equals(user)) {
 				group.addItem(new EditorState(DocType.OTHERS, d));
 			}
 		}
@@ -133,7 +133,7 @@ public class MultiUserEditorUserGroup extends CustomComponent
 	
 	private DocDifference myDifference(Set<DocDifference> diffs) {
 		for (DocDifference d : diffs) {
-			if (d.getUserId().equals(userId)) {
+			if (d.getUser().equals(user)) {
 				return d;
 			}
 		}

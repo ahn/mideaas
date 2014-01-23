@@ -52,7 +52,7 @@ public class MideaasComponentEditor extends TabSheet implements
 
 
 
-		controllerEditor = new MultiUserEditor(user.getUserId(), comp.getControllerMUD());
+		controllerEditor = new MultiUserEditor(user.getEditorUser(), comp.getControllerMUD());
 		controllerEditor.setMode(AceMode.java);
 
 		AsyncErrorChecker ch = new JavaErrorChecker(

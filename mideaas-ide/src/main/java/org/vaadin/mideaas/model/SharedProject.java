@@ -26,6 +26,7 @@ import javax.xml.transform.TransformerFactoryConfigurationError;
 
 import org.apache.commons.io.FileUtils;
 import org.vaadin.chatbox.SharedChat;
+import org.vaadin.mideaas.editor.EditorUser;
 import org.vaadin.mideaas.frontend.PomXml;
 import org.vaadin.mideaas.frontend.PomXml.Dependency;
 import org.vaadin.mideaas.java.util.CompilingService;
@@ -972,13 +973,13 @@ public class SharedProject {
 	}
 
 	public synchronized void removeDiffering(User user) {
-		String uid = user.getUserId();
+		EditorUser eu = user.getEditorUser();
 		for (ProjectFile f : files.values()) {
-			f.getMud().removeDiffering(uid);
+			f.getMud().removeDiffering(eu);
 		}
 		for (SharedView v : views.values()) {
-			v.getControllerMUD().removeDiffering(uid);
-			v.getModelMud().removeDiffering(uid);
+			v.getControllerMUD().removeDiffering(eu);
+			v.getModelMud().removeDiffering(eu);
 		}
 	}
 

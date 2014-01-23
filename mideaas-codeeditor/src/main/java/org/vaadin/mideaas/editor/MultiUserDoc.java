@@ -17,7 +17,7 @@ import org.vaadin.aceeditor.client.AceDoc;
 public class MultiUserDoc {
 	
 	public interface BaseChangedListener {
-		public void baseChanged(AceDoc doc, String byUserId);
+		public void baseChanged(AceDoc doc, EditorUser byUser);
 	}
 	
 	// Not sure if it's necessary to use weak references here,
@@ -34,11 +34,11 @@ public class MultiUserDoc {
 			new CopyOnWriteArrayList<DifferingChangedListener>();
 		
 	private AceDoc base;
-	private final HashMap<String, UserDoc> userDocs = new HashMap<String, UserDoc>();
+	private final HashMap<EditorUser, UserDoc> userDocs = new HashMap<EditorUser, UserDoc>();
 	private final ErrorChecker checker;
 
 	//private Set<String> differing = new HashSet<String>();
-	private HashMap<String,DocDifference> differences = new HashMap<String,DocDifference>();
+	private HashMap<EditorUser,DocDifference> differences = new HashMap<EditorUser,DocDifference>();
 	
 	private final File saveBaseTo;
 	
@@ -53,15 +53,15 @@ public class MultiUserDoc {
 	}
 	
 	public void dontTryToApply(ServerSideDocDiff toBase, UserDoc byUserDoc) {
-		String userId = byUserDoc==null ? null : byUserDoc.getUserId();
+		EditorUser user = byUserDoc==null ? null : byUserDoc.getUser();
 		if (toBase.isIdentity()) {
-			if (userId!=null) {
-				removeDiffering(userId);
+			if (user!=null) {
+				removeDiffering(user);
 			}
 			return;
 		}
 		
-		if (userId!=null) {
+		if (user!=null) {
 			addDiffering(byUserDoc);
 		}
 		
@@ -76,10 +76,10 @@ public class MultiUserDoc {
 	 * @return base changed
 	 */
 	public boolean tryToApply(ServerSideDocDiff toBase, UserDoc byUserDoc) {
-		String userId = byUserDoc==null ? null : byUserDoc.getUserId();
+		EditorUser user = byUserDoc==null ? null : byUserDoc.getUser();
 		if (toBase.isIdentity()) {
-			if (userId!=null) {
-				removeDiffering(userId);
+			if (user!=null) {
+				removeDiffering(user);
 			}
 			return false;
 		}
@@ -101,13 +101,13 @@ public class MultiUserDoc {
 			if (saveBaseTo!=null) {
 				writeToDisk(saveBaseTo, baseCandidate.getText());
 			}
-			fireBaseChanged(baseCandidate, userId);
-			if (userId!=null) {
-				removeDiffering(userId);
+			fireBaseChanged(baseCandidate, user);
+			if (user!=null) {
+				removeDiffering(user);
 			}
 		}
 		else {
-			if (userId!=null) {
+			if (user!=null) {
 				addDiffering(byUserDoc);
 			}
 		}
@@ -124,7 +124,7 @@ public class MultiUserDoc {
 		}
 	}
 	
-	private void fireBaseChanged(final AceDoc base, String byUser) {
+	private void fireBaseChanged(final AceDoc base, EditorUser byUser) {
 		boolean cleanup = false;
 		for (WeakReference<BaseChangedListener> ref : listeners) {
 			BaseChangedListener li = ref.get();
@@ -144,16 +144,16 @@ public class MultiUserDoc {
 
 	private void addDiffering(UserDoc userDoc) {
 		synchronized (this) {
-			String uid = userDoc.getUserId();
-			differences.put(uid, new DocDifference(uid, getBase(), userDoc.getDoc()));
+			EditorUser user = userDoc.getUser();
+			differences.put(user, new DocDifference(user, getBase(), userDoc.getDoc()));
 		}
 		fireDifferingChanged();
 	}
 	
-	public void removeDiffering(String userId) {
+	public void removeDiffering(EditorUser user) {
 		DocDifference removed;
 		synchronized (this) {
-			removed = differences.remove(userId);
+			removed = differences.remove(user);
 		}
 		if (removed!=null) {
 			fireDifferingChanged();
@@ -203,27 +203,27 @@ public class MultiUserDoc {
 	 * @param user
 	 * @return
 	 */
-	public synchronized UserDoc createUserDoc(String userId) {
-		UserDoc ud = userDocs.get(userId);
+	public synchronized UserDoc createUserDoc(EditorUser user) {
+		UserDoc ud = userDocs.get(user);
 		if (ud == null) {
-			ud = new UserDoc(userId, base);
+			ud = new UserDoc(user, base);
 			ud.setMUD(this);
 			addBaseChangedListenerWeak(ud);
-			userDocs.put(userId, ud);
+			userDocs.put(user, ud);
 		}
 		return ud;
 	}
 	
 
-	public synchronized UserDoc getUserDoc(String userId) {
-		return userDocs.get(userId);
+	public synchronized UserDoc getUserDoc(EditorUser user) {
+		return userDocs.get(user);
 	}
 	
-	public synchronized void removeUserDoc(String userId) {
-		UserDoc ud = userDocs.remove(userId);
+	public synchronized void removeUserDoc(EditorUser user) {
+		UserDoc ud = userDocs.remove(user);
 		if (ud!=null) {
 			removeBaseChangedListenerWeak(ud);
-			removeDiffering(userId);
+			removeDiffering(user);
 		}
 	}
 
@@ -231,7 +231,7 @@ public class MultiUserDoc {
 		setBaseNoFire(newText, null);
 	}
 	
-	public AceDoc setBaseNoFire(String newText, String byUserId) {
+	public AceDoc setBaseNoFire(String newText, EditorUser byUser) {
 		AceDoc newBase = base.withText(newText);
 		synchronized (this) {
 			base = newBase;
@@ -239,9 +239,9 @@ public class MultiUserDoc {
 		return newBase;
 	}
 	
-	public void setBaseAndFire(String newText, String byUserId) {
-		AceDoc newBase = setBaseNoFire(newText, byUserId);
-		fireBaseChanged(newBase, byUserId);
+	public void setBaseAndFire(String newText, EditorUser byUser) {
+		AceDoc newBase = setBaseNoFire(newText, byUser);
+		fireBaseChanged(newBase, byUser);
 	}
 
 	public void addBaseChangedListenerWeak(BaseChangedListener li) {

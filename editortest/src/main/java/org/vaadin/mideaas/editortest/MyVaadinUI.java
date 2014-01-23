@@ -4,6 +4,7 @@ import javax.servlet.annotation.WebServlet;
 
 import org.vaadin.aceeditor.AceMode;
 import org.vaadin.aceeditor.client.AceDoc;
+import org.vaadin.mideaas.editor.EditorUser;
 import org.vaadin.mideaas.editor.JavaSyntaxErrorChecker;
 import org.vaadin.mideaas.editor.MultiUserDoc;
 import org.vaadin.mideaas.editor.MultiUserEditor;
@@ -24,8 +25,9 @@ import com.vaadin.ui.VerticalLayout;
 public class MyVaadinUI extends UI
 {
 	private static long lastUserId = 0;
-	synchronized private static String createUserId() {
-		return "User"+(++lastUserId);
+	synchronized private static EditorUser createUser() {
+		long uid = ++lastUserId;
+		return new EditorUser(""+uid,"User "+uid);
 	}
 
     @WebServlet(value = "/*", asyncSupported = true)
@@ -49,12 +51,12 @@ public class MyVaadinUI extends UI
         layout.setSizeFull();
         setContent(layout);
 
-        String uid = createUserId();
+        EditorUser user = createUser();
         
-        Page.getCurrent().setTitle(uid);
-        layout.addComponent(new Label("My name is "+uid));
+        Page.getCurrent().setTitle(user.getName());
+        layout.addComponent(new Label("My name is "+user.getName()));
         
-        MultiUserEditor mue = new MultiUserEditor(uid, mud);
+        MultiUserEditor mue = new MultiUserEditor(user, mud);
         mue.setSizeFull();
         mue.setMode(AceMode.java);
         

@@ -38,7 +38,7 @@ public class ProjectFile {
 	}
 	
 	public static MultiUserEditor createEditor(User user, MultiUserDoc mud, String name) {
-		MultiUserEditor ed = new MultiUserEditor(user.getUserId(), mud);
+		MultiUserEditor ed = new MultiUserEditor(user.getEditorUser(), mud);
 		String ending = getFileEnding(name);
 		ed.setMode(AceMode.forFileEnding(ending));
 		return ed;

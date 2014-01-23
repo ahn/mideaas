@@ -2,6 +2,7 @@ package org.vaadin.mideaas.model;
 
 import java.util.HashMap;
 
+import org.vaadin.mideaas.editor.EditorUser;
 import org.vaadin.mideaas.social.OAuthService;
 import org.vaadin.mideaas.social.UserProfile;
 import org.vaadin.mideaas.social.OAuthService.Service;
@@ -14,7 +15,10 @@ public class User implements Comparable<User> {
 
 	private final String userId;
 	
+	private final EditorUser editorUser;
+	
 	private UserProfile activeProfile;
+	
 
 	private HashMap<OAuthService.Service, UserProfile> profiles =
 			new HashMap<OAuthService.Service, UserProfile>();
@@ -51,6 +55,9 @@ public class User implements Comparable<User> {
 
 	protected User(String userId, UserProfile profile) {
 		this.userId = userId;
+		editorUser = new EditorUser(userId, profile.getName());
+		// TODO: editorUser name won't change even if user name changes...
+		
 		profiles.put(profile.getService(), profile);
 		activeProfile = profile;
 		putUser(this);
@@ -111,6 +118,10 @@ public class User implements Comparable<User> {
 			return getUserId().compareTo(o.getUserId());
 		}
 		return c;
+	}
+
+	public EditorUser getEditorUser() {
+		return editorUser;
 	}
 	
 	

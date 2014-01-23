@@ -44,7 +44,7 @@ import com.vaadin.ui.Button.ClickEvent;
 public class MultiUserEditor extends CustomComponent
 		implements DiffListener, ResultListener, UserDoc.Listener {
 		
-	private final String userId;
+	private final EditorUser user;
 	private final MultiUserDoc mud;
 	private final AceEditor editor;
 	private UserDoc activeDoc;
@@ -61,9 +61,9 @@ public class MultiUserEditor extends CustomComponent
 	
 	private UserDoc myDoc;
 
-	public MultiUserEditor(String userId, MultiUserDoc mud) {
+	public MultiUserEditor(EditorUser user, MultiUserDoc mud) {
 		super();
-		this.userId = userId;
+		this.user = user;
 		this.mud = mud;
 		editor = new AceEditor();
 		
@@ -125,7 +125,7 @@ public class MultiUserEditor extends CustomComponent
 	public void attach() {
 		super.attach();
 		
-		myDoc = mud.createUserDoc(userId);
+		myDoc = mud.createUserDoc(user);
 		myDoc.editorAttached();
 		
 		getUI().addActionHandler(new Handler() {
@@ -166,7 +166,7 @@ public class MultiUserEditor extends CustomComponent
 		updateSyncButtonEnabled();
 		hBar.addComponent(syncButton);
 		
-		group = new MultiUserEditorUserGroup(userId, mud);
+		group = new MultiUserEditorUserGroup(user, mud);
 		setEditorState(group.getEditorState());
 		hBar.addComponent(group);
 		group.addDocStateChangedListener(new EditorStateChangedListener() {
@@ -196,7 +196,7 @@ public class MultiUserEditor extends CustomComponent
 		
 		editor.addDiffListener(this);
 		
-		setActiveDocToUser(userId);
+		setActiveDocToUser(user);
 		
 		// Should we always check errors on attach?
 		//checkErrors();
@@ -236,7 +236,7 @@ public class MultiUserEditor extends CustomComponent
 
 		currentState = state;
 		if (state.type==DocType.OTHERS || state.type==DocType.MINE) {
-			setActiveDocToUser(state.diff.getUserId());
+			setActiveDocToUser(state.diff.getUser());
 		}
 		else {
 			setActiveDocToBase();
@@ -252,8 +252,8 @@ public class MultiUserEditor extends CustomComponent
 		editor.setDoc(mud.getBase());
 		editor.setReadOnly(true);
 	}
-	private void setActiveDocToUser(String userId) {
-		setActiveDoc(mud.createUserDoc(userId));
+	private void setActiveDocToUser(EditorUser user) {
+		setActiveDoc(mud.createUserDoc(user));
 	}
 	
 	private void setActiveDoc(UserDoc userDoc) {
@@ -264,7 +264,7 @@ public class MultiUserEditor extends CustomComponent
 		activeDoc.addListener(this);
 		editor.setReadOnly(false);
 		editor.setDoc(userDoc.getDoc());
-		editor.setReadOnly(!userDoc.getUserId().equals(userId));
+		editor.setReadOnly(!userDoc.getUser().equals(user));
 	}
 
 
@@ -284,7 +284,7 @@ public class MultiUserEditor extends CustomComponent
 	
 	private void checkErrors() {
 		if (checker!=null) {
-			UserDoc doc = mud.getUserDoc(userId);
+			UserDoc doc = mud.getUserDoc(user);
 			if (doc!=null) {
 				String code = doc.getDoc().getText();
 				checker.checkErrors(code, this);

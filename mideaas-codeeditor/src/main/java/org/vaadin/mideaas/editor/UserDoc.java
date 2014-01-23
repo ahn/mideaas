@@ -20,7 +20,7 @@ public class UserDoc implements BaseChangedListener {
 
 	private List<Listener> listeners = new ArrayList<Listener>();
 	
-	private final String userId;
+	private final EditorUser user;
 	private AceDoc shadow;
 	private AceDoc work;
 	private MultiUserDoc mud;
@@ -29,8 +29,8 @@ public class UserDoc implements BaseChangedListener {
 
 	private int attached;
 	
-	public UserDoc(String userId, AceDoc initial) {
-		this.userId = userId;
+	public UserDoc(EditorUser user, AceDoc initial) {
+		this.user = user;
 		shadow = initial;
 		work = initial;
 	}
@@ -103,7 +103,7 @@ public class UserDoc implements BaseChangedListener {
 	}
 	
 	@Override
-	public void baseChanged(AceDoc base, String byUserId) {
+	public void baseChanged(AceDoc base, EditorUser byUser) {
 		AceDoc newWork;
 		boolean workChanged;
 		synchronized (this) {
@@ -131,9 +131,9 @@ public class UserDoc implements BaseChangedListener {
 		
 	}
 	
-	public String getUserId() {
+	public EditorUser getUser() {
 		// No need to sync because final.
-		return userId;
+		return user;
 	}
 
 	public void setDoc(AceDoc doc) {
@@ -152,7 +152,7 @@ public class UserDoc implements BaseChangedListener {
 	public synchronized void editorDetached() {
 		attached--;
 		if (attached==0) {
-			mud.removeUserDoc(userId);
+			mud.removeUserDoc(user);
 		}
 	}
 
