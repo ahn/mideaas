@@ -94,8 +94,7 @@ public class SharedProject {
 	/** Where this project is saved. */
 	private final File projectDir;
 
-	// Project consists of mostly two things: views and files.
-	private TreeMap<String, ProjectItem> objects = new TreeMap<String, ProjectItem>();
+	private TreeMap<String, ProjectItem> projectItems = new TreeMap<String, ProjectItem>();
 
 	private PomXml pomXml;
 
@@ -219,7 +218,7 @@ public class SharedProject {
 	 */
 	private Map<String, String> getJavaClasses() {
 		Map<String,String> classes = new HashMap<String,String>();
-		for (ProjectItem po : objects.values()) {
+		for (ProjectItem po : projectItems.values()) {
 			String[] cls = po.getJavaClass();
 			if (cls!=null) {
 				classes.put(getPackageName()+"."+cls[0], cls[1]);
@@ -421,7 +420,7 @@ public class SharedProject {
 	
 	public synchronized void writeToDisk(File dir) throws IOException {
 		File src = ProjectFileUtils.getSourceDir(dir, getPackageName());
-		for (ProjectItem po : objects.values()) {
+		for (ProjectItem po : projectItems.values()) {
 			po.writeBaseToDisk(src);
 		}
 
@@ -530,8 +529,8 @@ public class SharedProject {
 				projFiles.put(n, new ProjectFile(n, e.getValue(), null, saveTo, log));
 			}
 		}
-		objects = new TreeMap<String, ProjectItem>(views);
-		objects.putAll(projFiles);
+		projectItems = new TreeMap<String, ProjectItem>(views);
+		projectItems.putAll(projFiles);
 	}
 
 	/**
@@ -544,31 +543,35 @@ public class SharedProject {
 	}
 
 	public synchronized ProjectItem getProjectItem(String name) {
-		return objects.get(name);
+		return projectItems.get(name);
 	}
 
 	public synchronized boolean containsProjectItem(String name) {
-		return objects.containsKey(name);
+		return projectItems.containsKey(name);
 	}
 
-	public synchronized List<String> getViewNames() {
-		LinkedList<String> names = new LinkedList<String>();
-		for (ProjectItem po : objects.values()) {
-			if (po instanceof SharedView) {
-				names.add(po.getName());
-			}
-		}
-		return names;
-	}
-
-	public synchronized List<String> getFileNames() {
-		LinkedList<String> names = new LinkedList<String>();
-		for (ProjectItem po : objects.values()) {
-			if (po instanceof ProjectFile) {
-				names.add(po.getName());
-			}
-		}
-		return names;
+//	public synchronized List<String> getViewNames() {
+//		LinkedList<String> names = new LinkedList<String>();
+//		for (ProjectItem po : projectItems.values()) {
+//			if (po instanceof SharedView) {
+//				names.add(po.getName());
+//			}
+//		}
+//		return names;
+//	}
+//
+//	public synchronized List<String> getFileNames() {
+//		LinkedList<String> names = new LinkedList<String>();
+//		for (ProjectItem po : projectItems.values()) {
+//			if (po instanceof ProjectFile) {
+//				names.add(po.getName());
+//			}
+//		}
+//		return names;
+//	}
+	
+	public synchronized List<ProjectItem> getProjectItemsCopy() {
+		return new LinkedList<ProjectItem>(projectItems.values());
 	}
 
 	public synchronized List<Dependency> getDependencies() {
@@ -828,7 +831,7 @@ public class SharedProject {
 
 	
 	private void addView(SharedView view, User byUser) {
-		objects.put(view.getName(), view);
+		projectItems.put(view.getName(), view);
 		getCompiler().compile(view);
 		if (byUser!=null) {
 			getChat().addLine(byUser.getName() + " created a view: " + view.getName());
@@ -840,7 +843,7 @@ public class SharedProject {
 			if (containsProjectItem(f.getName())) {
 				return false;
 			}
-			objects.put(f.getName(), f);
+			projectItems.put(f.getName(), f);
 		}
 		compileFile(f);
 		if (byUser!=null) {
@@ -860,7 +863,7 @@ public class SharedProject {
 	public void removeProjectItem(String name, User byUser) {
 		ProjectItem removed;
 		synchronized (this) {
-			removed = objects.remove(name);
+			removed = projectItems.remove(name);
 		}
 		// TODO: remove from git repository!
 		if (removed!=null) {
@@ -897,7 +900,7 @@ public class SharedProject {
 		boolean removed;
 		synchronized (this) {
 			removed = users.remove(user);
-			for (ProjectItem po : objects.values()) {
+			for (ProjectItem po : projectItems.values()) {
 				po.removeUser(user);
 			}
 		}

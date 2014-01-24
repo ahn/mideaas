@@ -3,7 +3,11 @@ package org.vaadin.mideaas.model;
 import java.io.File;
 import java.io.IOException;
 
+import org.vaadin.mideaas.editor.MultiUserDoc.DifferingChangedListener;
+import org.vaadin.mideaas.frontend.Icons;
 import org.vaadin.mideaas.java.util.CompilingService;
+
+import com.vaadin.server.Resource;
 
 abstract public class ProjectItem {
 
@@ -33,4 +37,11 @@ abstract public class ProjectItem {
 
 	abstract public void removeUser(User user);
 
+	public Resource getIcon() {
+		return Icons.APPLICATION_FORM;
+	}
+
+	abstract public void addDifferingChangedListener(DifferingChangedListener li);
+	abstract public void removeDifferingChangedListener(DifferingChangedListener li);
+	
 }

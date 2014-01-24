@@ -15,6 +15,7 @@ import org.vaadin.aceeditor.client.AceDoc;
 import org.vaadin.mideaas.editor.ClaraXmlUtil;
 import org.vaadin.mideaas.editor.ErrorChecker;
 import org.vaadin.mideaas.editor.MultiUserDoc;
+import org.vaadin.mideaas.editor.MultiUserDoc.DifferingChangedListener;
 import org.vaadin.mideaas.editor.XmlSyntaxErrorChecker;
 import org.vaadin.mideaas.java.JavaSyntaxErrorChecker;
 import org.vaadin.mideaas.java.util.CompilingService;
@@ -258,5 +259,17 @@ public class SharedView extends ProjectItem {
 	public void removeUser(User user) {
 		getControllerMud().removeUser(user.getEditorUser());
 		getModelMud().removeUser(user.getEditorUser());
+	}
+
+	@Override
+	public void addDifferingChangedListener(DifferingChangedListener li) {
+		getControllerMud().addDifferingChangedListener(li);
+		getModelMud().addDifferingChangedListener(li);
+	}
+
+	@Override
+	public void removeDifferingChangedListener(DifferingChangedListener li) {
+		getControllerMud().removeDifferingChangedListener(li);
+		getModelMud().removeDifferingChangedListener(li);
 	}
 }

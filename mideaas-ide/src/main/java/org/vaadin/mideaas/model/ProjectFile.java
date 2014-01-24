@@ -9,6 +9,7 @@ import org.vaadin.aceeditor.client.AceDoc;
 import org.vaadin.mideaas.editor.ErrorChecker;
 import org.vaadin.mideaas.editor.MultiUserDoc;
 import org.vaadin.mideaas.editor.MultiUserEditor;
+import org.vaadin.mideaas.editor.MultiUserDoc.DifferingChangedListener;
 import org.vaadin.mideaas.java.JavaSyntaxErrorChecker;
 import org.vaadin.mideaas.java.util.CompilingService;
 
@@ -86,5 +87,15 @@ public class ProjectFile extends ProjectItem {
 	@Override
 	public void removeUser(User user) {
 		getMud().removeUser(user.getEditorUser());
+	}
+
+	@Override
+	public void addDifferingChangedListener(DifferingChangedListener li) {
+		getMud().addDifferingChangedListener(li);
+	}
+	
+	@Override
+	public void removeDifferingChangedListener(DifferingChangedListener li) {
+		getMud().removeDifferingChangedListener(li);
 	}
 }

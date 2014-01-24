@@ -10,6 +10,7 @@ import org.vaadin.mideaas.frontend.ProjectItemList.Listener;
 import org.vaadin.mideaas.java.JavaErrorChecker;
 import org.vaadin.mideaas.java.JavaSuggester;
 import org.vaadin.mideaas.model.ProjectFile;
+import org.vaadin.mideaas.model.ProjectItem;
 import org.vaadin.mideaas.model.SharedProject;
 import org.vaadin.mideaas.model.SharedView;
 import org.vaadin.mideaas.model.User;
@@ -182,26 +183,22 @@ public class MideaasEditor extends CustomComponent implements Listener {
 	}
 
 	@Override
-	public void componentSelected(String name) {
-		if (!name.equals(activeComponentName)) {
-			setActiveComponent((SharedView) project.getProjectItem(name));
+	public void projectItemSelected(String name) {
+		ProjectItem item = project.getProjectItem(name);
+		if (item==null) {
+			System.err.println("WARNING: " + name + " doesn't exist!");
+			return;
 		}
-
-	}
-
-	@Override
-	public void javaFileSelected(String name) {
-		if (!name.equals(activeComponentName)) {
-			ProjectFile f = (ProjectFile) project.getProjectItem(name);
-			if (f!=null) {
-				setActiveFile(f);
-			}
-			else {
-				System.err.println("WARNING: " + name + " doesn't exist!");
-			}
+		if (item.getName().equals(activeComponentName)) {
+			return;
+		}
+		if (item instanceof SharedView) {
+			setActiveComponent((SharedView) item);
+		}
+		else if (item instanceof ProjectFile) {
+			setActiveFile((ProjectFile) item);
 		}
 	}
-
 
 	private void setActiveFile(ProjectFile f) {
 		MultiUserEditor ed = f.createEditor(user);

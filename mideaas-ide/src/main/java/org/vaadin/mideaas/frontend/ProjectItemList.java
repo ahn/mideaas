@@ -1,33 +1,36 @@
 package org.vaadin.mideaas.frontend;
 
 import java.util.LinkedList;
+import java.util.List;
 
 import org.vaadin.dialogs.ConfirmDialog;
+import org.vaadin.mideaas.model.ProjectItem;
 import org.vaadin.mideaas.model.SharedProject;
 import org.vaadin.mideaas.model.SharedProject.ProjectListener;
+import org.vaadin.mideaas.model.SharedView;
 import org.vaadin.mideaas.model.User;
 
-import com.vaadin.event.ItemClickEvent;
-import com.vaadin.event.ItemClickEvent.ItemClickListener;
+import com.vaadin.data.Property.ValueChangeEvent;
+import com.vaadin.data.Property.ValueChangeListener;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Button.ClickListener;
 import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.HorizontalLayout;
+import com.vaadin.ui.Label;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.Panel;
-import com.vaadin.ui.Tree;
+import com.vaadin.ui.TreeTable;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 
 // TODO
 
 @SuppressWarnings("serial")
-public class ProjectItemList extends CustomComponent implements ItemClickListener, ProjectListener {
+public class ProjectItemList extends CustomComponent implements ProjectListener, ValueChangeListener {
 
 	public interface Listener {
-		public void componentSelected(String name);
-		public void javaFileSelected(String name);
+		public void projectItemSelected(String name);
 	}
 	
 	private static final String TITLE_VIEWS = "Views";
@@ -38,10 +41,11 @@ public class ProjectItemList extends CustomComponent implements ItemClickListene
 	private LinkedList<Listener> listeners = new LinkedList<Listener>();
 	
 	private final SharedProject project;
-	private final Tree tree = new Tree();
-
+	private final TreeTable tree = new TreeTable();
+	
 	private UI ui;
 
+	private String selected = "App.java";
 	
 	public ProjectItemList(SharedProject proj, final User user) {
 		super();
@@ -52,8 +56,6 @@ public class ProjectItemList extends CustomComponent implements ItemClickListene
 		
 		VerticalLayout la = new VerticalLayout();
 		p.setContent(la);
-		
-		tree.setSelectable(false);
 		
 		HorizontalLayout ho = new HorizontalLayout();
 		ho.setMargin(true);
@@ -133,10 +135,16 @@ public class ProjectItemList extends CustomComponent implements ItemClickListene
 		
 		this.ui = UI.getCurrent();
 		
-		draw();
 		
-		tree.addItemClickListener(this);
+		
+		tree.addContainerProperty("Name", Label.class,  null);
 		tree.setImmediate(true);
+		tree.setWidth("100%");
+		tree.setSelectable(true);
+		
+		tree.addValueChangeListener(this);
+		
+		draw();
 		
 		project.addListener(this);
 	}
@@ -152,52 +160,38 @@ public class ProjectItemList extends CustomComponent implements ItemClickListene
 	private void draw() {
 		tree.removeAllItems();
 		
-		tree.addItem(TITLE_VIEWS);
+		tree.addItem(new Object[]{new Label(TITLE_VIEWS)}, TITLE_VIEWS);
+		tree.addItem(new Object[]{new Label(TITLE_OTHER_FILES)}, TITLE_OTHER_FILES);
 		
-		for (String c : project.getViewNames()) {
-			tree.addItem(c);
-			tree.setItemIcon(c, Icons.APPLICATION_FORM);
-			tree.setChildrenAllowed(c, false);
-			tree.setParent(c, TITLE_VIEWS);
-		}
+		List<ProjectItem> items = project.getProjectItemsCopy();
 		
-		tree.addItem(TITLE_OTHER_FILES);
-		
-		for (String f : project.getFileNames()) {
-			tree.addItem(f);
-			tree.setItemIcon(f, f.endsWith(".java") ? Icons.DOCUMENT_ATTRIBUTE_J : Icons.DOCUMENT);
-			tree.setChildrenAllowed(f, false);
-			tree.setParent(f, TITLE_OTHER_FILES);
+		for (ProjectItem pi : items) {
+			String id = pi.getName();
+			tree.addItem(new Object[]{new ProjectItemLabel(pi)}, id);
+			tree.setItemIcon(id, pi.getIcon());
+			tree.setChildrenAllowed(id, false);
+			if (pi instanceof SharedView) {
+				tree.setParent(id, TITLE_VIEWS);
+			}
+			else {
+				tree.setParent(id, TITLE_OTHER_FILES);
+			}
 		}
 
-		tree.expandItem(TITLE_VIEWS);
-		tree.expandItem(TITLE_OTHER_FILES);
+		tree.setCollapsed(TITLE_VIEWS, false);
+		tree.setCollapsed(TITLE_OTHER_FILES, false);
+		//tree.expandItem(TITLE_VIEWS);
+		//tree.expandItem(TITLE_OTHER_FILES);
 	}
 
-	@Override
-	public void itemClick(ItemClickEvent event) {
-		
-		if (TITLE_VIEWS.equals(tree.getParent(event.getItemId()))) {
-			tree.select(event.getItemId());
-			fireComponentSelected(""+event.getItemId());
-		}
-		else if (TITLE_OTHER_FILES.equals(tree.getParent(event.getItemId()))) {
-			tree.select(event.getItemId());
-			fireJavaFileSelected(""+event.getItemId());
-		}
-	}
 	
 	private void fireComponentSelected(String name) {
 		for (Listener li : listeners) {
-			li.componentSelected(name);
+			li.projectItemSelected(name);
 		}
 	}
 	
-	private void fireJavaFileSelected(String name) {
-		for (Listener li : listeners) {
-			li.javaFileSelected(name);
-		}
-	}
+
 
 	@Override
 	public void changed() {
@@ -207,5 +201,18 @@ public class ProjectItemList extends CustomComponent implements ItemClickListene
 				draw();
 			}
 		});
+	}
+
+	@Override
+	public void valueChange(ValueChangeEvent event) {
+		String id = (String) event.getProperty().getValue();
+		Object parent = tree.getParent(id);
+		if (TITLE_VIEWS.equals(parent) || TITLE_OTHER_FILES.equals(parent)) {
+			selected = id;
+			fireComponentSelected(id);
+		}
+		else {
+			tree.select(selected);
+		}
 	}
 }
