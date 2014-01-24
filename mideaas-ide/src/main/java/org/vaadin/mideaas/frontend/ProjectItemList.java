@@ -99,7 +99,7 @@ public class ProjectItemList extends CustomComponent implements ItemClickListene
 				@Override
 				public void onClose(ConfirmDialog d) {
 					if (d.isConfirmed()) {
-						project.removeView(sel, user);
+						project.removeProjectItem(sel, user);
 					}
 				}
 			});
@@ -116,7 +116,7 @@ public class ProjectItemList extends CustomComponent implements ItemClickListene
 				@Override
 				public void onClose(ConfirmDialog d) {
 					if (d.isConfirmed()) {
-						project.removeFile(sel, user);
+						project.removeProjectItem(sel, user);
 					}
 				}
 			});

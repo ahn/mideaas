@@ -17,8 +17,6 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
@@ -27,7 +25,6 @@ import javax.xml.transform.TransformerFactoryConfigurationError;
 import org.apache.commons.io.FileUtils;
 import org.vaadin.chatbox.SharedChat;
 import org.vaadin.mideaas.editor.EditorUser;
-import org.vaadin.mideaas.editor.MultiUserDoc;
 import org.vaadin.mideaas.frontend.PomXml;
 import org.vaadin.mideaas.frontend.PomXml.Dependency;
 import org.vaadin.mideaas.java.util.CompilingService;
@@ -98,8 +95,7 @@ public class SharedProject {
 	private final File projectDir;
 
 	// Project consists of mostly two things: views and files.
-	private TreeMap<String, SharedView> views = new TreeMap<String, SharedView>();
-	private TreeMap<String, ProjectFile> files = new TreeMap<String, ProjectFile>();
+	private TreeMap<String, ProjectItem> objects = new TreeMap<String, ProjectItem>();
 
 	private PomXml pomXml;
 
@@ -223,19 +219,14 @@ public class SharedProject {
 	 */
 	private Map<String, String> getJavaClasses() {
 		Map<String,String> classes = new HashMap<String,String>();
-		for (Entry<String, ProjectFile> e : files.entrySet()) {
-			if (e.getKey().endsWith(".java")) {
-				String cls = fullJavaClassNameFromFilename(e.getKey());
-				String content = e.getValue().getMud().getBase().getText();
-				classes.put(cls, content);
+		for (ProjectItem po : objects.values()) {
+			String[] cls = po.getJavaClass();
+			if (cls!=null) {
+				classes.put(getPackageName()+"."+cls[0], cls[1]);
 			}
+			
 		}
-		for (Entry<String, SharedView> e : views.entrySet()) {
-			String cls = e.getValue().getControllerFullName();
-			String content = e.getValue().getControllerMud().getBase().getText(); // XXX
-			classes.put(cls, content);
-		}
-		
+				
 		// Assuming every project has this MideaasComponent class...
 		// TODO: this is a bit of a hack...
 		String cls = "org.vaadin.mideaas.MideaasComponent";
@@ -388,8 +379,8 @@ public class SharedProject {
 
 		SharedView c = null;
 		synchronized (this) {
-			if (containsView(name)) {
-				System.err.println("View " + name + " already exists.");
+			if (containsProjectItem(name)) {
+				System.err.println("Project object '" + name + "' already exists.");
 				return null;
 			}
 
@@ -430,13 +421,8 @@ public class SharedProject {
 	
 	public synchronized void writeToDisk(File dir) throws IOException {
 		File src = ProjectFileUtils.getSourceDir(dir, getPackageName());
-		for (SharedView v : views.values()) {
-			v.writeBaseToDisk(src);
-		}
-
-		for (ProjectFile e : files.values()) {
-			String s = e.getMud().getBase().getText();
-			FileUtils.write(new File(src, e.getName()), s);
+		for (ProjectItem po : objects.values()) {
+			po.writeBaseToDisk(src);
 		}
 
 		try {
@@ -544,8 +530,8 @@ public class SharedProject {
 				projFiles.put(n, new ProjectFile(n, e.getValue(), null, saveTo, log));
 			}
 		}
-		this.views = views;
-		this.files = projFiles;
+		objects = new TreeMap<String, ProjectItem>(views);
+		objects.putAll(projFiles);
 	}
 
 	/**
@@ -557,26 +543,32 @@ public class SharedProject {
 		//return !name.equals(ProjectFileUtils.getAppClassName() + ".java");
 	}
 
-	public synchronized SharedView getView(String name) {
-		return views.get(name);
+	public synchronized ProjectItem getProjectItem(String name) {
+		return objects.get(name);
 	}
 
-	public synchronized boolean containsView(String name) {
-		return views.containsKey(name);
-	}
-
-	public synchronized boolean containsFile(String name) {
-		return files.containsKey(name);
+	public synchronized boolean containsProjectItem(String name) {
+		return objects.containsKey(name);
 	}
 
 	public synchronized List<String> getViewNames() {
-		// Defensive copy because we don't want others to mess with the contents.
-		return new LinkedList<String>(views.keySet());
+		LinkedList<String> names = new LinkedList<String>();
+		for (ProjectItem po : objects.values()) {
+			if (po instanceof SharedView) {
+				names.add(po.getName());
+			}
+		}
+		return names;
 	}
 
 	public synchronized List<String> getFileNames() {
-		// Defensive copy because we don't want others to mess with the contents.
-		return new LinkedList<String>(files.keySet());
+		LinkedList<String> names = new LinkedList<String>();
+		for (ProjectItem po : objects.values()) {
+			if (po instanceof ProjectFile) {
+				names.add(po.getName());
+			}
+		}
+		return names;
 	}
 
 	public synchronized List<Dependency> getDependencies() {
@@ -650,22 +642,7 @@ public class SharedProject {
 		}
 	}
 
-	/**
-	 * Removes the user from project.
-	 * 
-	 * @param user
-	 *            the user
-	 */
-	public void removeUser(User user) {
-		boolean removed;
-		synchronized (this) {
-			removed = users.remove(user);
-		}
-		if (removed) {
-			getChat().addLine(user.getName() + " left");
-			// TODO fire something?
-		}
-	}
+
 	
 	private void removeAllUsers() {
 		@SuppressWarnings("unused")
@@ -849,16 +826,9 @@ public class SharedProject {
 		return compiler;
 	}
 
-	/**
-	 * 
-	 * @return the file; null if no such file.
-	 */
-	public synchronized ProjectFile getFile(String name) {
-		return files.get(name);
-	}
 	
 	private void addView(SharedView view, User byUser) {
-		views.put(view.getName(), view);
+		objects.put(view.getName(), view);
 		getCompiler().compile(view);
 		if (byUser!=null) {
 			getChat().addLine(byUser.getName() + " created a view: " + view.getName());
@@ -867,10 +837,10 @@ public class SharedProject {
 
 	public boolean addFile(ProjectFile f, User byUser) {
 		synchronized (this) {
-			if (containsFile(f.getName())) {
+			if (containsProjectItem(f.getName())) {
 				return false;
 			}
-			files.put(f.getName(), f);
+			objects.put(f.getName(), f);
 		}
 		compileFile(f);
 		if (byUser!=null) {
@@ -887,54 +857,18 @@ public class SharedProject {
 		}
 	}
 
-	/**
-	 * Removes the view from the project.
-	 * 
-	 * @param name
-	 * @param byUser
-	 */
-	public void removeView(String name, User byUser) {
-		SharedView removedView;
+	public void removeProjectItem(String name, User byUser) {
+		ProjectItem removed;
 		synchronized (this) {
-			removedView = views.remove(name);
+			removed = objects.remove(name);
 		}
 		// TODO: remove from git repository!
-		if (removedView!=null) {
-			removeViewFromDisk(removedView);
-			getCompiler().removeClass(removedView.getControllerFullName());
-			getChat().addLine(byUser.getName() + " deleted a view: " + name);
+		if (removed!=null) {
+			removed.removeFromDir(getSourceDir());
+			removed.removeFromClasspathOf(getCompiler(), getPackageName());
+			getChat().addLine(byUser.getName() + " deleted " + removed.getName());
 			fireChanged();
 		}
-	}
-
-	/**
-	 * Removes the file from the project.
-	 * 
-	 * @param name
-	 * @param byUser
-	 */
-	public void removeFile(String name, User byUser) {
-		boolean removed;
-		synchronized (this) {
-			removed = files.remove(name) != null;
-		}
-		// TODO: remove from git repository!
-		if (removed) {
-			removeFileFromDisk(name);
-			getCompiler().removeClass(fullJavaClassNameFromFilename(name));
-			getChat().addLine(byUser.getName() + " deleted a file: " + name);
-			fireChanged();
-		}
-	}
-	
-	private void removeViewFromDisk(SharedView view) {
-		removeFileFromDisk(view.getName()+".java");
-		removeFileFromDisk(view.getName()+".clara.xml");
-	}
-	
-	private void removeFileFromDisk(String filename) {
-		File f = new File(getSourceDir(), filename);
-		f.delete();
 	}
 
 	public File getSourceFileLocation(String filename) {
@@ -959,33 +893,20 @@ public class SharedProject {
 		return getProjectNames().contains(name);
 	}
 
-	private void removeDiffering(User user) {
-		EditorUser eu = user.getEditorUser();
-		for (ProjectFile f : files.values()) {
-			f.getMud().removeDiffering(eu);
+	public void removeUser(User user) {
+		boolean removed;
+		synchronized (this) {
+			removed = users.remove(user);
+			for (ProjectItem po : objects.values()) {
+				po.removeUser(user);
+			}
 		}
-		for (SharedView v : views.values()) {
-			v.getControllerMud().removeDiffering(eu);
-			v.getModelMud().removeDiffering(eu);
+		if (removed) {
+			getChat().addLine(user.getName() + " left");
 		}
-	}
-
-	public synchronized void removeUserAndHisDocs(User user) {
-		removeDiffering(user);
-		removeDocsOf(user);
 		
 	}
 
-	private void removeDocsOf(User user) {
-		EditorUser eu = user.getEditorUser();
-		for (ProjectFile pf : files.values()) {
-			pf.getMud().removeUser(eu);
-		}
-		for (SharedView view : views.values()) {
-			view.getControllerMud().removeUser(eu);
-			view.getModelMud().removeUser(eu);
-		}
-	}
 
 	
 

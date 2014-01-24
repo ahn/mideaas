@@ -96,7 +96,7 @@ public class MideaasEditor extends CustomComponent implements Listener {
 	
 	@Override
 	public void detach() {
-		project.removeUserAndHisDocs(user);
+		project.removeUser(user);
 		
 		super.detach();
 	}
@@ -136,7 +136,7 @@ public class MideaasEditor extends CustomComponent implements Listener {
 
 		split.setSplitPosition(20.0f);
 
-		setActiveFile(project.getFile("App.java"));
+		setActiveFile((ProjectFile) project.getProjectItem("App.java"));
 
 		//adds new menuitem (that does not do anything)
 		if (settings.easiCloudsFeaturesTurnedOn){
@@ -184,7 +184,7 @@ public class MideaasEditor extends CustomComponent implements Listener {
 	@Override
 	public void componentSelected(String name) {
 		if (!name.equals(activeComponentName)) {
-			setActiveComponent(project.getView(name));
+			setActiveComponent((SharedView) project.getProjectItem(name));
 		}
 
 	}
@@ -192,7 +192,7 @@ public class MideaasEditor extends CustomComponent implements Listener {
 	@Override
 	public void javaFileSelected(String name) {
 		if (!name.equals(activeComponentName)) {
-			ProjectFile f = project.getFile(name);
+			ProjectFile f = (ProjectFile) project.getProjectItem(name);
 			if (f!=null) {
 				setActiveFile(f);
 			}

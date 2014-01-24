@@ -150,7 +150,7 @@ public class MultiUserDoc {
 		fireDifferingChanged();
 	}
 	
-	public void removeDiffering(EditorUser user) {
+	private void removeDiffering(EditorUser user) {
 		DocDifference removed;
 		synchronized (this) {
 			removed = differences.remove(user);

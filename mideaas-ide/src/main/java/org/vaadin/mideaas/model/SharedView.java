@@ -17,12 +17,13 @@ import org.vaadin.mideaas.editor.ErrorChecker;
 import org.vaadin.mideaas.editor.MultiUserDoc;
 import org.vaadin.mideaas.editor.XmlSyntaxErrorChecker;
 import org.vaadin.mideaas.java.JavaSyntaxErrorChecker;
+import org.vaadin.mideaas.java.util.CompilingService;
 
 // TODO: Auto-generated Javadoc
 /**
  * The Class SharedView.
  */
-public class SharedView {
+public class SharedView extends ProjectItem {
 
 	public static final String NAME_PATTERN = "[A-Z]\\w+";
 
@@ -101,7 +102,7 @@ public class SharedView {
 	 *            the name
 	 */
 	public SharedView(String javaPackage, String name, File saveBaseToDir, ProjectLog log) {
-		
+		super(name);
 		// TODO: it doesn't always make sense to assign something to the muds
 		// if we know we're going to set them right away, such as when reading from disk.
 		
@@ -165,6 +166,7 @@ public class SharedView {
 		return modelMud;
 	}
 
+	@Override
 	public void writeBaseToDisk(File dir) throws IOException {
 		String ctrl;
 		String model;
@@ -232,5 +234,29 @@ public class SharedView {
 	public String getControllerFilename() {
 		return name+".java";
 	}
+	
+	@Override
+	public String[] getJavaClass() {
+		String cls = getControllerName();
+		String content = getControllerMud().getBase().getText();
+		return new String[] {cls, content};
+	}
 
+	@Override
+	public void removeFromDir(File sourceDir) {
+		new File(sourceDir, getName()+".java").delete();
+		new File(sourceDir, getName()+".clara.xml").delete();
+	}
+
+	@Override
+	public void removeFromClasspathOf(CompilingService compiler,
+			String packageName) {
+		compiler.removeClass(packageName+"."+getControllerName());
+	}
+	
+	@Override
+	public void removeUser(User user) {
+		getControllerMud().removeUser(user.getEditorUser());
+		getModelMud().removeUser(user.getEditorUser());
+	}
 }

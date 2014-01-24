@@ -90,14 +90,14 @@ public class AddNewWindow extends Window {
 	private Validator viewExistsValidator = new AbstractStringValidator("Already exists.") {
 		@Override
 		protected boolean isValidValue(String value) {
-			return !project.containsView(value);
+			return !project.containsProjectItem(value);
 		}
 	};
 	
 	private Validator fileExistsValidator = new AbstractStringValidator("Already exists.") {
 		@Override
 		protected boolean isValidValue(String value) {
-			return !project.containsFile(value);
+			return !project.containsProjectItem(value);
 		}
 	};
 	
