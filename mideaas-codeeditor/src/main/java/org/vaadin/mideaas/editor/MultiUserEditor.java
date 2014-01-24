@@ -126,7 +126,6 @@ public class MultiUserEditor extends CustomComponent
 		super.attach();
 		
 		myDoc = mud.createUserDoc(user);
-		myDoc.editorAttached();
 		
 		getUI().addActionHandler(new Handler() {
 			Action action_ok = new ShortcutAction("Alt+S", ShortcutAction.KeyCode.S, new int[] { ShortcutAction.ModifierKey.ALT });
@@ -222,9 +221,7 @@ public class MultiUserEditor extends CustomComponent
 		}
 		
 		editor.removeDiffListener(this);
-		
-		myDoc.editorDetached();
-		
+			
 		
 	}
 	

@@ -27,8 +27,6 @@ public class UserDoc implements BaseChangedListener {
 
 	private SyncMode syncMode = SyncMode.ASAP;
 
-	private int attached;
-	
 	public UserDoc(EditorUser user, AceDoc initial) {
 		this.user = user;
 		shadow = initial;
@@ -144,21 +142,6 @@ public class UserDoc implements BaseChangedListener {
 	public synchronized AceDoc getDoc() {
 		return work;
 	}
-	
-	public synchronized void editorAttached() {
-		attached++;
-	}
-
-	public synchronized void editorDetached() {
-		attached--;
-		if (attached==0) {
-			mud.removeUserDoc(user);
-		}
-	}
-
-	
-
-
-	
+		
 	
 }

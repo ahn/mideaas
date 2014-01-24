@@ -96,7 +96,7 @@ public class MideaasEditor extends CustomComponent implements Listener {
 	
 	@Override
 	public void detach() {
-		project.removeDiffering(user);
+		project.removeUserAndHisDocs(user);
 		
 		super.detach();
 	}

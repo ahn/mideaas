@@ -21,8 +21,8 @@ public class MultiUserDoc {
 	}
 	
 	// Not sure if it's necessary to use weak references here,
-	// since we're removing the listeners in removeUserDoc.
-	// But not sure if removeUserDoc is called in all cases...
+	// since we're removing the listeners in removeUser.
+	// But not sure if removeUser is called in all cases...
 	// If not, using weak refs allows the listener object to be garbage collected.
 	private CopyOnWriteArrayList<WeakReference<BaseChangedListener>> listeners =
 			new CopyOnWriteArrayList<WeakReference<BaseChangedListener>>();
@@ -219,7 +219,10 @@ public class MultiUserDoc {
 		return userDocs.get(user);
 	}
 	
-	public synchronized void removeUserDoc(EditorUser user) {
+	/**
+	 * Remove all data related to the user. 
+	 */
+	public synchronized void removeUser(EditorUser user) {
 		UserDoc ud = userDocs.remove(user);
 		if (ud!=null) {
 			removeBaseChangedListenerWeak(ud);
@@ -277,6 +280,7 @@ public class MultiUserDoc {
 	public void removeDifferingChangedListener(DifferingChangedListener li) {
 		ducListeners.remove(li);
 	}
+
 
 	
 

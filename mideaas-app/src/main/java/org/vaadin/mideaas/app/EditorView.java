@@ -84,7 +84,6 @@ public class EditorView extends CustomComponent implements View, CloseHandler {
 
 	@Override
 	public void closeRequested(SharedProject project) {
-		project.removeUser(user);
 		LobbyBroadcaster.broadcastProjectsChanged();
 		ui.navigateTo("lobby");
 	}

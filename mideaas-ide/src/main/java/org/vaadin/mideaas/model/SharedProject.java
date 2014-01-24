@@ -27,6 +27,7 @@ import javax.xml.transform.TransformerFactoryConfigurationError;
 import org.apache.commons.io.FileUtils;
 import org.vaadin.chatbox.SharedChat;
 import org.vaadin.mideaas.editor.EditorUser;
+import org.vaadin.mideaas.editor.MultiUserDoc;
 import org.vaadin.mideaas.frontend.PomXml;
 import org.vaadin.mideaas.frontend.PomXml.Dependency;
 import org.vaadin.mideaas.java.util.CompilingService;
@@ -231,7 +232,7 @@ public class SharedProject {
 		}
 		for (Entry<String, SharedView> e : views.entrySet()) {
 			String cls = e.getValue().getControllerFullName();
-			String content = e.getValue().getControllerMUD().getBase().getText(); // XXX
+			String content = e.getValue().getControllerMud().getBase().getText(); // XXX
 			classes.put(cls, content);
 		}
 		
@@ -958,14 +959,31 @@ public class SharedProject {
 		return getProjectNames().contains(name);
 	}
 
-	public synchronized void removeDiffering(User user) {
+	private void removeDiffering(User user) {
 		EditorUser eu = user.getEditorUser();
 		for (ProjectFile f : files.values()) {
 			f.getMud().removeDiffering(eu);
 		}
 		for (SharedView v : views.values()) {
-			v.getControllerMUD().removeDiffering(eu);
+			v.getControllerMud().removeDiffering(eu);
 			v.getModelMud().removeDiffering(eu);
+		}
+	}
+
+	public synchronized void removeUserAndHisDocs(User user) {
+		removeDiffering(user);
+		removeDocsOf(user);
+		
+	}
+
+	private void removeDocsOf(User user) {
+		EditorUser eu = user.getEditorUser();
+		for (ProjectFile pf : files.values()) {
+			pf.getMud().removeUser(eu);
+		}
+		for (SharedView view : views.values()) {
+			view.getControllerMud().removeUser(eu);
+			view.getModelMud().removeUser(eu);
 		}
 	}
 

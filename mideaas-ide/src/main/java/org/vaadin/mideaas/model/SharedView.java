@@ -157,7 +157,7 @@ public class SharedView {
 		return REGEX_NAME.matcher(name).matches();
 	}
 
-	public MultiUserDoc getControllerMUD() {
+	public MultiUserDoc getControllerMud() {
 		return controllerMud;
 	}
 
