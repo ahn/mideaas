@@ -59,8 +59,8 @@ public class Deployer extends CoapsCaller  {
     Deployer(String pathToWar){
     	this.pathToWar = pathToWar;
     	File file = new File(pathToWar);
-    	String warName = file.getName();
-    	String warLocation = file.getParentFile().getAbsolutePath();
+    	warName = file.getName();
+    	warLocation = file.getParentFile().getAbsolutePath();
 		appName = warName.replace(".war", "");
 
         deployLocation = "/home/ubuntu/delpoyedprojects";
