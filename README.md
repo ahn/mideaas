@@ -20,6 +20,9 @@ To run MIDEaaS, you need Java 7 SDK and [Maven](http://maven.apache.org/).
 
 4. (Optional) To use VisualDesigner, you must run the VisualDesigner ([here](https://collab.nokia.com/SME/browser/sme/VisualDesigner)) somewhere and configure its address in `mideaas-app/src/main/resources/mideaas.properties`.
 
+## Compile to WAR
+1. In the mideaas-app folder run 'mvn war:war'
+
 ---
 
 [![Build Status](https://travis-ci.org/ahn/mideaas.png)](https://travis-ci.org/ahn/mideaas)

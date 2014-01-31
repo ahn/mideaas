@@ -15,7 +15,7 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <vaadin.version>7.1.6</vaadin.version>
+        <vaadin.version>7.1.10</vaadin.version>
         <vaadin.plugin.version>${vaadin.version}</vaadin.plugin.version>
         <gwt.persistentunitcachedir>${project.basedir}/gwtcache</gwt.persistentunitcachedir>
     </properties>
@@ -42,11 +42,11 @@
             <version>${vaadin.version}</version>
         </dependency>
         <dependency>
-            <groupId>com.vaadin</groupId>
+           <groupId>com.vaadin</groupId>
             <artifactId>vaadin-client-compiled</artifactId>
             <version>${vaadin.version}</version>
         </dependency>
-<!--        <dependency>
+<!--         <dependency>
             <groupId>com.vaadin</groupId>
             <artifactId>vaadin-client</artifactId>
             <version>${vaadin.version}</version>
@@ -89,6 +89,7 @@
     </dependencies>
 
     <build>
+    	<finalName>%s</finalName>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>

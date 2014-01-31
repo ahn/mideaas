@@ -982,6 +982,10 @@ public class SharedProject {
 		}
 	}
 
+	public File getTargetDir() {
+		return new File(this.getProjectDir().getAbsolutePath(),"target-1");
+	}
+
 	
 
 }
