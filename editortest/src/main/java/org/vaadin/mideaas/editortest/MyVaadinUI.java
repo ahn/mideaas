@@ -4,9 +4,8 @@ import javax.servlet.annotation.WebServlet;
 
 import org.vaadin.aceeditor.AceMode;
 import org.vaadin.aceeditor.client.AceDoc;
+import org.vaadin.mideaas.editor.DocManager;
 import org.vaadin.mideaas.editor.EditorUser;
-import org.vaadin.mideaas.editor.JavaSyntaxErrorChecker;
-import org.vaadin.mideaas.editor.MultiUserDoc;
 import org.vaadin.mideaas.editor.MultiUserEditor;
 
 import com.vaadin.annotations.Push;
@@ -31,7 +30,7 @@ public class MyVaadinUI extends UI
 	}
 
     @WebServlet(value = "/*", asyncSupported = true)
-    @VaadinServletConfiguration(productionMode = false, ui = MyVaadinUI.class, widgetset = "org.vaadin.mideaas.editortest.AppWidgetSet", heartbeatInterval=2)
+    @VaadinServletConfiguration(productionMode = false, ui = MyVaadinUI.class, widgetset = "org.vaadin.mideaas.editortest.AppWidgetSet")
     public static class Servlet extends VaadinServlet {
     }
     
@@ -41,8 +40,7 @@ public class MyVaadinUI extends UI
     		+ "    void bar() {\n        int i = 2;\n    }\n\n"
     		+ "}\n";
     
-    private static final MultiUserDoc mud = new MultiUserDoc(
-    		"hehe", new AceDoc(JAVA_CODE), new JavaSyntaxErrorChecker(), null);
+    private static final DocManager mud = new DocManager(new AceDoc("//"));
 
     @Override
     protected void init(VaadinRequest request) {

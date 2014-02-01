@@ -51,11 +51,15 @@ public class ProjectItemList extends CustomComponent implements ProjectListener,
 		super();
 		this.project = proj;
 		this.user = user;
+		VerticalLayout mainLayout = new VerticalLayout();
 		Panel p = new Panel("Project Contents");
-		p.setHeight("200px");
+		mainLayout.addComponent(p);
 		
 		VerticalLayout la = new VerticalLayout();
 		p.setContent(la);
+		
+		la.addComponent(tree);
+		la.setExpandRatio(tree, 1);
 		
 		HorizontalLayout ho = new HorizontalLayout();
 		ho.setMargin(true);
@@ -83,14 +87,11 @@ public class ProjectItemList extends CustomComponent implements ProjectListener,
 		addButton.setWidth("100%");
 		addButton.setIcon(Icons.PLUS);
 		deleteButton.setIcon(Icons.CROSS);
-//		deleteButton.setWidth("100%");
 		ho.setExpandRatio(addButton, 1);
 		
-		la.addComponent(ho);
-		la.addComponent(tree);
-		la.setExpandRatio(tree, 1);
+		mainLayout.addComponent(ho);
 		
-		setCompositionRoot(p);
+		setCompositionRoot(mainLayout);
 	}
 	
 	private void delete() {
@@ -210,9 +211,6 @@ public class ProjectItemList extends CustomComponent implements ProjectListener,
 		if (TITLE_VIEWS.equals(parent) || TITLE_OTHER_FILES.equals(parent)) {
 			selected = id;
 			fireComponentSelected(id);
-		}
-		else {
-			tree.select(selected);
 		}
 	}
 }

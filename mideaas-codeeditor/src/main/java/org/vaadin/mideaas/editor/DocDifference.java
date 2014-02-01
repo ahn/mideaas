@@ -11,6 +11,7 @@ public class DocDifference {
 	private final EditorUser user;
 	private final AceDoc baseDoc;
 	private final AceDoc userDoc;
+	private ServerSideDocDiff diff;
 	private int inserts = -1;
 	private int deletes = -1;
 
@@ -22,6 +23,11 @@ public class DocDifference {
 	
 	public EditorUser getUser() {
 		return user;
+	}
+	
+	public ServerSideDocDiff getDiff() {
+		ensureCalced();
+		return diff;
 	}
 
 	public int getInserts() {
@@ -40,16 +46,15 @@ public class DocDifference {
 	}
 
 	private synchronized void ensureCalced() {
-		if (inserts >= 0) {
+		if (diff != null) {
 			return;
 		}
 		if (baseDoc==null || userDoc==null) {
-			// XXX ???
 			inserts = 0;
 			deletes = 0;
 			return;
 		}
-		ServerSideDocDiff diff = ServerSideDocDiff.diff(baseDoc, userDoc);
+		diff = ServerSideDocDiff.diff(baseDoc, userDoc);
 		inserts = 0;
 		deletes = 0;
 		for (Patch p : diff.getPatches()) {
@@ -66,6 +71,6 @@ public class DocDifference {
 	
 	@Override
 	public String toString() {
-		return "DD "+user+" +" + getInserts() + " -" + getDeletes();
+		return "DD "+user.getName()+" +" + getInserts() + " -" + getDeletes();
 	}
 }

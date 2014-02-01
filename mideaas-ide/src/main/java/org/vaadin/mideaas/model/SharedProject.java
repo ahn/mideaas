@@ -856,7 +856,7 @@ public class SharedProject {
 	private void compileFile(ProjectFile f) {
 		if (f.getName().endsWith(".java")) {
 			String cls = fullJavaClassNameFromFilename(f.getName());
-			getCompiler().compile(cls, f.getMud().getBase().getText(), null);
+			getCompiler().compile(cls, f.getBaseText(), null);
 		}
 	}
 

@@ -1,14 +1,17 @@
 package org.vaadin.mideaas.frontend;
 
 import java.util.ArrayList;
-import java.util.Set;
+import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
 import org.vaadin.mideaas.editor.DocDifference;
-import org.vaadin.mideaas.editor.MultiUserDoc.DifferingChangedListener;
+import org.vaadin.mideaas.editor.DocManager.DifferingChangedListener;
+import org.vaadin.mideaas.editor.EditorUser;
 import org.vaadin.mideaas.model.ProjectItem;
 
 import com.vaadin.ui.Label;
+
+
 
 @SuppressWarnings("serial")
 public class ProjectItemLabel extends Label implements DifferingChangedListener {
@@ -35,20 +38,20 @@ public class ProjectItemLabel extends Label implements DifferingChangedListener 
 	}
 
 	@Override
-	public void differencesChanged(final Set<DocDifference> diffs) {
+	public void differingChanged(final Map<EditorUser, DocDifference> diffs) {
 		getUI().access(new Runnable() {
-			@Override
-			public void run() {
-				String caption = item.getName();
-				if (!diffs.isEmpty()) {
-					ArrayList<String> names = new ArrayList<String>(diffs.size());
-					for (DocDifference dd : diffs) {
-						names.add(dd.getUser().getName());
-					}
-					caption += " (" + StringUtils.join(names, ", ") + ")";
+		@Override
+		public void run() {
+			String caption = item.getName();
+			if (!diffs.isEmpty()) {
+				ArrayList<String> names = new ArrayList<String>(diffs.size());
+				for (DocDifference dd : diffs.values()) {
+					names.add(dd.getUser().getName());
 				}
-				setValue(caption);
+				caption += " (" + StringUtils.join(names, ", ") + ")";
 			}
-		});
+			setValue(caption);
+		}
+	});
 	}
 }

@@ -1,67 +1,38 @@
 package org.vaadin.mideaas.editor;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-
 import org.vaadin.aceeditor.AceEditor;
-import org.vaadin.aceeditor.AceEditor.DiffEvent;
-import org.vaadin.aceeditor.AceEditor.DiffListener;
 import org.vaadin.aceeditor.AceEditor.SelectionChangeListener;
 import org.vaadin.aceeditor.AceMode;
 import org.vaadin.aceeditor.AceTheme;
 import org.vaadin.aceeditor.SuggestionExtension;
 import org.vaadin.aceeditor.TextRange;
-import org.vaadin.aceeditor.client.AceAnnotation;
-import org.vaadin.aceeditor.client.AceAnnotation.MarkerAnnotation;
 import org.vaadin.aceeditor.client.AceDoc;
-import org.vaadin.aceeditor.client.AceMarker;
-import org.vaadin.aceeditor.client.AceRange;
-import org.vaadin.mideaas.editor.AsyncErrorChecker.ResultListener;
-import org.vaadin.mideaas.editor.EditorState.DocType;
-import org.vaadin.mideaas.editor.ErrorChecker.Error;
 import org.vaadin.mideaas.editor.MultiUserEditorUserGroup.EditorStateChangedEvent;
 import org.vaadin.mideaas.editor.MultiUserEditorUserGroup.EditorStateChangedListener;
-import org.w3c.dom.stylesheets.DocumentStyle;
 
 import com.vaadin.annotations.StyleSheet;
-import com.vaadin.data.Property.ValueChangeEvent;
-import com.vaadin.data.Property.ValueChangeListener;
-import com.vaadin.event.Action;
-import com.vaadin.event.Action.Handler;
 import com.vaadin.event.FieldEvents.TextChangeListener;
-import com.vaadin.event.ShortcutAction;
-import com.vaadin.ui.Button;
-import com.vaadin.ui.Button.ClickListener;
-import com.vaadin.ui.CheckBox;
 import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.HorizontalLayout;
+import com.vaadin.ui.Label;
 import com.vaadin.ui.VerticalLayout;
-import com.vaadin.ui.Button.ClickEvent;
 
 @StyleSheet("ace-markers.css")
 @SuppressWarnings("serial")
-public class MultiUserEditor extends CustomComponent
-		implements DiffListener, ResultListener, UserDoc.Listener {
+public class MultiUserEditor extends CustomComponent {
 		
 	private final EditorUser user;
-	private final MultiUserDoc mud;
+	private final DocManager mud;
 	private final AceEditor editor;
-	private UserDoc activeDoc;
-
-	private EditorState currentState;
+	private SharedDoc activeDoc;
 	
 	private final HorizontalLayout hBar = new HorizontalLayout();
 	private MultiUserEditorUserGroup group;
 	private AsyncErrorChecker checker;
 	
-	private final CheckBox autoSync = new CheckBox("Autopush");
-	private final Button syncButton = new Button("Push");
-	private final Button useThisButton = new Button("Use this code");
-	
-	private UserDoc myDoc;
+	private final Label titleLabel = new Label();
 
-	public MultiUserEditor(EditorUser user, MultiUserDoc mud) {
+	public MultiUserEditor(EditorUser user, DocManager mud) {
 		super();
 		this.user = user;
 		this.mud = mud;
@@ -72,6 +43,7 @@ public class MultiUserEditor extends CustomComponent
 		VerticalLayout layout = new VerticalLayout();
 		layout.setSizeFull();
 		layout.addComponent(hBar);
+		hBar.addComponent(titleLabel);
 		layout.addComponent(editor);
 		layout.setExpandRatio(editor, 1);
 		setCompositionRoot(layout);
@@ -82,6 +54,10 @@ public class MultiUserEditor extends CustomComponent
 		editor.setThemePath(path);
 		editor.setModePath(path);
 		editor.setWorkerPath(path); 
+	}
+	
+	public void setTitle(String title) {
+		titleLabel.setValue(title);
 	}
 	
 	public void setErrorChecker(AsyncErrorChecker checker) {
@@ -106,7 +82,6 @@ public class MultiUserEditor extends CustomComponent
 
 	public void addTextChangeListener(TextChangeListener listener) {
 		editor.addTextChangeListener(listener);
-		
 	}
 
 	public TextRange getSelection() {
@@ -125,46 +100,6 @@ public class MultiUserEditor extends CustomComponent
 	public void attach() {
 		super.attach();
 		
-		myDoc = mud.createUserDoc(user);
-		
-		getUI().addActionHandler(new Handler() {
-			Action action_ok = new ShortcutAction("Alt+S", ShortcutAction.KeyCode.S, new int[] { ShortcutAction.ModifierKey.ALT });
-			@Override
-			public Action[] getActions(Object target, Object sender) {
-				return new Action[]{action_ok};
-			}
-
-			@Override
-			public void handleAction(Action action, Object sender, Object target) {
-				syncDoc();
-			}
-			
-		});
-		
-		autoSync.setValue(true);
-		autoSync.setImmediate(true);
-		autoSync.addValueChangeListener(new ValueChangeListener() {
-			@Override
-			public void valueChange(ValueChangeEvent event) {
-				myDoc.setSyncMode(autoSync.getValue() ? SyncMode.ASAP : SyncMode.MANUAL);
-				updateSyncButtonEnabled();
-				if (activeDoc==myDoc) {
-					activeDoc.syncDoc(editor.getDoc().withoutMarkers());
-				}
-			}
-			
-		});
-		hBar.addComponent(autoSync);
-		
-		syncButton.addClickListener(new ClickListener() {
-			@Override
-			public void buttonClick(ClickEvent event) {
-				syncDoc();
-			}
-		});
-		updateSyncButtonEnabled();
-		hBar.addComponent(syncButton);
-		
 		group = new MultiUserEditorUserGroup(user, mud);
 		setEditorState(group.getEditorState());
 		hBar.addComponent(group);
@@ -172,179 +107,51 @@ public class MultiUserEditor extends CustomComponent
 			@Override
 			public void stateChanged(EditorStateChangedEvent e) {
 				setEditorState(e.state);
-				useThisButton.setEnabled(e.state.type != DocType.MINE);
-				updateSyncButtonEnabled();
 				editor.focus();
 			}
 		});
-		
-		useThisButton.addClickListener(new ClickListener() {
-			@Override
-			public void buttonClick(ClickEvent event) {
-				if (activeDoc!=null && activeDoc!=myDoc) {
-					myDoc.setDoc(activeDoc.getDoc());
-				}
-				else if (currentState.type==EditorState.DocType.BASE){
-					myDoc.setDoc(mud.getBase());
-				}
-			}
-		});
-		useThisButton.setEnabled(false);
-		
-		hBar.addComponent(useThisButton);
-		
-		editor.addDiffListener(this);
-		
-		setActiveDocToUser(user);
-		
-		// Should we always check errors on attach?
-		checkErrors();
-
+	
 	}
 	
-	private void updateSyncButtonEnabled() {
-		syncButton.setEnabled(activeDoc==myDoc && !autoSync.getValue());
-	}
 
-
-	protected void syncDoc() {
-		if (activeDoc!=null && currentState.type==EditorState.DocType.MINE) {
-			activeDoc.syncDoc(editor.getDoc().withoutMarkers());
-		}
-	}
 	@Override
 	public void detach() {
 		super.detach();
 		
 		if (activeDoc!=null) {
-			activeDoc.removeListener(this);
-		}
-		
-		editor.removeDiffListener(this);
-			
-		
+			activeDoc.detachEditor(editor);
+		}	
 	}
 	
 
-	private void setEditorState(EditorState state) {
-		if (currentState!=null && currentState.equals(state)) {
-			return;
+	private void setEditorState(EditorState editorState) {
+		
+		EditorUser u = editorState.getUser();
+		if (u!=null) {
+			setActiveDocToUser(u);
 		}
-
-		currentState = state;
-		if (state.type==DocType.OTHERS || state.type==DocType.MINE) {
-			setActiveDocToUser(state.diff.getUser());
-		}
-		else {
+		else if (editorState.type==EditorState.DocType.BASE) {
 			setActiveDocToBase();
 		}
 	}
 	
 	private void setActiveDocToBase() {
-		if (activeDoc!=null) {
-			activeDoc.removeListener(this);
-		}
-		activeDoc = null;
-		editor.setReadOnly(false);
-		editor.setDoc(mud.getBase());
+		setActiveDoc(mud.getBase());
 		editor.setReadOnly(true);
 	}
+
+	
 	private void setActiveDocToUser(EditorUser user) {
-		setActiveDoc(mud.createUserDoc(user));
+		setActiveDoc(mud.getUserDoc(user).getDoc());
+		editor.setReadOnly(!this.user.equals(user));
 	}
 	
-	private void setActiveDoc(UserDoc userDoc) {
+	private void setActiveDoc(SharedDoc doc) {
 		if (activeDoc!=null) {
-			activeDoc.removeListener(this);
+			activeDoc.detachEditor(editor);
 		}
-		activeDoc = userDoc;
-		activeDoc.addListener(this);
-		editor.setReadOnly(false);
-		editor.setDoc(userDoc.getDoc());
-		editor.setReadOnly(!userDoc.getUser().equals(user));
-	}
-
-
-	@Override
-	public void changed(final AceDoc doc, ChangeType type) {
-		getUI().access(new Runnable() {
-			@Override
-			public void run() {
-				setEditorDoc(doc);
-				updateSyncButtonEnabled(); // is this the right place?
-			}
-		});
-		if (checker!=null) {
-			checker.checkErrors(doc.getText(), this);
-		}
-	}
-	
-	private void checkErrors() {
-		if (checker!=null) {
-			UserDoc doc = mud.getUserDoc(user);
-			if (doc!=null) {
-				String code = doc.getDoc().getText();
-				checker.checkErrors(code, this);
-			}
-		}
-	}
-	
-	private void setEditorDoc(AceDoc doc) {
-		boolean wasReadOnly = editor.isReadOnly();
-		editor.setReadOnly(false);
-		editor.setDoc(doc);
-		editor.setReadOnly(wasReadOnly);
-	}
-	
-	@Override
-	public void errorsChecked(final List<Error> errors) {
-		getUI().access(new Runnable() {
-			@Override
-			public void run() {
-				setEditorDoc(docWithErrors(getDoc(), errors));
-			}
-		});
-	}
-
-	private AceDoc docWithErrors(AceDoc doc, List<Error> errors) {
-		HashMap<String, AceMarker> markers = new HashMap<String, AceMarker>(errors.size());
-		HashSet<MarkerAnnotation> manns = new HashSet<MarkerAnnotation>(errors.size());
-		for (Error err : errors) {
-			AceMarker m = markerFromError(newMarkerId(), err, doc.getText());
-			markers.put(m.getMarkerId(), m);
-			AceAnnotation ann = new AceAnnotation(err.message, AceAnnotation.Type.error);
-			manns.add(new MarkerAnnotation(m.getMarkerId(), ann));
-		}
-		return doc.withMarkers(markers).withMarkerAnnotations(manns);		
-	}
-	
-	private long latestMarkerId = 0L;
-	private String newMarkerId() {
-		// TODO ?
-		return "error" + this.hashCode() + (++latestMarkerId);
-	}
-	
-	private static AceMarker markerFromError(String markerId, Error e, String text) {
-		AceRange range = new TextRange(text, e.start, e.start==e.end ? e.start+1 : e.end);
-		String cssClass = "myerrormarker1";
-		AceMarker.Type type = AceMarker.Type.text;
-		boolean inFront = true;
-		AceMarker.OnTextChange onChange = AceMarker.OnTextChange.ADJUST;
-		return new AceMarker(markerId, range, cssClass, type, inFront, onChange);
-	}
-
-	@Override
-	public void diff(DiffEvent e) {
-		if (activeDoc!=null) {
-			AceDoc doc = editor.getDoc().withoutMarkers();
-			if (checker!=null) {
-				checker.checkErrors(doc.getText(), this);
-			}
-			activeDoc.editorChanged(doc);
-			if (activeDoc==myDoc) {
-				updateSyncButtonEnabled();
-			}
-		}
+		activeDoc = doc;
+		activeDoc.attachEditor(editor);
 	}
 
 }

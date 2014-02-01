@@ -76,7 +76,7 @@ public class CompilingService implements ClasspathListener {
 	}
 
 	public void compile(SharedView view) {
-		compile(view.getControllerFullName(), view.getControllerMud().getBase().getText(), null);
+		compile(view.getControllerFullName(), view.getControllerMud().getBaseText(), null);
 	}
 
 	public void removeClass(String fullJavaClassName) {

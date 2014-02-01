@@ -13,9 +13,9 @@ import org.apache.commons.io.FileUtils;
 import org.vaadin.aceeditor.ServerSideDocDiff;
 import org.vaadin.aceeditor.client.AceDoc;
 import org.vaadin.mideaas.editor.ClaraXmlUtil;
+import org.vaadin.mideaas.editor.DocManager;
+import org.vaadin.mideaas.editor.DocManager.DifferingChangedListener;
 import org.vaadin.mideaas.editor.ErrorChecker;
-import org.vaadin.mideaas.editor.MultiUserDoc;
-import org.vaadin.mideaas.editor.MultiUserDoc.DifferingChangedListener;
 import org.vaadin.mideaas.editor.XmlSyntaxErrorChecker;
 import org.vaadin.mideaas.java.JavaSyntaxErrorChecker;
 import org.vaadin.mideaas.java.util.CompilingService;
@@ -89,8 +89,8 @@ public class SharedView extends ProjectItem {
 
 //	private final String modelId = generateModelId();
 
-	private MultiUserDoc controllerMud;
-	private MultiUserDoc modelMud;
+	private DocManager controllerMud;
+	private DocManager modelMud;
 
 	private ErrorChecker javaChecker = new JavaSyntaxErrorChecker();
 
@@ -111,10 +111,13 @@ public class SharedView extends ProjectItem {
 		this.name = name;
 		String code = ControllerCode.createInitial(javaPackage, name).getCode();
 		File codeFile = new File(saveBaseToDir, name+".java");
-		controllerMud = new MultiUserDoc(codeFile.getName(), new AceDoc(code), javaChecker, codeFile);
+		//controllerMud = new DocManager(codeFile.getName(), new AceDoc(code), javaChecker, codeFile);
+		controllerMud = new DocManager(new AceDoc(code));
 		String xml = ClaraXmlUtil.createHelloWorld("VerticalLayout", "This is " + getName());
 		File modelFile = new File(saveBaseToDir, name+".clara.xml");
-		modelMud = new MultiUserDoc(modelFile.getName(), new AceDoc(xml), new XmlSyntaxErrorChecker(), modelFile);
+		//modelMud = new DocManager((modelFile.getName(), new AceDoc(xml), new XmlSyntaxErrorChecker(), modelFile);
+		modelMud = new DocManager(new AceDoc(xml));
+		
 //		storeModelForVisualDesigner();
 	}
 
@@ -159,11 +162,11 @@ public class SharedView extends ProjectItem {
 		return REGEX_NAME.matcher(name).matches();
 	}
 
-	public MultiUserDoc getControllerMud() {
+	public DocManager getControllerMud() {
 		return controllerMud;
 	}
 
-	public MultiUserDoc getModelMud() {
+	public DocManager getModelMud() {
 		return modelMud;
 	}
 
@@ -172,63 +175,64 @@ public class SharedView extends ProjectItem {
 		String ctrl;
 		String model;
 		synchronized (this) {
-			ctrl = controllerMud.getBase().getText();
-			model = modelMud.getBase().getText();
+			ctrl = controllerMud.getBaseText();
+			model = modelMud.getBaseText();
 		}
 		FileUtils.write(new File(dir, getControllerName() + ".java"), ctrl);
 		FileUtils.write(new File(dir, name + ".clara.xml"), model);
 	}
 
 	public void setModelBase(String xml) {
-		modelMud.setBaseNoFire(xml, null /* TODO */);
+		modelMud.setBaseNoFire(xml);
 	}
 	
 	public void setControllerBase(String code) {
-		controllerMud.setBaseNoFire(code, null /* TODO */);
+		controllerMud.setBaseNoFire(code);
 	}
 
 
+	// TODO: below
 	
 	public void ensureClaraFieldExists(String id, String className) {
-		try {
-			ControllerCode c = new ControllerCode(controllerMud.getBase().getText());
-			String code1 = c.getCode();
-			c.ensureClaraFieldExists(id, className);
-			ServerSideDocDiff d = ServerSideDocDiff.diff(new AceDoc(code1), new AceDoc(c.getCode()));
-			controllerMud.tryToApply(d, null);
-		} catch (ParseException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+//		try {
+//			ControllerCode c = new ControllerCode(controllerMud.getBaseText());
+//			String code1 = c.getCode();
+//			c.ensureClaraFieldExists(id, className);
+//			ServerSideDocDiff d = ServerSideDocDiff.diff(new AceDoc(code1), new AceDoc(c.getCode()));
+//			controllerMud.tryToApply(d, null);
+//		} catch (ParseException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
 	}
 
-	public boolean ensureClaraHandlerExists(String id, String className, String todo) {
-		try {
-			ControllerCode c = new ControllerCode(controllerMud.getBase().getText());
-			String code1 = c.getCode();
-			String comment = todo==null||todo.isEmpty() ? null : "TODO: "+todo;
-			c.ensureClaraHandlerExists(id, className, comment);
-			ServerSideDocDiff d = ServerSideDocDiff.diff(new AceDoc(code1), new AceDoc(c.getCode()));
-			controllerMud.tryToApply(d, null);
-			return true;
-		} catch (ParseException e) {
-			e.printStackTrace();
-			return false;
-		}
+	public void ensureClaraHandlerExists(String id, String className, String todo) {
+//		try {
+//			ControllerCode c = new ControllerCode(controllerMud.getBase().getText());
+//			String code1 = c.getCode();
+//			String comment = todo==null||todo.isEmpty() ? null : "TODO: "+todo;
+//			c.ensureClaraHandlerExists(id, className, comment);
+//			ServerSideDocDiff d = ServerSideDocDiff.diff(new AceDoc(code1), new AceDoc(c.getCode()));
+//			controllerMud.tryToApply(d, null);
+//			return true;
+//		} catch (ParseException e) {
+//			e.printStackTrace();
+//			return false;
+//		}
 	}
 
 	public void ensureDataSource(String id, String cls, String todo) {
-		try {
-			ControllerCode c = new ControllerCode(controllerMud.getBase().getText());
-			String code1 = c.getCode();
-			String comment = todo==null||todo.isEmpty() ? null : "TODO: "+todo;
-			c.ensureClaraDataSource(id, cls, comment);
-			ServerSideDocDiff d = ServerSideDocDiff.diff(new AceDoc(code1), new AceDoc(c.getCode()));
-			controllerMud.tryToApply(d, null);
-		} catch (ParseException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+//		try {
+//			ControllerCode c = new ControllerCode(controllerMud.getBase().getText());
+//			String code1 = c.getCode();
+//			String comment = todo==null||todo.isEmpty() ? null : "TODO: "+todo;
+//			c.ensureClaraDataSource(id, cls, comment);
+//			ServerSideDocDiff d = ServerSideDocDiff.diff(new AceDoc(code1), new AceDoc(c.getCode()));
+//			controllerMud.tryToApply(d, null);
+//		} catch (ParseException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
 	}
 
 	//?
@@ -239,7 +243,7 @@ public class SharedView extends ProjectItem {
 	@Override
 	public String[] getJavaClass() {
 		String cls = getControllerName();
-		String content = getControllerMud().getBase().getText();
+		String content = getControllerMud().getBaseText();
 		return new String[] {cls, content};
 	}
 
@@ -257,8 +261,8 @@ public class SharedView extends ProjectItem {
 	
 	@Override
 	public void removeUser(User user) {
-		getControllerMud().removeUser(user.getEditorUser());
-		getModelMud().removeUser(user.getEditorUser());
+		getControllerMud().removeUserDoc(user.getEditorUser());
+		getModelMud().removeUserDoc(user.getEditorUser());
 	}
 
 	@Override

@@ -47,13 +47,13 @@ public class MideaasComponentEditor extends TabSheet implements
 		setSizeFull();
 
 		claraEditor = new ClaraEditor(user, comp.getModelMud());
-
 		claraEditor.setSizeFull();
 
 
 
 		controllerEditor = new MultiUserEditor(user.getEditorUser(), comp.getControllerMud());
 		controllerEditor.setMode(AceMode.java);
+		controllerEditor.setTitle(comp.getName());
 
 		AsyncErrorChecker ch = new JavaErrorChecker(
 				comp.getControllerFullName(), project.getCompiler());
@@ -128,10 +128,11 @@ public class MideaasComponentEditor extends TabSheet implements
 
 	@Override
 	public void goToHandler(String id, String cls, String todo) {
-		boolean success = comp.ensureClaraHandlerExists(id, cls, todo);
-		if (success) {
-			Notification.show("Handler for "+id+" added.");
-		}
+		// TODO
+//		boolean success = comp.ensureClaraHandlerExists(id, cls, todo);
+//		if (success) {
+//			Notification.show("Handler for "+id+" added.");
+//		}
 	}
 
 	@Override

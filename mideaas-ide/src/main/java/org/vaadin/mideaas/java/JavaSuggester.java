@@ -8,7 +8,7 @@ import org.vaadin.aceeditor.ServerSideDocDiff;
 import org.vaadin.aceeditor.Suggester;
 import org.vaadin.aceeditor.Suggestion;
 import org.vaadin.aceeditor.client.AceDoc;
-import org.vaadin.mideaas.editor.MultiUserDoc;
+import org.vaadin.mideaas.editor.DocManager;
 import org.vaadin.mideaas.java.util.CompilerSuggester;
 import org.vaadin.mideaas.java.util.CustomMethodSuggestionGenerator;
 import org.vaadin.mideaas.java.util.InMemoryCompiler;
@@ -26,9 +26,9 @@ public class JavaSuggester implements Suggester {
 			// TODO: more?
 	
 	private final CompilerSuggester compSugger;
-	private final MultiUserDoc codeMud;
+	private final DocManager codeMud;
 
-	public JavaSuggester(InMemoryCompiler compiler, String className, MultiUserDoc codeMud) {
+	public JavaSuggester(InMemoryCompiler compiler, String className, DocManager codeMud) {
 		compSugger = new CompilerSuggester(compiler, className);
 		this.codeMud = codeMud;
 		CustomMethodSuggestionGenerator vaadinSG = new CustomMethodSuggestionGenerator(compiler);
@@ -51,18 +51,20 @@ public class JavaSuggester implements Suggester {
 		String s1 = text.substring(0,cursor) + ins + text.substring(cursor);
 		return s1;
 	}
+
+	// TODO
 	
 	private void ensureImport(String cls) {
-		try {
-			ControllerCode c = new ControllerCode(codeMud.getBase().getText());
-			String code1 = c.getCode();
-			c.ensureImport(cls);
-			ServerSideDocDiff d = ServerSideDocDiff.diff(new AceDoc(code1), new AceDoc(c.getCode()));
-			codeMud.tryToApply(d, null);
-		} catch (ParseException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+//		try {
+//			ControllerCode c = new ControllerCode(codeMud.getBase().getText());
+//			String code1 = c.getCode();
+//			c.ensureImport(cls);
+//			ServerSideDocDiff d = ServerSideDocDiff.diff(new AceDoc(code1), new AceDoc(c.getCode()));
+//			codeMud.tryToApply(d, null);
+//		} catch (ParseException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
 	}
 
 }

@@ -2,10 +2,10 @@ package org.vaadin.mideaas.editor;
 
 import java.lang.reflect.Method;
 import java.util.EventObject;
-import java.util.Set;
+import java.util.Map;
 
+import org.vaadin.mideaas.editor.DocManager.DifferingChangedListener;
 import org.vaadin.mideaas.editor.EditorState.DocType;
-import org.vaadin.mideaas.editor.MultiUserDoc.DifferingChangedListener;
 
 import com.vaadin.data.Property.ValueChangeEvent;
 import com.vaadin.data.Property.ValueChangeListener;
@@ -15,7 +15,7 @@ import com.vaadin.util.ReflectTools;
 
 @SuppressWarnings("serial")
 public class MultiUserEditorUserGroup extends CustomComponent
-		implements DifferingChangedListener, ValueChangeListener {
+		implements ValueChangeListener, DifferingChangedListener {
 	
 	public interface EditorStateChangedListener {
 		public void stateChanged(EditorStateChangedEvent event);
@@ -35,16 +35,16 @@ public class MultiUserEditorUserGroup extends CustomComponent
 	private final HorizontalOptionGroup group = new HorizontalOptionGroup();
 
 	private final EditorUser user;
-	private final MultiUserDoc doc;
+	private final DocManager mud;
 	private final EditorState mineThatEqualsBase;
 	
 	
 	private EditorState currentState;
 
 	
-	public MultiUserEditorUserGroup(EditorUser user, MultiUserDoc doc) {
+	public MultiUserEditorUserGroup(EditorUser user, DocManager mud) {
 		this.user = user;
-		this.doc = doc;
+		this.mud = mud;
 		mineThatEqualsBase = new EditorState(DocType.MINE, new DocDifference(user, null, null));
 		currentState = mineThatEqualsBase;
 		group.setImmediate(true);
@@ -68,53 +68,41 @@ public class MultiUserEditorUserGroup extends CustomComponent
 	@Override
 	public void attach() {
 		super.attach();
-		setDifferences(doc.getDifferences());
-		doc.addDifferingChangedListener(this);
+		setDifferences(mud.getDifferences());
+		mud.addDifferingChangedListener(this);
 		group.addValueChangeListener(this);
 	}
 	
 	@Override
 	public void detach() {
 		
-		doc.removeDifferingChangedListener(this);
+		mud.removeDifferingChangedListener(this);
 		
 		super.detach();
 	}
-	
-	@Override
-	public void differencesChanged(final Set<DocDifference> diffs) {
-		getUI().access(new Runnable() {
-			@Override
-			public void run() {
-				setDifferences(diffs);
-			}
-		});
-	}
 
-	private void setDifferences(Set<DocDifference> diffs) {
+	private void setDifferences(Map<EditorUser, DocDifference> map) {
 		group.removeAllItems();
 		
-		if (diffs.isEmpty()) {
+		if (map.isEmpty()) {
 			group.addItem(mineThatEqualsBase);
 			group.select(mineThatEqualsBase);
 			setCurrentState(mineThatEqualsBase);
 			return;
 		}
-		
-		EditorState base = new EditorState(DocType.BASE, null);
-		
-		DocDifference my = myDifference(diffs);
+
+		DocDifference my = map.get(user);
 		EditorState myState;
 		if (my==null) {
 			myState = mineThatEqualsBase;
 		}
 		else {
-			group.addItem(base);
+			group.addItem(EditorState.BASE_STATE);
 			myState = new EditorState(DocType.MINE, my);
 		}
 		group.addItem(myState);
 		
-		for (DocDifference d : diffs) {
+		for (DocDifference d : map.values()) {
 			if (!d.getUser().equals(user)) {
 				group.addItem(new EditorState(DocType.OTHERS, d));
 			}
@@ -130,15 +118,6 @@ public class MultiUserEditorUserGroup extends CustomComponent
 		
 		
 	}
-	
-	private DocDifference myDifference(Set<DocDifference> diffs) {
-		for (DocDifference d : diffs) {
-			if (d.getUser().equals(user)) {
-				return d;
-			}
-		}
-		return null;
-	}
 
 	private void setCurrentState(EditorState state) {
 		if (state.equals(currentState)) {
@@ -146,20 +125,26 @@ public class MultiUserEditorUserGroup extends CustomComponent
 		}
 		
 		currentState = state;
-		fireChange(currentState);
-	}
-
-	private void fireChange(EditorState state) {
-		fireEvent(new EditorStateChangedEvent(this, state));
+		fireEvent(new EditorStateChangedEvent(this, currentState));
 	}
 
 	@Override
 	public void valueChange(ValueChangeEvent event) {
 		EditorState st = (EditorState)event.getProperty().getValue();
-		if (st==null) {
-			st = mineThatEqualsBase;
+		if (st!=null) {
+			setCurrentState(st);
 		}
-		setCurrentState(st);
+		
+	}
+
+	@Override
+	public void differingChanged(final Map<EditorUser, DocDifference> diffs) {
+		getUI().access(new Runnable() {
+			@Override
+			public void run() {
+				setDifferences(diffs);
+			}
+		});
 	}
 	
 	

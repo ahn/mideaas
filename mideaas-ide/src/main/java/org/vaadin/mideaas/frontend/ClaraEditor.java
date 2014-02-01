@@ -16,11 +16,11 @@ import org.vaadin.aceeditor.AceEditor;
 import org.vaadin.aceeditor.AceEditor.SelectionChangeListener;
 import org.vaadin.aceeditor.AceMode;
 import org.vaadin.aceeditor.client.AceDoc;
+import org.vaadin.mideaas.editor.DocManager;
 import org.vaadin.mideaas.editor.EditorUser;
-import org.vaadin.mideaas.editor.MultiUserDoc;
+import org.vaadin.mideaas.editor.JuuserDoc;
 import org.vaadin.mideaas.editor.MultiUserEditor;
 import org.vaadin.mideaas.editor.XmlAsyncErrorChecker;
-import org.vaadin.mideaas.editor.MultiUserDoc.BaseChangedListener;
 import org.vaadin.mideaas.model.User;
 import org.vaadin.teemu.clara.Clara;
 import org.xml.sax.InputSource;
@@ -47,7 +47,7 @@ import com.vaadin.ui.VerticalLayout;
 
 @SuppressWarnings("serial")
 public class ClaraEditor extends CustomComponent implements
-		SelectionChangeListener, TextChangeListener, BaseChangedListener {
+		SelectionChangeListener, TextChangeListener {
 
 	public interface ClaraEditorListener {
 		public void goToDefinition(String id, String className);
@@ -59,7 +59,7 @@ public class ClaraEditor extends CustomComponent implements
 
 	private HorizontalSplitPanel split = new HorizontalSplitPanel();
 	private MultiUserEditor editor;
-	private final MultiUserDoc mud;
+	private final DocManager mud;
 	private VerticalLayout componentContext = new VerticalLayout();
 
 	private ClaraPreviewWindow previewWindow = null;
@@ -88,7 +88,7 @@ public class ClaraEditor extends CustomComponent implements
 		return new BigInteger(130, new Random()).toString(32);
 	}
 	
-	public ClaraEditor(User user, MultiUserDoc modelMud) {
+	public ClaraEditor(User user, DocManager modelMud) {
 		super();
 		this.user = user;
 		mud = modelMud;
@@ -98,7 +98,7 @@ public class ClaraEditor extends CustomComponent implements
 		editor.setWordWrap(true);
 		editor.setErrorChecker(new XmlAsyncErrorChecker());
 		
-		storeModel(mud.getBase().getText());
+		storeModel(mud.getBaseText());
 
 		Button openPreview = new Button("Preview");
 		openPreview.addClickListener(new ClickListener() {
@@ -147,7 +147,7 @@ public class ClaraEditor extends CustomComponent implements
 		editor.addSelectionChangeListener(this);
 		editor.addTextChangeListener(this);
 		
-		mud.addBaseChangedListenerWeak(this);
+		//mud.addBaseChangedListenerWeak(this);
 
 		udpateXmlContext();
 	}
@@ -157,7 +157,8 @@ public class ClaraEditor extends CustomComponent implements
 	}
 	
 	public void setXml(String xml) {
-		mud.createUserDoc(user.getEditorUser()).setDoc(new AceDoc(xml));
+		JuuserDoc ud = mud.getUserDoc(user.getEditorUser());
+		ud.getDoc().setDoc(new AceDoc(xml));
 	}
 
 	private ClaraXmlHandler parseDocument(InputStream is) {
@@ -207,10 +208,10 @@ public class ClaraEditor extends CustomComponent implements
 		udpateXmlContext();
 	}
 
-	@Override
-	public void baseChanged(AceDoc doc, EditorUser user) {
-		storeModel(doc.getText());
-	}
+//	@Override
+//	public void baseChanged(AceDoc doc, EditorUser user) {
+//		storeModel(doc.getText());
+//	}
 	
 	private void storeModel(String xml) {
 		MideaasServlet servlet = getServlet();
