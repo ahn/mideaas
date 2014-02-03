@@ -41,7 +41,7 @@ public class CFAppView extends CustomComponent{
 		this.setCompositionRoot(vlo);
 
 		//if application is running
-		if (xml.contains("STARTED")){
+		if (xml.contains("STARTED")||xml.contains("STOPPED")){
 			Button start=new Button("Start");
 			Button stop=new Button("Stop");
 			Button restart=new Button("Restart");

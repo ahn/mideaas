@@ -222,11 +222,11 @@ public class Deployer extends CoapsCaller  {
     static String parseUrl(String response) {
             String seekString = "<uri>";
             int startIndex = response.indexOf(seekString)+seekString.length();
-            if (startIndex==-1){return "-1";}
+            if (startIndex==-1){return "";}
             response = response.substring(startIndex);
             seekString = "</uri>";
             int endIndex = response.indexOf(seekString);
-            if (endIndex==-1){return "-1";}
+            if (endIndex==-1){return "";}
             String uriToService = response.substring(0, endIndex);
             if (!uriToService.startsWith("http")){
         		uriToService = "http://" + uriToService;
@@ -371,26 +371,31 @@ public class Deployer extends CoapsCaller  {
 			//deploys war over cf-api
 			file = pathToWar;
 		}
-		Deployer apiClient = new Deployer(file);
-		
-		final String manifest = apiClient.getManifest(file);
-		logView.newLine("Manifest: " + manifest);
 
 		Runnable runnable = new Runnable() {
 			@Override
 			public void run() {
+				//Client for doing deploying
+				Deployer apiClient = new Deployer(file);
+				//manifest for creating environment and application (same can be used for the both)
+				final String manifest = apiClient.getManifest(file);
+				logView.newLine("Manifest: " + manifest);
+				//Adds some visibilitythings to user interface
 				fireNetworkingStarted("deploying application");
+				//creates environment and extracts envID
 				logView.newLine("create environment");
 				ClientResponse envresponse = Deployer.createEnvironment(manifest);
 				String envresponsestring = envresponse.getEntity(new GenericType<String>(){});
 				logView.newLine("response: " + envresponsestring);
 				String envId = Deployer.parseEnvID(envresponsestring);
+				//creates application and extracts appID
 				logView.newLine("create app");
 				ClientResponse appresponse = Deployer.createApplication(manifest);
 				String appresponsestring = appresponse.getEntity(new GenericType<String>(){});
 				logView.newLine("response: " + appresponsestring);
 				String appId = Deployer.parseAppID(appresponsestring);
 				
+				//sends the file over the network
 				String uriToService="";
 				logView.newLine("deploy app");
 				ClientResponse deployresponse = null;
@@ -409,14 +414,15 @@ public class Deployer extends CoapsCaller  {
 				logView.newLine("response: " + deployresponsestring);
 				uriToService = Deployer.parseUrl(deployresponsestring);
 				logView.newLine("uri: " + uriToService);
-				logView.newLine("start app");
-				ClientResponse startresponse = Deployer.startApplication(appId);
-				String startresponsestring = startresponse.getEntity(new GenericType<String>(){});
-				logView.newLine("response: " + startresponsestring);
 		
-				//TODO show path;
+				//if deploying successed, then application is started
 		        if (uriToService.length()>0){
-		    		link.setResource(new ExternalResource(uriToService));
+					logView.newLine("start app");
+					ClientResponse startresponse = Deployer.startApplication(appId);
+					String startresponsestring = startresponse.getEntity(new GenericType<String>(){});
+					logView.newLine("response: " + startresponsestring);
+
+					link.setResource(new ExternalResource(uriToService));
 		    		link.setVisible(true);
 		    		
 		    		qrCode.setValue(uriToService);

@@ -209,6 +209,7 @@ public class DeployComponent extends CustomComponent implements DeployListener{
 		});
 	}
 
+	//deletes all the environments and applications (mainly because of testing purposes... Should be disabled later)
 	private void deleteAppsUsingPAASAPI() {
 		logView.newLine("Deletes applications running");
 		String xml = Deployer.deleteApplications();
@@ -217,6 +218,7 @@ public class DeployComponent extends CustomComponent implements DeployListener{
 		if(Deployer.deleteEnvironments(logView)){
 			link.setVisible(false);
 			qrCode.setVisible(false);
+			deployFail("Apps deleted");
 		}
 		updateCFAppsView();
 	}
@@ -238,7 +240,4 @@ public class DeployComponent extends CustomComponent implements DeployListener{
 		view.setSizeFull();
 		UI.getCurrent().addWindow(w);
 	}	
-
-			
-
 }
