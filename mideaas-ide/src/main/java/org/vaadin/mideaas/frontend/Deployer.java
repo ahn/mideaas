@@ -200,7 +200,7 @@ public class Deployer extends CoapsCaller  {
             "		<paas_environment_template name=\"TomcatEnvTemp\" memory=\"" + memory + "\">\n"+
             "  		  <description>TomcatServerEnvironmentTemplate</description>\n"+
             "		  <paas_environment_node content_type=\"container\" name=\"tomcat\" version=\"\" provider=\"CF\"/>\n"+
-            "		  <paas_environment_node content_type=\"database\" name=\"mysql\" version=\"\" provider=\"CF\"/>\n"+
+//            "		  <paas_environment_node content_type=\"database\" name=\"mysql\" version=\"\" provider=\"CF\"/>\n"+
             "		</paas_environment_template>\n"+
             "	</paas_environment>\n"+
             "</paas_application_manifest>\n";                		
