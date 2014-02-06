@@ -390,7 +390,6 @@ public class Deployer extends CoapsCaller  {
 				String envresponsestring = envresponse.getEntity(new GenericType<String>(){});
 				logView.newLine("response: " + envresponsestring);
 				String envId = Deployer.parseEnvID(envresponsestring);
-				String envId = "1";
 				//creates application and extracts appID
 				logView.newLine("create app");
 				ClientResponse appresponse = Deployer.createApplication(manifest);
