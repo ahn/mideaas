@@ -34,10 +34,8 @@ public class CFAppView extends CustomComponent{
 	private void updateContent(String xml) {
 		HorizontalLayout hlo = new HorizontalLayout();
 		VerticalLayout vlo = new VerticalLayout();
-		Label text = new Label("XML related to application:");
 		Label xmllabel = new Label(xml);
 		xmllabel.setContentMode(ContentMode.TEXT);
-		vlo.addComponent(text);
 		vlo.addComponent(xmllabel);
 		vlo.addComponent(hlo);
 		this.setCompositionRoot(vlo);
@@ -101,7 +99,7 @@ public class CFAppView extends CustomComponent{
 		//application is running
 		if (xml.contains("STARTED")){
 			String uriToService = Deployer.parseUrl(xml);
-			Link link = new Link("link to app", new ExternalResource(uriToService));
+			Link link = new Link("Link To App", new ExternalResource(uriToService));
 			QRCode qrCode = new QRCode();
 			qrCode.setValue(uriToService);
 			qrCode.setWidth("128px");

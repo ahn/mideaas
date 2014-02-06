@@ -304,7 +304,7 @@ public class Deployer extends CoapsCaller  {
 			String description = parse(split,"description");
 			final String uri = parse(split,"uri");
 			if (idstring!=null){
-				Button button = new Button("show more");
+				Button button = new Button("Show more");
 				final Deployer deployer = this;
 				button.addClickListener(new Button.ClickListener() {				
 					@Override
@@ -313,7 +313,7 @@ public class Deployer extends CoapsCaller  {
 						ClientResponse response = Deployer.describeApplication(client, idstring);
 						String responseString = response.getEntity(new GenericType<String>(){});
 				        CFAppView view = new CFAppView(idstring, responseString,cfAppsView,logView,deployer);
-				        Window w = new Window("app");
+				        Window w = new Window("Application with appId: " + idstring);
 						w.center();
 						w.setWidth("80%");
 						w.setHeight("80%");

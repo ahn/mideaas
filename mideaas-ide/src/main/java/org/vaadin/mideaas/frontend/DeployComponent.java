@@ -38,11 +38,11 @@ public class DeployComponent extends CustomComponent implements DeployListener{
 	private QRCode qrCode = new QRCode();
 	private Link link = new Link("Link To App", null);
 
-	final private Button deployButton = new Button("Deploy to CF");
+	final private Button deployButton = new Button("Deploy app");
 	final private Button cancelButton = new Button("Cancel");
 	final private Button stopButton = new Button("Delete all apps");
-	final private Button showButton = new Button("Show applications");
-	final private Button showLogButton = new ShowLogButton("Show XML messages", logView);
+	final private Button showButton = new Button("Show all apps");
+	final private Button showLogButton = new ShowLogButton("XMLMessage Log", logView);
 
 	private Embedded loadingImg = new Embedded(null, new ThemeResource(
 			"../base/common/img/loading-indicator.gif"));
@@ -56,7 +56,7 @@ public class DeployComponent extends CustomComponent implements DeployListener{
 	}
 	
 	private void buildLayout() {
-		Panel p = new Panel("Deploy panel");
+		Panel p = new Panel("CloudFoundry panel");
 		p.setContent(layout);
 		
 		layout.addComponent(deployButton);
@@ -232,7 +232,7 @@ public class DeployComponent extends CustomComponent implements DeployListener{
 	private void findAppsInPAASAPI() {
 		logView.newLine("Gets applications running");
         view = new CFAppsView(deployer, logView);
-        Window w = new Window("View to applications running in CloudFoundry");
+        Window w = new Window("Applications running in CloudFoundry");
 		w.center();
 		w.setWidth("80%");
 		w.setHeight("80%");

@@ -139,7 +139,7 @@ public class MideaasEditor extends CustomComponent implements Listener {
 		setActiveFile(project.getFile("App.java"));
 
 		//adds new menuitem (that does not do anything)
-		if (settings.easiCloudsFeaturesTurnedOn){
+		/*if (settings.easiCloudsFeaturesTurnedOn){
 			MenuItem root = this.menu.addItem("Deploy to...",null);
 			MenuItem item = root.addItem("Jetty", null);
 			item.setCheckable(true);
@@ -147,7 +147,7 @@ public class MideaasEditor extends CustomComponent implements Listener {
 			item = root.addItem("Gae", null);
 			item.setCheckable(true);
 			item.setChecked(false);
-		}
+		}*/
 		
 	}
 

@@ -29,7 +29,7 @@ public class CFAppsView extends CustomComponent{
         table.setColumnReorderingAllowed(true);
         table.setColumnCollapsingAllowed(true);
 
-        table.addContainerProperty("Id", Integer.class, null);
+        table.addContainerProperty("AppId", Integer.class, null);
         table.addContainerProperty("Name", String.class, null);
         table.addContainerProperty("Description", String.class, null);
         table.addContainerProperty("Url", String.class, null);
