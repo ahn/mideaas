@@ -47,7 +47,7 @@ public class Deployer extends CoapsCaller  {
 	private ExecutorService executor = Executors.newSingleThreadExecutor();
 	private static DefaultHttpClient httpclient = new DefaultHttpClient();
 	private String date;
-	private static String paasApiUrl = "http://130.230.142.89:8080/CF-api/rest/";
+	private final String paasApiUri;
 	private String memory;
 	private String deployLocation;
 	private String warLocation;
@@ -56,15 +56,16 @@ public class Deployer extends CoapsCaller  {
 	private CopyOnWriteArrayList<DeployListener> listeners = new CopyOnWriteArrayList<>();
 	private String pathToWar;
 
-    Deployer(String pathToWar){
+    Deployer(String pathToWar, String paasApiUri){
     	this.pathToWar = pathToWar;
+    	this.paasApiUri = paasApiUri;
     	File file = new File(pathToWar);
     	warName = file.getName();
     	warLocation = file.getParentFile().getAbsolutePath();
 		appName = warName.replace(".war", "");
 
         deployLocation = "/home/ubuntu/delpoyedprojects";
-        memory = "256";
+        memory = "512";
         Date today = new Date();
         date = new SimpleDateFormat("yyyy-MM-dd").format(today);
     }
@@ -73,8 +74,8 @@ public class Deployer extends CoapsCaller  {
 		return Deployer.findApplications(createClient());
 	}
 
-    public static String deleteApplications(){
-    	String url = paasApiUrl+"app/delete";
+    public String deleteApplications(){
+    	String url = paasApiUri+"app/delete";
     	HttpDelete delete = new HttpDelete(url);
 		try {
 			CloseableHttpResponse response = httpclient.execute(delete);
@@ -113,8 +114,8 @@ public class Deployer extends CoapsCaller  {
 		return CoapsCaller.stopApplication(createClient(), appId);
 	}
 	
-    public static String deleteApplication(String appId){    	
-    	String deleteurl = paasApiUrl + "app/" + appId + "/delete";
+    public String deleteApplication(String appId){    	
+    	String deleteurl = paasApiUri + "app/" + appId + "/delete";
     	HttpDelete delete = new HttpDelete(deleteurl);
 		try {
 			CloseableHttpResponse response = httpclient.execute(delete);
@@ -127,8 +128,8 @@ public class Deployer extends CoapsCaller  {
     }
     
     //removes environments
-    public static boolean deleteEnvironments(LogView logView){
-    	String url = paasApiUrl+"environment";
+    public boolean deleteEnvironments(LogView logView){
+    	String url = paasApiUri+"environment";
     	HttpGet get = new HttpGet(url);        	
 		try {
 			logView.newLine("gets environments");
@@ -153,9 +154,9 @@ public class Deployer extends CoapsCaller  {
 		return CoapsCaller.createEnvironment(createClient(), manifest);
 	}
     
-    private static void removeEnvironment(int i, LogView logView) {
+    private void removeEnvironment(int i, LogView logView) {
 		logView.newLine("removes: " + i);
-    	String url = paasApiUrl+"environment";
+    	String url = paasApiUri+"environment";
     	HttpDelete delete = new HttpDelete(url+"/" + i);
     	CloseableHttpResponse response;
 		try {
@@ -294,7 +295,7 @@ public class Deployer extends CoapsCaller  {
 		return createManifest(appName,warName, warLocation, deployLocation, date,memory);
 	}
 
-	public static ArrayList<Object[]> createRows(String responseString,final CFAppsView cfAppsView, final LogView logView) {
+	public ArrayList<Object[]> createRows(String responseString,final CFAppsView cfAppsView, final LogView logView) {
 		String[] splittedResponse = responseString.split("<application>") ;
 		ArrayList<Object[]> apps = new ArrayList<Object[]>();
 		for (String split:splittedResponse){
@@ -304,13 +305,14 @@ public class Deployer extends CoapsCaller  {
 			final String uri = parse(split,"uri");
 			if (idstring!=null){
 				Button button = new Button("show more");
+				final Deployer deployer = this;
 				button.addClickListener(new Button.ClickListener() {				
 					@Override
 					public void buttonClick(ClickEvent event) {
 						WebResource client = Deployer.createClient();
 						ClientResponse response = Deployer.describeApplication(client, idstring);
 						String responseString = response.getEntity(new GenericType<String>(){});
-				        CFAppView view = new CFAppView(idstring, responseString,cfAppsView,logView);
+				        CFAppView view = new CFAppView(idstring, responseString,cfAppsView,logView,deployer);
 				        Window w = new Window("app");
 						w.center();
 						w.setWidth("80%");
@@ -376,7 +378,7 @@ public class Deployer extends CoapsCaller  {
 			@Override
 			public void run() {
 				//Client for doing deploying
-				Deployer apiClient = new Deployer(file);
+				Deployer apiClient = new Deployer(file, paasApiUri);
 				//manifest for creating environment and application (same can be used for the both)
 				final String manifest = apiClient.getManifest(file);
 				logView.newLine("Manifest: " + manifest);

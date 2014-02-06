@@ -27,6 +27,7 @@ public class MideaasConfig {
         EASICLOUDS_FEATURES, 
         PAAS_DEPLOY, 
         GAE_COMPILE,
+        COAPS_API_URI,
         EXPERIMENT,
         LOG_DIR,
         DEFAULT_WIDGETSET_USER_AGENT,
@@ -136,12 +137,17 @@ public class MideaasConfig {
 	}
 
 	public static UserSettings getDefaultUserSettings() {
-		UserSettings settings = new UserSettings();
+		boolean ecFeaturesOn=MideaasConfig.easiCloudsFeaturesTurnedOn();
+		boolean pdOn=MideaasConfig.paasDeployTurnedOn();
+		boolean cgon=MideaasConfig.compileGaeTurnedOn();
+		String coapsApiUri = MideaasConfig.coapsApiUri();
+		UserSettings settings = new UserSettings(coapsApiUri, ecFeaturesOn, pdOn, cgon);
 		settings.userAgent = getProperty(Prop.DEFAULT_WIDGETSET_USER_AGENT);
-		settings.easiCloudsFeaturesTurnedOn=MideaasConfig.easiCloudsFeaturesTurnedOn();
-		settings.paasDeployTurnedOn=MideaasConfig.paasDeployTurnedOn();
-		settings.compileGae=MideaasConfig.compileGaeTurnedOn();
 		return settings;
+	}
+
+	private static String coapsApiUri() {
+    	return MideaasConfig.getProperty(Prop.COAPS_API_URI);
 	}
 
 	public static File getFeedbackFile() {

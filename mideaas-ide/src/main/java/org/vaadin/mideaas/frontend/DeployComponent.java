@@ -52,7 +52,7 @@ public class DeployComponent extends CustomComponent implements DeployListener{
 		this.project = project;
 		this.settings=settings;
 		String pathToWar = new File(project.getTargetDir().getAbsolutePath(), project.getName()+".war").getAbsolutePath();
-		this.deployer = new Deployer(pathToWar);
+		this.deployer = new Deployer(pathToWar, settings.coapsApiUri);
 	}
 	
 	private void buildLayout() {
@@ -212,10 +212,10 @@ public class DeployComponent extends CustomComponent implements DeployListener{
 	//deletes all the environments and applications (mainly because of testing purposes... Should be disabled later)
 	private void deleteAppsUsingPAASAPI() {
 		logView.newLine("Deletes applications running");
-		String xml = Deployer.deleteApplications();
+		String xml = deployer.deleteApplications();
 		logView.newLine(xml);
 		logView.newLine("Deletes environments");
-		if(Deployer.deleteEnvironments(logView)){
+		if(deployer.deleteEnvironments(logView)){
 			link.setVisible(false);
 			qrCode.setVisible(false);
 			deployFail("Apps deleted");
@@ -231,7 +231,7 @@ public class DeployComponent extends CustomComponent implements DeployListener{
 
 	private void findAppsInPAASAPI() {
 		logView.newLine("Gets applications running");
-        view = new CFAppsView(logView);
+        view = new CFAppsView(deployer, logView);
         Window w = new Window("View to applications running in CloudFoundry");
 		w.center();
 		w.setWidth("80%");

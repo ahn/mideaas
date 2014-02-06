@@ -13,11 +13,13 @@ public class CFAppsView extends CustomComponent{
 
 	private Table table = new Table();
 	private LogView logView;
+	private final Deployer deployer;
 
-	public CFAppsView(LogView logView) {
+	public CFAppsView(Deployer deployer, LogView logView) {
 		super();
 		this.setCompositionRoot(table);
 		this.logView=logView;
+		this.deployer = deployer;
 		
 		table.setSizeFull();
         table.setSelectable(true);
@@ -41,7 +43,7 @@ public class CFAppsView extends CustomComponent{
 		String responseString = response.getEntity(new GenericType<String>(){});
         logView.newLine(responseString);
 
-        ArrayList<Object[]> items = Deployer.createRows(responseString,this, logView);
+        ArrayList<Object[]> items = deployer.createRows(responseString,this, logView);
         for (Object[] item:items){
         	try{
         		table.addItem(item,item[0]);

@@ -20,12 +20,14 @@ public class CFAppView extends CustomComponent{
 	private LogView logView;
 	private String id;
 	private CFAppsView cfAppsView;
+	private final Deployer deployer;
 
-	public CFAppView(final String id, String xml,final CFAppsView cfAppsView, final LogView logView) {
+	public CFAppView(final String id, String xml,final CFAppsView cfAppsView, final LogView logView, Deployer deployer) {
 		super();
 		this.id = id;
 		this.logView=logView;
 		this.cfAppsView = cfAppsView;
+		this.deployer = deployer;
 		updateContent(xml);
 	}
 
@@ -84,10 +86,11 @@ public class CFAppView extends CustomComponent{
 				}
 			});
 			delete.addClickListener(new Button.ClickListener() {				
+
 				@Override
 				public void buttonClick(ClickEvent event) {
 					logView.newLine("Deletes applications running");
-					String response = Deployer.deleteApplication(id);
+					String response = deployer.deleteApplication(id);
 					logView.newLine(response);
 					updateContent(response);
 					if (cfAppsView!=null){
