@@ -40,7 +40,7 @@ public class DeployComponent extends CustomComponent implements DeployListener{
 
 	final private Button deployButton = new Button("Deploy to CF");
 	final private Button cancelButton = new Button("Cancel");
-	final private Button stopButton = new Button("Stop applications");
+	final private Button stopButton = new Button("Delete all apps");
 	final private Button showButton = new Button("Show applications");
 	final private Button showLogButton = new ShowLogButton("Show XML messages", logView);
 
