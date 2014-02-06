@@ -42,25 +42,10 @@ public class CFAppView extends CustomComponent{
 		vlo.addComponent(hlo);
 		this.setCompositionRoot(vlo);
 
-		//if application is running
-		if (xml.contains("STARTED")||xml.contains("STOPPED")){
+		//if application is stopped
+		if (xml.contains("STOPPED")){
 			Button start=new Button("Start");
-			Button stop=new Button("Stop");
-			Button restart=new Button("Restart");
-			Button delete=new Button("Delete");
-			String uriToService = Deployer.parseUrl(xml);
-			Link link = new Link("link to app", new ExternalResource(uriToService));
-			QRCode qrCode = new QRCode();
-			qrCode.setValue(uriToService);
-			qrCode.setWidth("128px");
-			qrCode.setHeight("128px");
 			hlo.addComponent(start);
-			hlo.addComponent(stop);
-			hlo.addComponent(restart);
-			hlo.addComponent(delete);
-			vlo.addComponent(qrCode);
-			vlo.addComponent(link);
-			//button listeners
 			start.addClickListener(new Button.ClickListener() {				
 				@Override
 				public void buttonClick(ClickEvent event) {
@@ -69,6 +54,14 @@ public class CFAppView extends CustomComponent{
 					updateContent(responseString);
 				}
 			});
+		}
+
+		//application is running
+		if (xml.contains("STARTED")){
+			Button stop=new Button("Stop");
+			Button restart=new Button("Restart");			
+			hlo.addComponent(stop);
+			hlo.addComponent(restart);
 			stop.addClickListener(new Button.ClickListener() {				
 				@Override
 				public void buttonClick(ClickEvent event) {
@@ -85,8 +78,13 @@ public class CFAppView extends CustomComponent{
 					updateContent(responseString);
 				}
 			});
+		}
+		
+		//application somehow exists
+		if (xml.contains("STARTED")||xml.contains("STOPPED")||xml.contains("CREATED")){
+			Button delete=new Button("Delete");						
+			hlo.addComponent(delete);
 			delete.addClickListener(new Button.ClickListener() {				
-
 				@Override
 				public void buttonClick(ClickEvent event) {
 					logView.newLine("Deletes applications running");
@@ -98,6 +96,18 @@ public class CFAppView extends CustomComponent{
 					}
 				}
 			});
+		}
+			
+		//application is running
+		if (xml.contains("STARTED")){
+			String uriToService = Deployer.parseUrl(xml);
+			Link link = new Link("link to app", new ExternalResource(uriToService));
+			QRCode qrCode = new QRCode();
+			qrCode.setValue(uriToService);
+			qrCode.setWidth("128px");
+			qrCode.setHeight("128px");
+			vlo.addComponent(qrCode);
+			vlo.addComponent(link);
 		}
 		xmllabel.setValue(xml);
 	}	
