@@ -126,23 +126,15 @@ public class CoapsCaller {
 			// File f = new File(url.toURI());
 			// FileReader fr=new FileReader(fileName);
 			File f = new File(fileName);
-
-			form = new FormDataMultiPart().field("file", f,
-					MediaType.MULTIPART_FORM_DATA_TYPE);
+			if (f.exists()){
+				form = new FormDataMultiPart();
+				form.field("file", f,MediaType.MULTIPART_FORM_DATA_TYPE);				
+			}else{
+				throw new FileNotFoundException(fileName + " not found!");
+			}
+			
 		} else {
-			File f = new File(localTempPath + "/temp");
-			try {
-				f.createNewFile();
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			try{
-			form = new FormDataMultiPart().field("file", f,
-					MediaType.MULTIPART_FORM_DATA_TYPE);
-			}catch(Exception e){
-				throw e;
-			}
+			throw new FileNotFoundException(fileName + " not found!");
 		}
 		try{
 			ClientResponse cr = client

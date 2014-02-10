@@ -404,13 +404,16 @@ public class Deployer extends CoapsCaller  {
 				try {
 					deployresponse = Deployer.deployApplication(envId, appId, file);
 				} catch (FileNotFoundException e) {
-					logView.newLine("exception: " + e.getMessage());
-					//return false;				
+					logView.newLine("Aborted: FileNotFoudException: " + e.getMessage());
+					e.printStackTrace();
+					fireNetworkingFinished(false, "File not found: press build");
+					return;				
 				} catch (URISyntaxException e) {
 					// TODO Auto-generated catch block
 					logView.newLine("exception: " + e.getMessage());
 					e.printStackTrace();
-					//return false;
+					fireNetworkingFinished(false, "Deploying failed");
+					return;
 				}
 				String deployresponsestring = deployresponse.getEntity(new GenericType<String>(){});
 				logView.newLine("response: " + deployresponsestring);
