@@ -123,7 +123,7 @@ public class MideaasEditor extends CustomComponent implements Listener {
 		sideBar.addComponent(buildComponent);
 		//adds delpoy component to view
 		if (settings.paasDeployTurnedOn){
-			sideBar.addComponent(new DeployComponent(project, settings));
+			sideBar.addComponent(new DeployComponent(project, settings,user));
 		}
 		
 		sideBar.addComponent(new JettyComponent(project, user));

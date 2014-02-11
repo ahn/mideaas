@@ -4,6 +4,7 @@ import java.io.File;
 
 import org.vaadin.mideaas.frontend.Deployer.DeployListener;
 import org.vaadin.mideaas.model.SharedProject;
+import org.vaadin.mideaas.model.User;
 import org.vaadin.mideaas.model.UserSettings;
 
 import com.vaadin.server.ThemeResource;
@@ -47,11 +48,11 @@ public class DeployComponent extends CustomComponent implements DeployListener{
 	private Embedded loadingImg = new Embedded(null, new ThemeResource(
 			"../base/common/img/loading-indicator.gif"));
 
-	public DeployComponent(SharedProject project, UserSettings settings) {
+	public DeployComponent(SharedProject project, UserSettings settings, User user) {
 		super();
 		this.project = project;
 		this.settings=settings;
-		String pathToWar = new File(project.getTargetDir().getAbsolutePath(), project.getName()+".war").getAbsolutePath();
+		String pathToWar = new File(project.getTargetPathFor(user).getAbsolutePath(), project.getName()+".war").getAbsolutePath();
 		this.deployer = new Deployer(pathToWar, settings.coapsApiUri);
 	}
 	

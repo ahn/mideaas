@@ -26,6 +26,7 @@ import javax.xml.transform.TransformerFactoryConfigurationError;
 
 import org.apache.commons.io.FileUtils;
 import org.vaadin.chatbox.SharedChat;
+import org.vaadin.mideaas.frontend.MavenUtil;
 import org.vaadin.mideaas.frontend.PomXml;
 import org.vaadin.mideaas.frontend.PomXml.Dependency;
 import org.vaadin.mideaas.java.util.CompilingService;
@@ -982,8 +983,8 @@ public class SharedProject {
 		}
 	}
 
-	public File getTargetDir() {
-		return new File(this.getProjectDir().getAbsolutePath(),"target-1");
+	public File getTargetPathFor(User u) {
+		return new File(this.getProjectDir().getAbsolutePath(), MavenUtil.targetDirFor(u));
 	}
 
 	
