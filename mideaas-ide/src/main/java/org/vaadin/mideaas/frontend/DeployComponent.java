@@ -1,19 +1,26 @@
 package org.vaadin.mideaas.frontend;
 
 import java.io.File;
+import java.io.IOException;
+import java.net.URI;
 
 import org.vaadin.mideaas.frontend.Deployer.DeployListener;
 import org.vaadin.mideaas.model.SharedProject;
 import org.vaadin.mideaas.model.User;
 import org.vaadin.mideaas.model.UserSettings;
 
+import com.vaadin.server.RequestHandler;
 import com.vaadin.server.ThemeResource;
+import com.vaadin.server.VaadinRequest;
+import com.vaadin.server.VaadinResponse;
+import com.vaadin.server.VaadinSession;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.Embedded;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Link;
+import com.vaadin.ui.Notification;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
@@ -47,6 +54,8 @@ public class DeployComponent extends CustomComponent implements DeployListener{
 
 	private Embedded loadingImg = new Embedded(null, new ThemeResource(
 			"../base/common/img/loading-indicator.gif"));
+	protected String responseMessage = null;
+	private Button showResponseDataButton;
 
 	public DeployComponent(SharedProject project, UserSettings settings, User user) {
 		super();
@@ -59,6 +68,11 @@ public class DeployComponent extends CustomComponent implements DeployListener{
 	private void buildLayout() {
 		Panel p = new Panel("CloudFoundry panel");
 		p.setContent(layout);
+		
+		//TODO: add stuff here
+		if (settings.useSlaSelectionMap){
+			createSLANavigationFeatures();
+		}
 		
 		layout.addComponent(deployButton);
 		
@@ -115,6 +129,65 @@ public class DeployComponent extends CustomComponent implements DeployListener{
 		});		
 	}
 
+	private void createSLANavigationFeatures() {
+		Button slabutton = new Button("Negotiate SLA");			
+		slabutton.addClickListener(new Button.ClickListener() {				
+			@Override
+			public void buttonClick(ClickEvent event) {
+				VaadinSession.getCurrent().addRequestHandler(
+						new RequestHandler() {
+						    @Override
+						    public boolean handleRequest(VaadinSession session,
+						                                 VaadinRequest request,
+						                                 VaadinResponse response)
+						            throws IOException {
+								VaadinSession.getCurrent().removeRequestHandler(this);
+								final UI ui = getUI();
+								final String url = request.getPathInfo();
+								// TODO Auto-generated method stub
+								ui.access(new Runnable(){
+									@Override
+									public void run() {
+										setMessage("ok, uri was: " + url);
+									}
+								}
+								);
+					            return true;
+						    }
+						}
+				);
+				String params = "/addParametersAndVallbackURLHere";
+				getUI().getPage().open(settings.slaSelectionMapUri+params, "newWindow");
+			}
+		});
+		layout.addComponent(slabutton);
+		showResponseDataButton = new Button("ShowResponseData");
+		showResponseDataButton.setEnabled(false);
+		layout.addComponent(showResponseDataButton);
+		//buttonhandlers
+		this.showResponseDataButton.addClickListener(new Button.ClickListener() {				
+			@Override
+			public void buttonClick(ClickEvent event) {
+				String message = getMessage();
+				Notification.show(message);
+			}
+		});
+	}
+
+	private String getMessage() {
+		// TODO Auto-generated method stub
+		return this.responseMessage;
+	}	
+	
+	private void setMessage(String message) {
+		this.responseMessage=message;
+		if (message==null){
+			showResponseDataButton.setEnabled(false);
+		}else{
+			showResponseDataButton.setEnabled(true);
+		}
+	}	
+	
 	@Override
 	public void attach() {
 		super.attach();
