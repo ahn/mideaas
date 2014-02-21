@@ -3,31 +3,19 @@ package org.vaadin.mideaas.frontend;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 
-import javax.servlet.http.HttpServletRequest;
-
+import org.apache.commons.compress.archivers.tar.TarArchiveOutputStream;
+import org.apache.commons.compress.compressors.gzip.GzipCompressorOutputStream;
 import org.vaadin.mideaas.model.SharedProject;
-import org.vaadin.mideaas.model.User;
 import org.vaadin.mideaas.model.UserSettings;
 
-import com.vaadin.server.ExternalResource;
-import com.vaadin.server.VaadinServletService;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
-import com.vaadin.ui.Button.ClickListener;
 import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Link;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.VerticalLayout;
-
-import fi.jasoft.qrcode.QRCode;
-import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
-import org.apache.commons.compress.archivers.tar.TarArchiveOutputStream;
-import org.apache.commons.compress.compressors.gzip.GzipCompressorOutputStream;
-import org.apache.commons.compress.utils.IOUtils;
 
 @SuppressWarnings("serial")
 public class DeployComponent extends CustomComponent {

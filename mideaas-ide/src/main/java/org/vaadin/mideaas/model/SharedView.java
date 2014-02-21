@@ -13,6 +13,7 @@ import org.apache.commons.io.FileUtils;
 import org.vaadin.aceeditor.ServerSideDocDiff;
 import org.vaadin.aceeditor.client.AceDoc;
 import org.vaadin.mideaas.editor.ClaraXmlUtil;
+import org.vaadin.mideaas.editor.DocDiffMediator;
 import org.vaadin.mideaas.editor.JavaSyntaxGuard;
 import org.vaadin.mideaas.editor.MultiUserDoc;
 import org.vaadin.mideaas.editor.MultiUserDoc.DifferingChangedListener;
@@ -22,6 +23,7 @@ import org.vaadin.mideaas.editor.XmlSyntaxGuard;
 import org.vaadin.mideaas.frontend.Icons;
 import org.vaadin.mideaas.java.JavaSyntaxErrorChecker;
 import org.vaadin.mideaas.java.util.CompilingService;
+import org.vaadin.mideaas.model.ControllerCode.Modifier;
 
 import com.vaadin.server.Resource;
 
@@ -194,46 +196,43 @@ public class SharedView extends ProjectItem {
 
 	// TODO: below
 	
-	public void ensureClaraFieldExists(String id, String className) {
-//		try {
-//			ControllerCode c = new ControllerCode(controllerMud.getBaseText());
-//			String code1 = c.getCode();
-//			c.ensureClaraFieldExists(id, className);
-//			ServerSideDocDiff d = ServerSideDocDiff.diff(new AceDoc(code1), new AceDoc(c.getCode()));
-//			controllerMud.tryToApply(d, null);
-//		} catch (ParseException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		}
+	public void ensureClaraFieldExists(final String id, final String className) {
+		modify(new Modifier() {
+			@Override
+			public void modify(ControllerCode c) {
+				c.ensureClaraFieldExists(id, className);
+			}
+		});
+	}
+	
+	private void modify(Modifier modifier) {
+		final ServerSideDocDiff d;
+		try {
+			d = ControllerCode.getDiffAfterModify(controllerMud.getBaseText(), modifier);
+		} catch (ParseException e) {
+			return;
+		}
+		DocDiffMediator mm = controllerMud.getBase().fork();
+		mm.getDownstream().applyDiff(d);
+		mm.detach();
 	}
 
-	public void ensureClaraHandlerExists(String id, String className, String todo) {
-//		try {
-//			ControllerCode c = new ControllerCode(controllerMud.getBase().getText());
-//			String code1 = c.getCode();
-//			String comment = todo==null||todo.isEmpty() ? null : "TODO: "+todo;
-//			c.ensureClaraHandlerExists(id, className, comment);
-//			ServerSideDocDiff d = ServerSideDocDiff.diff(new AceDoc(code1), new AceDoc(c.getCode()));
-//			controllerMud.tryToApply(d, null);
-//			return true;
-//		} catch (ParseException e) {
-//			e.printStackTrace();
-//			return false;
-//		}
+	public void ensureClaraHandlerExists(final String id, final String className, final String comment) {
+		modify(new Modifier() {
+			@Override
+			public void modify(ControllerCode c) {
+				c.ensureClaraHandlerExists(id, className, comment);
+			}
+		});
 	}
 
-	public void ensureDataSource(String id, String cls, String todo) {
-//		try {
-//			ControllerCode c = new ControllerCode(controllerMud.getBase().getText());
-//			String code1 = c.getCode();
-//			String comment = todo==null||todo.isEmpty() ? null : "TODO: "+todo;
-//			c.ensureClaraDataSource(id, cls, comment);
-//			ServerSideDocDiff d = ServerSideDocDiff.diff(new AceDoc(code1), new AceDoc(c.getCode()));
-//			controllerMud.tryToApply(d, null);
-//		} catch (ParseException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		}
+	public void ensureDataSource(final String id, final String cls, final String comment) {
+		modify(new Modifier() {
+			@Override
+			public void modify(ControllerCode c) {
+				c.ensureClaraDataSource(id, cls, comment);
+			}
+		});
 	}
 
 	//?

@@ -44,7 +44,7 @@ public class SharedDoc implements DiffListener {
 		editor.removeDiffListener(this);
 	}
 	
-	private void applyDiff(ServerSideDocDiff diff) {
+	public void applyDiff(ServerSideDocDiff diff) {
 		if (diff.isIdentity()) {
 			return;
 		}
@@ -113,6 +113,12 @@ public class SharedDoc implements DiffListener {
 	@Override
 	public void diff(DiffEvent e) {
 		applyDiff(e.getDiff());
+	}
+
+	public DocDiffMediator fork() {
+		SharedDoc fork = new SharedDoc(getDoc());
+		return new DocDiffMediator(this, fork);
+		
 	}
 
 	

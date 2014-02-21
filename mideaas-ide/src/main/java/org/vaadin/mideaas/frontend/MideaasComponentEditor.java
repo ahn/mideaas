@@ -13,7 +13,6 @@ import org.vaadin.mideaas.model.SharedView;
 import org.vaadin.mideaas.model.User;
 
 import com.vaadin.ui.Component;
-import com.vaadin.ui.Notification;
 import com.vaadin.ui.TabSheet;
 
 @SuppressWarnings("serial")
@@ -121,23 +120,20 @@ public class MideaasComponentEditor extends TabSheet implements
 
 	@Override
 	public void goToDefinition(String id, String className) {
-		// TODO
 		comp.ensureClaraFieldExists(id, className);
 		setSelectedTab(EditingMode.CONTROLLER);
 	}
 
 	@Override
 	public void goToHandler(String id, String cls, String todo) {
-		// TODO
-//		boolean success = comp.ensureClaraHandlerExists(id, cls, todo);
-//		if (success) {
-//			Notification.show("Handler for "+id+" added.");
-//		}
+		comp.ensureClaraHandlerExists(id, cls, "TODO: "+todo);
+		setSelectedTab(EditingMode.CONTROLLER);
 	}
 
 	@Override
 	public void setDataSource(String id, String cls, String todo) {
-		comp.ensureDataSource(id, cls, todo);
+		comp.ensureDataSource(id, cls, "TODO: "+todo);
+		setSelectedTab(EditingMode.CONTROLLER);
 	}
 
 	public void setTestingEnabled(boolean enabled) {

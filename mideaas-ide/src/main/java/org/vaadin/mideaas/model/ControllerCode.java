@@ -43,6 +43,9 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.vaadin.aceeditor.ServerSideDocDiff;
+import org.vaadin.mideaas.editor.DocDiffMediator;
+
 
 /**
  * 
@@ -634,7 +637,15 @@ public class ControllerCode {
 		return 0; // XXX
 	}
 
+	public interface Modifier {
+		public void modify(ControllerCode c);
+	}
 	
-
+	public static ServerSideDocDiff getDiffAfterModify(String initial, Modifier modifier) throws ParseException {
+		ControllerCode c = new ControllerCode(initial);
+		String base = c.getCode();
+		modifier.modify(c);
+		return ServerSideDocDiff.diff(base, c.getCode());
+	}
 	
 }

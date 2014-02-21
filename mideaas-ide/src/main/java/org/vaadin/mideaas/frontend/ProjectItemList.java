@@ -44,8 +44,6 @@ public class ProjectItemList extends CustomComponent implements ProjectListener,
 	private final TreeTable tree = new TreeTable();
 	
 	private UI ui;
-
-	private String selected = "App.java";
 	
 	public ProjectItemList(SharedProject proj, final User user) {
 		super();
@@ -181,8 +179,6 @@ public class ProjectItemList extends CustomComponent implements ProjectListener,
 
 		tree.setCollapsed(TITLE_VIEWS, false);
 		tree.setCollapsed(TITLE_OTHER_FILES, false);
-		//tree.expandItem(TITLE_VIEWS);
-		//tree.expandItem(TITLE_OTHER_FILES);
 	}
 
 	
@@ -209,7 +205,6 @@ public class ProjectItemList extends CustomComponent implements ProjectListener,
 		String id = (String) event.getProperty().getValue();
 		Object parent = tree.getParent(id);
 		if (TITLE_VIEWS.equals(parent) || TITLE_OTHER_FILES.equals(parent)) {
-			selected = id;
 			fireComponentSelected(id);
 		}
 	}

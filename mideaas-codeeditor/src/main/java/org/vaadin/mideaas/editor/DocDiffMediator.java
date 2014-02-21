@@ -55,6 +55,14 @@ public class DocDiffMediator {
 		downstream.addListener(downstreamListener);
 	}
 	
+	public SharedDoc getUpstream() {
+		return upstream;
+	}
+	
+	public SharedDoc getDownstream() {
+		return downstream;
+	}
+	
 	public synchronized void setUpwardsGuard(Guard guard) {
 		upwardsGuard = guard;
 	}
@@ -99,6 +107,6 @@ public class DocDiffMediator {
 	public void detach() {
 		upstream.removeListener(upstreamListener);
 		downstream.removeListener(downstreamListener);
-	}	
+	}
 
 }
