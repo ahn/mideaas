@@ -19,8 +19,11 @@ import org.vaadin.mideaas.editor.MultiUserDoc.DifferingChangedListener;
 import org.vaadin.mideaas.editor.ErrorChecker;
 import org.vaadin.mideaas.editor.XmlSyntaxErrorChecker;
 import org.vaadin.mideaas.editor.XmlSyntaxGuard;
+import org.vaadin.mideaas.frontend.Icons;
 import org.vaadin.mideaas.java.JavaSyntaxErrorChecker;
 import org.vaadin.mideaas.java.util.CompilingService;
+
+import com.vaadin.server.Resource;
 
 // TODO: Auto-generated Javadoc
 /**
@@ -274,4 +277,10 @@ public class SharedView extends ProjectItem {
 		getControllerMud().removeDifferingChangedListener(li);
 		getModelMud().removeDifferingChangedListener(li);
 	}
+
+	@Override
+	public Resource getIcon() {
+		return Icons.APPLICATION_FORM;
+	}
+
 }

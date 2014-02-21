@@ -14,8 +14,11 @@ import org.vaadin.mideaas.editor.MultiUserDoc.DifferingChangedListener;
 import org.vaadin.mideaas.editor.ErrorChecker;
 import org.vaadin.mideaas.editor.MultiUserEditor;
 import org.vaadin.mideaas.editor.XmlSyntaxGuard;
+import org.vaadin.mideaas.frontend.Icons;
 import org.vaadin.mideaas.java.JavaSyntaxErrorChecker;
 import org.vaadin.mideaas.java.util.CompilingService;
+
+import com.vaadin.server.Resource;
 
 public class ProjectFile extends ProjectItem {
 	
@@ -116,6 +119,16 @@ public class ProjectFile extends ProjectItem {
 			return new XmlSyntaxGuard();
 		}
 		return null;
+	}
+	
+	@Override
+	public Resource getIcon() {
+		if (getName().endsWith(".java")) {
+			return Icons.DOCUMENT_ATTRIBUTE_J;
+		}
+		else {
+			return Icons.DOCUMENT;
+		}
 	}
 
 }

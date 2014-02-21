@@ -37,9 +37,7 @@ abstract public class ProjectItem {
 
 	abstract public void removeUser(User user);
 
-	public Resource getIcon() {
-		return Icons.APPLICATION_FORM;
-	}
+	abstract public Resource getIcon();
 
 	abstract public void addDifferingChangedListener(DifferingChangedListener li);
 	abstract public void removeDifferingChangedListener(DifferingChangedListener li);
