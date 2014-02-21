@@ -3,7 +3,7 @@ package org.vaadin.mideaas.model;
 import java.io.File;
 import java.io.IOException;
 
-import org.vaadin.mideaas.editor.DocManager.DifferingChangedListener;
+import org.vaadin.mideaas.editor.MultiUserDoc.DifferingChangedListener;
 import org.vaadin.mideaas.frontend.Icons;
 import org.vaadin.mideaas.java.util.CompilingService;
 

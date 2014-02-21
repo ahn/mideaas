@@ -4,7 +4,7 @@ import java.lang.reflect.Method;
 import java.util.EventObject;
 import java.util.Map;
 
-import org.vaadin.mideaas.editor.DocManager.DifferingChangedListener;
+import org.vaadin.mideaas.editor.MultiUserDoc.DifferingChangedListener;
 import org.vaadin.mideaas.editor.EditorState.DocType;
 
 import com.vaadin.data.Property.ValueChangeEvent;
@@ -35,14 +35,14 @@ public class MultiUserEditorUserGroup extends CustomComponent
 	private final HorizontalOptionGroup group = new HorizontalOptionGroup();
 
 	private final EditorUser user;
-	private final DocManager mud;
+	private final MultiUserDoc mud;
 	private final EditorState mineThatEqualsBase;
 	
 	
 	private EditorState currentState;
 
 	
-	public MultiUserEditorUserGroup(EditorUser user, DocManager mud) {
+	public MultiUserEditorUserGroup(EditorUser user, MultiUserDoc mud) {
 		this.user = user;
 		this.mud = mud;
 		mineThatEqualsBase = new EditorState(DocType.MINE, new DocDifference(user, null, null));

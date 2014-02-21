@@ -16,9 +16,9 @@ import org.vaadin.aceeditor.AceEditor;
 import org.vaadin.aceeditor.AceEditor.SelectionChangeListener;
 import org.vaadin.aceeditor.AceMode;
 import org.vaadin.aceeditor.client.AceDoc;
-import org.vaadin.mideaas.editor.DocManager;
+import org.vaadin.mideaas.editor.MultiUserDoc;
 import org.vaadin.mideaas.editor.EditorUser;
-import org.vaadin.mideaas.editor.JuuserDoc;
+import org.vaadin.mideaas.editor.UserDoc;
 import org.vaadin.mideaas.editor.MultiUserEditor;
 import org.vaadin.mideaas.editor.XmlAsyncErrorChecker;
 import org.vaadin.mideaas.model.User;
@@ -59,7 +59,7 @@ public class ClaraEditor extends CustomComponent implements
 
 	private HorizontalSplitPanel split = new HorizontalSplitPanel();
 	private MultiUserEditor editor;
-	private final DocManager mud;
+	private final MultiUserDoc mud;
 	private VerticalLayout componentContext = new VerticalLayout();
 
 	private ClaraPreviewWindow previewWindow = null;
@@ -88,7 +88,7 @@ public class ClaraEditor extends CustomComponent implements
 		return new BigInteger(130, new Random()).toString(32);
 	}
 	
-	public ClaraEditor(User user, DocManager modelMud) {
+	public ClaraEditor(User user, MultiUserDoc modelMud) {
 		super();
 		this.user = user;
 		mud = modelMud;
@@ -157,7 +157,7 @@ public class ClaraEditor extends CustomComponent implements
 	}
 	
 	public void setXml(String xml) {
-		JuuserDoc ud = mud.getUserDoc(user.getEditorUser());
+		UserDoc ud = mud.getUserDoc(user.getEditorUser());
 		ud.getDoc().setDoc(new AceDoc(xml));
 	}
 

@@ -8,7 +8,7 @@ import org.vaadin.aceeditor.ServerSideDocDiff;
 import org.vaadin.aceeditor.Suggester;
 import org.vaadin.aceeditor.Suggestion;
 import org.vaadin.aceeditor.client.AceDoc;
-import org.vaadin.mideaas.editor.DocManager;
+import org.vaadin.mideaas.editor.MultiUserDoc;
 import org.vaadin.mideaas.java.util.CompilerSuggester;
 import org.vaadin.mideaas.java.util.CustomMethodSuggestionGenerator;
 import org.vaadin.mideaas.java.util.InMemoryCompiler;
@@ -26,9 +26,9 @@ public class JavaSuggester implements Suggester {
 			// TODO: more?
 	
 	private final CompilerSuggester compSugger;
-	private final DocManager codeMud;
+	private final MultiUserDoc codeMud;
 
-	public JavaSuggester(InMemoryCompiler compiler, String className, DocManager codeMud) {
+	public JavaSuggester(InMemoryCompiler compiler, String className, MultiUserDoc codeMud) {
 		compSugger = new CompilerSuggester(compiler, className);
 		this.codeMud = codeMud;
 		CustomMethodSuggestionGenerator vaadinSG = new CustomMethodSuggestionGenerator(compiler);

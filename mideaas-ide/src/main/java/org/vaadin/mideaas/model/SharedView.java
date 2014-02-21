@@ -13,10 +13,12 @@ import org.apache.commons.io.FileUtils;
 import org.vaadin.aceeditor.ServerSideDocDiff;
 import org.vaadin.aceeditor.client.AceDoc;
 import org.vaadin.mideaas.editor.ClaraXmlUtil;
-import org.vaadin.mideaas.editor.DocManager;
-import org.vaadin.mideaas.editor.DocManager.DifferingChangedListener;
+import org.vaadin.mideaas.editor.JavaSyntaxGuard;
+import org.vaadin.mideaas.editor.MultiUserDoc;
+import org.vaadin.mideaas.editor.MultiUserDoc.DifferingChangedListener;
 import org.vaadin.mideaas.editor.ErrorChecker;
 import org.vaadin.mideaas.editor.XmlSyntaxErrorChecker;
+import org.vaadin.mideaas.editor.XmlSyntaxGuard;
 import org.vaadin.mideaas.java.JavaSyntaxErrorChecker;
 import org.vaadin.mideaas.java.util.CompilingService;
 
@@ -89,10 +91,8 @@ public class SharedView extends ProjectItem {
 
 //	private final String modelId = generateModelId();
 
-	private DocManager controllerMud;
-	private DocManager modelMud;
-
-	private ErrorChecker javaChecker = new JavaSyntaxErrorChecker();
+	private MultiUserDoc controllerMud;
+	private MultiUserDoc modelMud;
 
 	/**
 	 * Instantiates a new shared component.
@@ -111,12 +111,10 @@ public class SharedView extends ProjectItem {
 		this.name = name;
 		String code = ControllerCode.createInitial(javaPackage, name).getCode();
 		File codeFile = new File(saveBaseToDir, name+".java");
-		//controllerMud = new DocManager(codeFile.getName(), new AceDoc(code), javaChecker, codeFile);
-		controllerMud = new DocManager(new AceDoc(code));
+		controllerMud = new MultiUserDoc(new AceDoc(code), codeFile, new JavaSyntaxGuard());
 		String xml = ClaraXmlUtil.createHelloWorld("VerticalLayout", "This is " + getName());
 		File modelFile = new File(saveBaseToDir, name+".clara.xml");
-		//modelMud = new DocManager((modelFile.getName(), new AceDoc(xml), new XmlSyntaxErrorChecker(), modelFile);
-		modelMud = new DocManager(new AceDoc(xml));
+		modelMud = new MultiUserDoc(new AceDoc(xml), modelFile, new XmlSyntaxGuard());
 		
 //		storeModelForVisualDesigner();
 	}
@@ -162,11 +160,11 @@ public class SharedView extends ProjectItem {
 		return REGEX_NAME.matcher(name).matches();
 	}
 
-	public DocManager getControllerMud() {
+	public MultiUserDoc getControllerMud() {
 		return controllerMud;
 	}
 
-	public DocManager getModelMud() {
+	public MultiUserDoc getModelMud() {
 		return modelMud;
 	}
 

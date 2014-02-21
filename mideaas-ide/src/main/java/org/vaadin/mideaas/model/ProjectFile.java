@@ -6,38 +6,42 @@ import java.io.IOException;
 import org.apache.commons.io.FileUtils;
 import org.vaadin.aceeditor.AceMode;
 import org.vaadin.aceeditor.client.AceDoc;
-import org.vaadin.mideaas.editor.DocManager;
-import org.vaadin.mideaas.editor.DocManager.DifferingChangedListener;
+import org.vaadin.mideaas.editor.DocDiffMediator;
+import org.vaadin.mideaas.editor.DocDiffMediator.Guard;
+import org.vaadin.mideaas.editor.JavaSyntaxGuard;
+import org.vaadin.mideaas.editor.MultiUserDoc;
+import org.vaadin.mideaas.editor.MultiUserDoc.DifferingChangedListener;
 import org.vaadin.mideaas.editor.ErrorChecker;
 import org.vaadin.mideaas.editor.MultiUserEditor;
+import org.vaadin.mideaas.editor.XmlSyntaxGuard;
 import org.vaadin.mideaas.java.JavaSyntaxErrorChecker;
 import org.vaadin.mideaas.java.util.CompilingService;
 
 public class ProjectFile extends ProjectItem {
 	
-	private final DocManager KEKE;
+	private final MultiUserDoc mud;
 	public ProjectFile(String name, String content, ErrorChecker checker, File saveBaseTo, ProjectLog log) {
 		super(name);
-		KEKE = new DocManager(new AceDoc(content));
+		mud = new MultiUserDoc(new AceDoc(content), saveBaseTo, guardForName(name));
 	}
 	
 	public static ProjectFile newJavaFile(String name, String content, File saveBaseTo, ProjectLog log) {
 		return new ProjectFile(name, content, new JavaSyntaxErrorChecker(), saveBaseTo, log);
 	}
 	
-	public DocManager getMud() {
-		return KEKE;
+	public MultiUserDoc getMud() {
+		return mud;
 	}
 	
 	public MultiUserEditor  createEditor(User user) {
-		return createEditor(user, KEKE, getName());
+		return createEditor(user, mud, getName());
 	}
 	
 	public String getFileEnding() {
 		return getFileEnding(getName());
 	}
 	
-	public static MultiUserEditor createEditor(User user, DocManager mud, String name) {
+	public static MultiUserEditor createEditor(User user, MultiUserDoc mud, String name) {
 		MultiUserEditor ed = new MultiUserEditor(user.getEditorUser(), mud);
 		ed.setTitle(name);
 		String ending = getFileEnding(name);
@@ -102,6 +106,16 @@ public class ProjectFile extends ProjectItem {
 
 	public String getBaseText() {
 		return getMud().getBase().getDoc().getText(); // XXX Ugly
+	}
+	
+	public static DocDiffMediator.Guard guardForName(String name) {
+		if (name.endsWith(".java")) {
+			return new JavaSyntaxGuard();
+		}
+		else if (name.endsWith(".xml")) {
+			return new XmlSyntaxGuard();
+		}
+		return null;
 	}
 
 }

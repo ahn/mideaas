@@ -4,7 +4,7 @@ import javax.servlet.annotation.WebServlet;
 
 import org.vaadin.aceeditor.AceMode;
 import org.vaadin.aceeditor.client.AceDoc;
-import org.vaadin.mideaas.editor.DocManager;
+import org.vaadin.mideaas.editor.MultiUserDoc;
 import org.vaadin.mideaas.editor.EditorUser;
 import org.vaadin.mideaas.editor.MultiUserEditor;
 
@@ -40,7 +40,7 @@ public class MyVaadinUI extends UI
     		+ "    void bar() {\n        int i = 2;\n    }\n\n"
     		+ "}\n";
     
-    private static final DocManager mud = new DocManager(new AceDoc("//"));
+    private static final MultiUserDoc mud = new MultiUserDoc(new AceDoc("//"));
 
     @Override
     protected void init(VaadinRequest request) {

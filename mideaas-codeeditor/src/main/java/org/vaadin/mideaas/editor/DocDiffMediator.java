@@ -15,7 +15,7 @@ import org.vaadin.mideaas.editor.SharedDoc.Listener;
  */
 public class DocDiffMediator {
 	
-	interface Guard {
+	public interface Guard {
 		/**
 		 * Whether the candidate should be accepted.
 		 * 

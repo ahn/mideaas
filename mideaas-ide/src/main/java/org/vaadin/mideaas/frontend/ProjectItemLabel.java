@@ -5,7 +5,7 @@ import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
 import org.vaadin.mideaas.editor.DocDifference;
-import org.vaadin.mideaas.editor.DocManager.DifferingChangedListener;
+import org.vaadin.mideaas.editor.MultiUserDoc.DifferingChangedListener;
 import org.vaadin.mideaas.editor.EditorUser;
 import org.vaadin.mideaas.model.ProjectItem;
 
