@@ -91,7 +91,9 @@ public class MultiUserDoc implements SharedDoc.Listener {
 				@Override
 				public void run() {
 					synchronized (baseChangeTimer) {
-						saveBaseToDisk();
+						if (saveBaseTo!=null) {
+							saveBaseToDisk();
+						}
 						fireDifferingChanged(getDifferences());
 						fireScheduled = false;
 					}
