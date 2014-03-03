@@ -6,9 +6,28 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
+import org.apache.commons.io.FileUtils;
 import org.vaadin.mideaas.model.UserSettings;
 
 public class MideaasConfig {
+	
+	@SuppressWarnings("serial")
+	public static class ConfigError extends RuntimeException {
+		public ConfigError(File config, String message) {
+			super(msg(message,config));
+		}
+		public ConfigError(File config, String message, Throwable cause) {
+			super(msg(message,config), cause);
+		}
+		private static String msg(String message, File config) {
+			if (config==null) {
+				return message + "\n... when reading default config file at mideaas-app/src/main/resources/"+MIDEAAS_CONFIG_FILE_IN_CLASSPATH;
+			}
+			else {
+				return message + "\n... when reading config file "+config;
+			}
+		}
+	}
     
 	//get using: MideaasConfig.getProperty(Prop.JETTY_STOP_PORT_MAX)
     public enum Prop {
@@ -65,6 +84,7 @@ public class MideaasConfig {
                     readConfigFrom(f);
                 } catch (IOException e) {
                     System.err.println("WARNING: error reading config from '" + f +"'. Reading default config.");
+                    readDefaultConfig();
                 }
             }
             else {
@@ -84,14 +104,17 @@ public class MideaasConfig {
 	}
 
     private static void readConfigFrom(File f) throws IOException {
-        FileInputStream fis = null;
-        try {
-            fis = new FileInputStream(f);
-            properties.load(fis);
+        readConfigFrom(new FileInputStream(f));
+        checkProperties(f);
+    }
+    
+    private static void readConfigFrom(InputStream inputStream) throws IOException {
+    	try {
+            properties.load(inputStream);
         }
         finally {
-            if (fis!=null) {
-                fis.close();
+            if (inputStream!=null) {
+            	inputStream.close();
             }
         }
     }
@@ -101,13 +124,14 @@ public class MideaasConfig {
                 .getResourceAsStream(MIDEAAS_CONFIG_FILE_IN_CLASSPATH);
     
         if (inputStream == null) {
-            System.err.println("WARNING: could not load properties file: " + MIDEAAS_CONFIG_FILE_IN_CLASSPATH);
+        	throw new ConfigError(new File(MIDEAAS_CONFIG_FILE_IN_CLASSPATH), "Could not load properties file.");
         }
         else {
             try {
-                properties.load(inputStream);
+                readConfigFrom(inputStream);
+                checkProperties(null);
             } catch (IOException e) {
-                System.err.println("WARNING: error loading properties file: " + e.getMessage());
+            	throw new ConfigError(new File(MIDEAAS_CONFIG_FILE_IN_CLASSPATH), "Could not read", e);
             }
         }
     }
@@ -149,9 +173,8 @@ public class MideaasConfig {
 		return d==null ? null : new File(d);
 	}
 	
-	public static String getProjectsDir() {
-		String dir = MideaasConfig.getProperty(Prop.PROJECTS_DIR);
-		return dir;
+	public static File getProjectsDir() {
+		return new File(MideaasConfig.getProperty(Prop.PROJECTS_DIR));
 	}
 	
 	public static String getFNTSServers() {
@@ -163,5 +186,30 @@ public class MideaasConfig {
 		int executors = Integer.valueOf(MideaasConfig.getProperty(Prop.EXECUTORS));
 		return executors;
 	}
+	
+	public static File getMavenHome() {
+		return new File(getProperty(Prop.MAVEN_HOME));
+	}
+	
+	public static void checkProperties(File f) {
+		
+		if (!getProjectsDir().isDirectory()) {
+			throw new ConfigError(f, Prop.PROJECTS_DIR + " does not exist: " + getProjectsDir());
+		}
+		
+		File logDir = getLogDir();
+		if (logDir!=null && !logDir.isDirectory()) {
+			throw new ConfigError(f, Prop.LOG_DIR + " does not exist: " + logDir);
+		}
+		
+		File mvn = FileUtils.getFile(getMavenHome(), "bin", "mvn");
+		if (!mvn.isFile()) {
+			throw new ConfigError(f, "Not a proper "+Prop.MAVEN_HOME+": "+getMavenHome()+" - "+mvn+" does not exist.");
+		}
+		
+		// TODO: more checks
+	}
+
+	
 
 }

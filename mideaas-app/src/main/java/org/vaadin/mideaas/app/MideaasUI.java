@@ -80,8 +80,7 @@ public class MideaasUI extends UI {
 		
 		JettyUtil.stopAllJettys(); // XXX TODO???
 
-		MavenUtil.setMavenHome(new File(MideaasConfig
-				.getProperty(Prop.MAVEN_HOME)));
+		MavenUtil.setMavenHome(MideaasConfig.getMavenHome());
 
 		ClaraEditor.setVisualDesignerUrl(MideaasConfig
 				.getProperty(Prop.VISUAL_DESIGNER_URL));
