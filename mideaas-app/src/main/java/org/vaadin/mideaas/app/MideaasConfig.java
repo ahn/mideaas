@@ -43,9 +43,14 @@ public class MideaasConfig {
         JETTY_PORT_MAX,
         JETTY_STOP_PORT_MIN,
         JETTY_STOP_PORT_MAX,
+        
         EASICLOUDS_FEATURES, 
         PAAS_DEPLOY, 
         GAE_COMPILE,
+        COAPS_API_URI, 
+        USE_SLA_SELECTION_MAP, 
+        SLA_SELECTION_MAP_URI,
+        
         EXPERIMENT,
         LOG_DIR,
         DEFAULT_WIDGETSET_USER_AGENT,
@@ -160,12 +165,28 @@ public class MideaasConfig {
 	}
 
 	public static UserSettings getDefaultUserSettings() {
-		UserSettings settings = new UserSettings();
+		boolean ecFeaturesOn=MideaasConfig.easiCloudsFeaturesTurnedOn();
+		boolean pdOn=MideaasConfig.paasDeployTurnedOn();
+		boolean cgon=MideaasConfig.compileGaeTurnedOn();
+		String coapsApiUri = MideaasConfig.coapsApiUri();
+		boolean useSLASelectionMap = MideaasConfig.useSLASelectionMap();
+		String slaSelectionMapUri = MideaasConfig.slaSelectionMapUri();
+		
+		UserSettings settings = new UserSettings(coapsApiUri, ecFeaturesOn, pdOn, cgon, useSLASelectionMap, slaSelectionMapUri);
 		settings.userAgent = getProperty(Prop.DEFAULT_WIDGETSET_USER_AGENT);
-		settings.easiCloudsFeaturesTurnedOn=MideaasConfig.easiCloudsFeaturesTurnedOn();
-		settings.paasDeployTurnedOn=MideaasConfig.paasDeployTurnedOn();
-		settings.compileGae=MideaasConfig.compileGaeTurnedOn();
 		return settings;
+	}
+
+	private static String slaSelectionMapUri() {
+    	return MideaasConfig.getProperty(Prop.SLA_SELECTION_MAP_URI);
+	}
+
+	private static boolean useSLASelectionMap() {
+    	return "on".equals(MideaasConfig.getProperty(Prop.USE_SLA_SELECTION_MAP));
+	}
+
+	private static String coapsApiUri() {
+    	return MideaasConfig.getProperty(Prop.COAPS_API_URI);
 	}
 
 	public static File getFeedbackFile() {

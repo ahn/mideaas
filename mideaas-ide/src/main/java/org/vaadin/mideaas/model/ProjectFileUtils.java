@@ -219,9 +219,10 @@ public class ProjectFileUtils {
 		String artifactId = projPackage.substring(lastDot+1);
 		String version = "0.1-SNAPSHOT"; // ?
 		String packaging="war";
+		String warname=artifactId;
 		
 		return String.format(readResource("pom.xml.format"),
-				groupId, artifactId, version, packaging);
+				groupId, artifactId, version, packaging,warname);
 	}
 	
 	private static String generateWebXml(String projPackage,UserSettings settings) throws IOException {

@@ -7,7 +7,19 @@ package org.vaadin.mideaas.model;
  */
 public class UserSettings {
 	public String userAgent;
-	public Boolean easiCloudsFeaturesTurnedOn;
-	public boolean paasDeployTurnedOn;
-	public boolean compileGae;
+	public final Boolean easiCloudsFeaturesTurnedOn;
+	public final boolean paasDeployTurnedOn;
+	public final boolean compileGae;
+	public final String coapsApiUri;
+	public final boolean useSlaSelectionMap;
+	public final String slaSelectionMapUri;
+	
+	public UserSettings(String apiUri, boolean easiCloudsFeaturesTurnedOn, boolean paasDeployTurnedOn, boolean compileGae, boolean useSlaSelectionMap, String slaSelectionMapUri){
+		this.easiCloudsFeaturesTurnedOn = easiCloudsFeaturesTurnedOn; 
+		this.paasDeployTurnedOn = paasDeployTurnedOn;
+		this.compileGae = compileGae;
+		this.coapsApiUri = apiUri;
+		this.useSlaSelectionMap = useSlaSelectionMap;
+		this.slaSelectionMapUri = slaSelectionMapUri;
+	}
 }

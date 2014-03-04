@@ -124,7 +124,7 @@ public class MideaasEditor extends CustomComponent implements Listener {
 		sideBar.addComponent(buildComponent);
 		//adds delpoy component to view
 		if (settings.paasDeployTurnedOn){
-			sideBar.addComponent(new DeployComponent(project, settings));
+			sideBar.addComponent(new DeployComponent(project, settings,user));
 		}
 		
 		sideBar.addComponent(new JettyComponent(project, user));
@@ -140,7 +140,7 @@ public class MideaasEditor extends CustomComponent implements Listener {
 		setActiveFile((ProjectFile) project.getProjectItem("App.java"));
 
 		//adds new menuitem (that does not do anything)
-		if (settings.easiCloudsFeaturesTurnedOn){
+		/*if (settings.easiCloudsFeaturesTurnedOn){
 			MenuItem root = this.menu.addItem("Deploy to...",null);
 			MenuItem item = root.addItem("Jetty", null);
 			item.setCheckable(true);
@@ -148,7 +148,7 @@ public class MideaasEditor extends CustomComponent implements Listener {
 			item = root.addItem("Gae", null);
 			item.setCheckable(true);
 			item.setChecked(false);
-		}
+		}*/
 		
 	}
 

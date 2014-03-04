@@ -19,6 +19,7 @@ import javax.tools.DiagnosticCollector;
 import javax.tools.JavaCompiler;
 import javax.tools.JavaCompiler.CompilationTask;
 import javax.tools.JavaFileObject;
+import javax.tools.StandardJavaFileManager;
 import javax.tools.ToolProvider;
 
 
@@ -116,7 +117,8 @@ public class InMemoryCompiler {
 		// to update a class in the same classloader.
 		xcl = new SpecialClassLoader(ucl, xcl);
 
-		SpecialJavaFileManager specu = new SpecialJavaFileManager(compiler.getStandardFileManager(collector, null, null), xcl);
+		StandardJavaFileManager standard = compiler.getStandardFileManager(collector, null, null);
+		SpecialJavaFileManager specu = new SpecialJavaFileManager(standard, xcl);
 //		SpecialJavaFileManager specu = new SpecialJavaFileManager(compiler.getStandardFileManager(collector, null, null), ucl);
 		
 		CompilationTask task = compiler.getTask(null, specu, collector,

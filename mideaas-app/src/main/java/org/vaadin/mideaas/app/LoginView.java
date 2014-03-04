@@ -45,7 +45,7 @@ public class LoginView extends VerticalLayout implements View {
     
     @Override
 	public void enter(ViewChangeEvent event) {
-		// collects possible openID Token ?openId=EC-D-DD-000815%7Cunity from url
+    	// collects possible openID Token ?openId=EC-D-DD-000815%7Cunity from url
 		if (MideaasConfig.easiCloudsFeaturesTurnedOn()) {
 			URI location = getUI().getPage().getLocation();
 			String value = location.getQuery();
