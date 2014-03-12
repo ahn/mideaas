@@ -22,7 +22,12 @@ import com.vaadin.annotations.PreserveOnRefresh;
 import com.vaadin.annotations.Push;
 import com.vaadin.annotations.Theme;
 import com.vaadin.navigator.Navigator;
+import com.vaadin.server.CustomizedSystemMessages;
+import com.vaadin.server.SystemMessages;
+import com.vaadin.server.SystemMessagesInfo;
+import com.vaadin.server.SystemMessagesProvider;
 import com.vaadin.server.VaadinRequest;
+import com.vaadin.server.VaadinService;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.UI;
 
@@ -106,6 +111,24 @@ public class MideaasUI extends UI {
 		navigator.addProvider(new EditorViewProvider(this, settings));
 		
 		navigator.setErrorView(new LobbyView(this));
+		
+		// cutomizing System messages
+		VaadinService.getCurrent().setSystemMessagesProvider( new SystemMessagesProvider() {
+		    
+			@Override
+			public SystemMessages getSystemMessages(
+					SystemMessagesInfo systemMessagesInfo) {
+				// TODO Auto-generated method stub
+				CustomizedSystemMessages messages = new CustomizedSystemMessages();
+				
+				//messages.setSessionExpiredCaption("farshad");
+				//messages.setSessionExpiredMessage("ahmadi");
+				messages.setSessionExpiredNotificationEnabled(false);
+				messages.setSessionExpiredURL("/mideaas");
+		    	
+		    	return messages;
+			}
+		});
 	}
 
 	@Override
@@ -220,7 +243,9 @@ public class MideaasUI extends UI {
 			addUser(user);
 		}
 		else {
-			navigateTo("");
+			//navigateTo("");
+			getSession().close();
+			
 		}
 	}
 

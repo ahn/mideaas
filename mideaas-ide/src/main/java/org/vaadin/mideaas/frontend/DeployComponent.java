@@ -8,11 +8,13 @@ import org.vaadin.mideaas.model.SharedProject;
 import org.vaadin.mideaas.model.User;
 import org.vaadin.mideaas.model.UserSettings;
 
+import com.vaadin.server.ExternalResource;
 import com.vaadin.server.RequestHandler;
 import com.vaadin.server.ThemeResource;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.server.VaadinResponse;
 import com.vaadin.server.VaadinSession;
+import com.vaadin.ui.BrowserFrame;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.CustomComponent;
@@ -29,6 +31,9 @@ import fi.jasoft.qrcode.QRCode;
 
 @SuppressWarnings("serial")
 public class DeployComponent extends CustomComponent implements DeployListener{
+	
+	private String ipOfPlaceOfDeploy = null; 
+	final private Window mapSubWindow = new Window();
 	
 	private final Deployer deployer;
 	private final SharedProject project;
@@ -133,30 +138,48 @@ public class DeployComponent extends CustomComponent implements DeployListener{
 		slabutton.addClickListener(new Button.ClickListener() {				
 			@Override
 			public void buttonClick(ClickEvent event) {
-				VaadinSession.getCurrent().addRequestHandler(
-						new RequestHandler() {
-						    @Override
-						    public boolean handleRequest(VaadinSession session,
-						                                 VaadinRequest request,
-						                                 VaadinResponse response)
-						            throws IOException {
-								VaadinSession.getCurrent().removeRequestHandler(this);
-								final UI ui = getUI();
-								final String url = request.getPathInfo();
-								// TODO Auto-generated method stub
-								ui.access(new Runnable(){
-									@Override
-									public void run() {
-										setMessage("ok, uri was: " + url);
-									}
-								}
-								);
-					            return true;
-						    }
+				ipOfPlaceOfDeploy = null;
+				showResponseDataButton.setEnabled(false);
+				//String params = "/cloud?callbalckurl=130.230.142.89:8080/mideaas";
+				String params = "/cloud?callbackUri=130.230.142.89:8080/mideaas";
+				
+				
+				// opening map application in a sub-window added to current UI  
+				mapSubWindow.setModal(true);
+				mapSubWindow.setHeight("60%");
+				mapSubWindow.setWidth("60%");
+				mapSubWindow.center();
+				VerticalLayout mapSubWindowLayout = new VerticalLayout();
+				mapSubWindow.setContent(mapSubWindowLayout);
+				mapSubWindowLayout.setSizeFull();
+				BrowserFrame mapBrowserFrame = new BrowserFrame("",new ExternalResource(settings.slaSelectionMapUri + params));
+				mapSubWindowLayout.addComponent(mapBrowserFrame);
+				mapBrowserFrame.setSizeFull();
+				UI.getCurrent().addWindow(mapSubWindow);
+				
+				
+				// opening map application in a new window
+				//getUI().getPage().open(settings.slaSelectionMapUri+params, "newWindow");
+				
+				VaadinSession.getCurrent().addRequestHandler(new RequestHandler() {
+					
+					@Override
+					public boolean handleRequest(
+							VaadinSession session,
+							VaadinRequest request,
+							VaadinResponse response) throws IOException {
+						// TODO Auto-generated method stub
+						//VaadinSession.getCurrent().removeRequestHandler(this);
+						
+						ipOfPlaceOfDeploy = request.getParameter("selectedApi");
+						if(ipOfPlaceOfDeploy != null) {
+							showResponseDataButton.setEnabled(true);
+							mapSubWindow.close();
 						}
-				);
-				String params = "/addParametersAndVallbackURLHere";
-				getUI().getPage().open(settings.slaSelectionMapUri+params, "newWindow");
+						
+						return false;
+					}
+				});
 			}
 		});
 		layout.addComponent(slabutton);
@@ -167,12 +190,13 @@ public class DeployComponent extends CustomComponent implements DeployListener{
 		this.showResponseDataButton.addClickListener(new Button.ClickListener() {				
 			@Override
 			public void buttonClick(ClickEvent event) {
-				String message = getMessage();
-				Notification.show(message);
+				//String message = getMessage();
+				Notification.show(ipOfPlaceOfDeploy);
 			}
 		});
 	}
 
+	/*
 	private String getMessage() {
 		// TODO Auto-generated method stub
 		return this.responseMessage;
@@ -186,6 +210,7 @@ public class DeployComponent extends CustomComponent implements DeployListener{
 			showResponseDataButton.setEnabled(true);
 		}
 	}	
+	*/
 	
 	@Override
 	public void attach() {
