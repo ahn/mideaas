@@ -1,6 +1,7 @@
 package org.vaadin.mideaas.test;
 
 import java.io.Serializable;
+
 import com.vaadin.ui.CheckBox;
 
 

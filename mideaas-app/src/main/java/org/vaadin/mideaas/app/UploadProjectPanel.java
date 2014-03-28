@@ -4,7 +4,10 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.LinkedList;
+import java.util.Set;
 
 import org.vaadin.mideaas.frontend.Icons;
 import org.vaadin.mideaas.model.SharedProject;
@@ -19,6 +22,15 @@ import com.vaadin.ui.Upload.SucceededEvent;
 public class UploadProjectPanel extends Panel implements Upload.Receiver,
 		Upload.SucceededListener, Upload.FailedListener {
 
+	// http://stackoverflow.com/questions/856013/mime-type-for-zip-file-in-google-chrome
+	private final static Set<String> ZIP_MIMETYPES = new HashSet<String>(
+			Arrays.asList(new String[] {
+					"application/zip",
+					"application/x-zip",
+					"application/octet-stream",
+					"application/x-zip-compressed"
+			}));
+	
 	public interface ProjectUploadListener {
 		public void projectUploaded(SharedProject p);
 	}
@@ -64,7 +76,7 @@ public class UploadProjectPanel extends Panel implements Upload.Receiver,
 
 	public void uploadSucceeded(SucceededEvent event) {
 		// Is this the right way to test if it's a zip file??
-		if ("application/x-zip-compressed".equals(event.getMIMEType())) {
+		if (ZIP_MIMETYPES.contains(event.getMIMEType())) {
 			ui.uploadProject(file);
 		} else {
 			Notification.show("Not a zip file. The mimetype is " +event.getMIMEType());

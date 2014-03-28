@@ -11,7 +11,7 @@
 //
 //import javax.xml.parsers.ParserConfigurationException;
 //
-//import org.vaadin.aceeditor.java.util.InMemoryCompiler;
+//import org.vaadin.mideaas.java.util.InMemoryCompiler;
 //import org.vaadin.chatbox.SharedChat;
 //import org.vaadin.mideaas.frontend.MavenTask;
 //import org.vaadin.mideaas.frontend.PomXml.Dependency;

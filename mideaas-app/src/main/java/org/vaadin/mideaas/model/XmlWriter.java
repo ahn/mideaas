@@ -1,6 +1,8 @@
 package org.vaadin.mideaas.model;
 
-import java.io.*;
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
 
 import org.vaadin.mideaas.app.MideaasConfig;
 import org.vaadin.mideaas.test.Script;

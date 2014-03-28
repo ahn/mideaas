@@ -1,5 +1,7 @@
 package org.vaadin.mideaas.model;
 
+import java.util.Set;
+
 // TODO: Auto-generated Javadoc
 /**
  * The listener interface for receiving lobbyBroadcast events.
@@ -14,16 +16,7 @@ package org.vaadin.mideaas.model;
  * https://vaadin.com/wiki/-/wiki/Main/Broadcasting%20messages%20to%20other%20users
  */
 public interface LobbyBroadcastListener {
-	
-	/**
-	 * Detach.
-	 */
-	public void detach();
-	
-	/**
-	 * Receive lobby broadcast.
-	 *
-	 * @param message the message
-	 */
-	public void receiveLobbyBroadcast(final String message);	 
+	public void projectsChanged();
+
+	public void loggedInUsersChanged(Set<User> users);	 
 }

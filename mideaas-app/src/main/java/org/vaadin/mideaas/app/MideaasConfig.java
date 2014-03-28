@@ -6,9 +6,28 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
+import org.apache.commons.io.FileUtils;
 import org.vaadin.mideaas.model.UserSettings;
 
 public class MideaasConfig {
+	
+	@SuppressWarnings("serial")
+	public static class ConfigError extends RuntimeException {
+		public ConfigError(File config, String message) {
+			super(msg(message,config));
+		}
+		public ConfigError(File config, String message, Throwable cause) {
+			super(msg(message,config), cause);
+		}
+		private static String msg(String message, File config) {
+			if (config==null) {
+				return message + "\n... when reading default config file at mideaas-app/src/main/resources/"+MIDEAAS_CONFIG_FILE_IN_CLASSPATH;
+			}
+			else {
+				return message + "\n... when reading config file "+config;
+			}
+		}
+	}
     
 	//get using: MideaasConfig.getProperty(Prop.JETTY_STOP_PORT_MAX)
     public enum Prop {
@@ -24,11 +43,27 @@ public class MideaasConfig {
         JETTY_PORT_MAX,
         JETTY_STOP_PORT_MIN,
         JETTY_STOP_PORT_MAX,
-        EASICLOUDS_FEATURES,
+        
+        EASICLOUDS_FEATURES, 
+        PAAS_DEPLOY, 
+        GAE_COMPILE,
+        COAPS_API_URI, 
+        USE_SLA_SELECTION_MAP, 
+        SLA_SELECTION_MAP_URI,
+        
         EXPERIMENT,
         LOG_DIR,
         DEFAULT_WIDGETSET_USER_AGENT,
-        FEEDBACK_FILE
+        FEEDBACK_FILE,
+
+        GITHUB_KEY,
+        GITHUB_SECRET,
+        
+        FACEBOOK_KEY,
+        FACEBOOK_SECRET,
+        
+        TWITTER_KEY,
+        TWITTER_SECRET
     }
 
     public static final String MIDEAAS_CONFIG_FILE_IN_CLASSPATH = "mideaas.properties";
@@ -54,6 +89,7 @@ public class MideaasConfig {
                     readConfigFrom(f);
                 } catch (IOException e) {
                     System.err.println("WARNING: error reading config from '" + f +"'. Reading default config.");
+                    readDefaultConfig();
                 }
             }
             else {
@@ -73,14 +109,17 @@ public class MideaasConfig {
 	}
 
     private static void readConfigFrom(File f) throws IOException {
-        FileInputStream fis = null;
-        try {
-            fis = new FileInputStream(f);
-            properties.load(fis);
+        readConfigFrom(new FileInputStream(f));
+        checkProperties(f);
+    }
+    
+    private static void readConfigFrom(InputStream inputStream) throws IOException {
+    	try {
+            properties.load(inputStream);
         }
         finally {
-            if (fis!=null) {
-                fis.close();
+            if (inputStream!=null) {
+            	inputStream.close();
             }
         }
     }
@@ -90,19 +129,30 @@ public class MideaasConfig {
                 .getResourceAsStream(MIDEAAS_CONFIG_FILE_IN_CLASSPATH);
     
         if (inputStream == null) {
-            System.err.println("WARNING: could not load properties file: " + MIDEAAS_CONFIG_FILE_IN_CLASSPATH);
+        	throw new ConfigError(new File(MIDEAAS_CONFIG_FILE_IN_CLASSPATH), "Could not load properties file.");
         }
         else {
             try {
-                properties.load(inputStream);
+                readConfigFrom(inputStream);
+                checkProperties(null);
             } catch (IOException e) {
-                System.err.println("WARNING: error loading properties file: " + e.getMessage());
+            	throw new ConfigError(new File(MIDEAAS_CONFIG_FILE_IN_CLASSPATH), "Could not read", e);
             }
         }
     }
 
     public static boolean easiCloudsFeaturesTurnedOn(){
     	return "on".equals(MideaasConfig.getProperty(Prop.EASICLOUDS_FEATURES));
+    }
+
+    public static boolean compileGaeTurnedOn(){
+    	return "on".equals(MideaasConfig.getProperty(Prop.GAE_COMPILE));
+    }
+
+    public static boolean paasDeployTurnedOn(){
+    	String value = MideaasConfig.getProperty(Prop.PAAS_DEPLOY);
+    	boolean boolValue = "on".equals(value);
+    	return boolValue;
     }
     
     public static boolean isExperiment() {
@@ -115,9 +165,28 @@ public class MideaasConfig {
 	}
 
 	public static UserSettings getDefaultUserSettings() {
-		UserSettings settings = new UserSettings();
+		boolean ecFeaturesOn=MideaasConfig.easiCloudsFeaturesTurnedOn();
+		boolean pdOn=MideaasConfig.paasDeployTurnedOn();
+		boolean cgon=MideaasConfig.compileGaeTurnedOn();
+		String coapsApiUri = MideaasConfig.coapsApiUri();
+		boolean useSLASelectionMap = MideaasConfig.useSLASelectionMap();
+		String slaSelectionMapUri = MideaasConfig.slaSelectionMapUri();
+		
+		UserSettings settings = new UserSettings(coapsApiUri, ecFeaturesOn, pdOn, cgon, useSLASelectionMap, slaSelectionMapUri);
 		settings.userAgent = getProperty(Prop.DEFAULT_WIDGETSET_USER_AGENT);
 		return settings;
+	}
+
+	private static String slaSelectionMapUri() {
+    	return MideaasConfig.getProperty(Prop.SLA_SELECTION_MAP_URI);
+	}
+
+	private static boolean useSLASelectionMap() {
+    	return "on".equals(MideaasConfig.getProperty(Prop.USE_SLA_SELECTION_MAP));
+	}
+
+	private static String coapsApiUri() {
+    	return MideaasConfig.getProperty(Prop.COAPS_API_URI);
 	}
 
 	public static File getFeedbackFile() {
@@ -125,9 +194,8 @@ public class MideaasConfig {
 		return d==null ? null : new File(d);
 	}
 	
-	public static String getProjectsDir() {
-		String dir = MideaasConfig.getProperty(Prop.PROJECTS_DIR);
-		return dir;
+	public static File getProjectsDir() {
+		return new File(MideaasConfig.getProperty(Prop.PROJECTS_DIR));
 	}
 	
 	public static String getFNTSServers() {
@@ -139,5 +207,30 @@ public class MideaasConfig {
 		int executors = Integer.valueOf(MideaasConfig.getProperty(Prop.EXECUTORS));
 		return executors;
 	}
+	
+	public static File getMavenHome() {
+		return new File(getProperty(Prop.MAVEN_HOME));
+	}
+	
+	public static void checkProperties(File f) {
+		
+		if (!getProjectsDir().isDirectory()) {
+			throw new ConfigError(f, Prop.PROJECTS_DIR + " does not exist: " + getProjectsDir());
+		}
+		
+		File logDir = getLogDir();
+		if (logDir!=null && !logDir.isDirectory()) {
+			throw new ConfigError(f, Prop.LOG_DIR + " does not exist: " + logDir);
+		}
+		
+		File mvn = FileUtils.getFile(getMavenHome(), "bin", "mvn");
+		if (!mvn.isFile()) {
+			throw new ConfigError(f, "Not a proper "+Prop.MAVEN_HOME+": "+getMavenHome()+" - "+mvn+" does not exist.");
+		}
+		
+		// TODO: more checks
+	}
+
+	
 
 }

@@ -9,6 +9,7 @@ import org.vaadin.mideaas.frontend.MenuBarUtil;
 import org.vaadin.mideaas.frontend.MideaasEditorPlugin;
 import org.vaadin.mideaas.model.SharedProject;
 import org.vaadin.mideaas.model.User;
+import org.vaadin.mideaas.model.UserSettings;
 import org.vaadin.mideaas.model.ZipUtils;
 
 import com.vaadin.server.FileDownloader;
@@ -23,10 +24,13 @@ import com.vaadin.ui.Window;
 public class ZipPlugin implements MideaasEditorPlugin {
 
 	private final SharedProject project;
+	private final UserSettings settings;
+
 //	private final User user;
 	
-	public ZipPlugin(SharedProject project, User user) {
+	public ZipPlugin(SharedProject project, User user, UserSettings settings) {
 		this.project = project;
+		this.settings=settings;
 //		this.user = user;
 	}
 	
@@ -62,7 +66,7 @@ public class ZipPlugin implements MideaasEditorPlugin {
 		try {
 			File zipFile = File.createTempFile("mideaas-"+project.getName(), ".zip");
 			
-			zipProjectToFile(zipFile);
+			zipProjectToFile(zipFile, settings);
 			FileResource zip = new FileResource(zipFile);
 			FileDownloader fd = new FileDownloader(zip);
 			Button downloadButton = new Button("Download project");
@@ -82,7 +86,7 @@ public class ZipPlugin implements MideaasEditorPlugin {
 	}
 	
 	
-	public void zipProjectToFile(File destZipFile) throws IOException {
+	public void zipProjectToFile(File destZipFile, UserSettings settings) throws IOException {
 		File tmp = Files.createTempDirectory("zip").toFile();
 		File dir = new File(tmp, project.getName());
 		File gitDir = new File(project.getProjectDir(), ".git");
@@ -90,7 +94,7 @@ public class ZipPlugin implements MideaasEditorPlugin {
 			FileUtils.copyDirectory(gitDir, new File(dir, ".git"));
 		}
 		synchronized(project) { // XXX???
-			project.writeToDiskIncludingInitial(dir);
+			project.writeToDiskIncludingInitial(dir,settings);
 			ZipUtils.zipDir(dir, destZipFile);
 		}
 		FileUtils.deleteDirectory(tmp);

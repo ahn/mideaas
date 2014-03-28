@@ -94,10 +94,10 @@ public class CreateProjectPanel extends Panel {
 		
 		projectTypeGroup.select("Vaadin");
 		
-		if (MideaasConfig.easiCloudsFeaturesTurnedOn()){
+/*		if (MideaasConfig.easiCloudsFeaturesTurnedOn()){
 			la.addComponent(projectTypeGroup);
 			la.addComponent(skBox);
-		}
+		}*/
 		
 		initNewProjectButton(tf, skBox);
 		cnpButton.setWidth("100%");
@@ -134,7 +134,9 @@ public class CreateProjectPanel extends Panel {
 //				type = ProjectType.generic;
 //			}
 
-			ui.newProject(name,skBox.getValue());
+		//ui.newProject(name,skBox.getValue());
+		ui.newProject(name,true);
+
 		} else {
 			Notification.show("Not a valid project name.");
 		}
