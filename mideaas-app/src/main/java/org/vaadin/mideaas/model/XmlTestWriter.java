@@ -73,7 +73,8 @@ public class XmlTestWriter{
 				test.appendChild(location);
 				
 				Element checked = doc.createElement("checked");
-				checked.appendChild(doc.createTextNode(String.valueOf(p.getCheck().getValue())));
+				//checked.appendChild(doc.createTextNode(String.valueOf(p.getCheck().getValue())));
+				checked.appendChild(doc.createTextNode(String.valueOf(p.getCheck())));
 				test.appendChild(checked);
 				
 				Element notes = doc.createElement("notes");
@@ -97,6 +98,10 @@ public class XmlTestWriter{
 					engine.appendChild(doc.createTextNode(eng));
 					server.appendChild(engine);
 				}
+				
+				Element details = doc.createElement("details");
+				details.appendChild(doc.createTextNode(s.getDetails().trim()));
+				server.appendChild(details);
 				
 				servers.appendChild(server);
 			}
@@ -146,9 +151,11 @@ public class XmlTestWriter{
   	      		boolean servers = false;
   	      		boolean server = false;
   	      		boolean serverengines = false;
+  	      		boolean serverdetails = false;
   	      		Script scr;
   	      		Server serv;
   	      		String notes = "";
+  	      		String details = "";
 
   	      		public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
   	      			if (qName.equalsIgnoreCase("project")) {
@@ -179,7 +186,9 @@ public class XmlTestWriter{
 	      				server = true;
 	      			} else if (qName.equalsIgnoreCase("engines")) {
 	      				serverengines = true;
-	      			}
+  	      			} else if (qName.equalsIgnoreCase("details")) {
+  	      				serverdetails = true;
+  	      			}
   	      		}
 
   	      		public void endElement(String uri, String localName, String qName) throws SAXException {
@@ -207,11 +216,14 @@ public class XmlTestWriter{
   	      			} else if (qName.equalsIgnoreCase("servers")) {
   	      				servers = false;
   	      			} else if (qName.equalsIgnoreCase("server")) {
+  	      				serv.setDetails(details);
   	      				ServerContainer.addServerObjectToContainer(serv);
   	      				server = false;
   	      			} else if (qName.equalsIgnoreCase("engines")) {
   	      				serverengines = false;
-  	      			}
+  	      			} else if (qName.equalsIgnoreCase("details")) {
+	      				serverdetails = false;
+	      			}
   	      		}
 
   	      		public void characters(char ch[], int start, int length) throws SAXException {
@@ -235,6 +247,8 @@ public class XmlTestWriter{
 	      					trimmedEngines.add(engine.trim());
 	      				}
 	      				serv.setEngines(trimmedEngines);
+	      			} else if (serverdetails) {
+	      				details = details + new String(ch, start, length).trim() + "\n";
 	      			}
   	      		}
   	      	};

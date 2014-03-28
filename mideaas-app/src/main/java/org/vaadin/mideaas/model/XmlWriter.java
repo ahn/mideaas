@@ -54,7 +54,8 @@ public class XmlWriter {
         	this.endElement("result");
         	
         	this.startElement("check", "", "");
-        	this.characters(String.valueOf(script.getCheck().getValue()));
+        	//this.characters(String.valueOf(script.getCheck().getValue()));
+        	this.characters(String.valueOf(script.getCheck()));
         	this.endElement("check");
         	
         	this.startElement("notes", "", "");
@@ -83,6 +84,10 @@ public class XmlWriter {
         	}
         	this.characters(engines);
         	this.endElement("engines");
+        	
+        	this.startElement("details", "", "");
+        	this.characters(server.getDetails());
+        	this.endElement("details");
         	
         	this.endElement("server");
         }

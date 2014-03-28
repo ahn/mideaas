@@ -16,8 +16,11 @@ import java.util.concurrent.Executors;
 import org.apache.xmlrpc.client.XmlRpcClient;
 import org.apache.xmlrpc.client.XmlRpcClientConfigImpl;
 import org.vaadin.mideaas.app.MideaasConfig;
-import org.vaadin.mideaas.test.Script;
+
+import org.vaadin.mideaas.app.MideaasTest;
 import org.vaadin.mideaas.test.ScriptContainer;
+
+import org.vaadin.mideaas.test.Script;
 
 import com.vaadin.ui.Notification;
 
@@ -38,7 +41,7 @@ public class XmlRpcContact {
             return (String)result.get("ping");
         }
         catch ( Exception ex ) {
-        	ex.printStackTrace();
+        	//ex.printStackTrace();
         	return "Connection failed";
         }
 	}
@@ -61,7 +64,7 @@ public class XmlRpcContact {
 		return result;
 	}
 	
-	public static void executeParallelTests(String server, Map<String, String> map, int NTHREADS) {
+	public static void executeParallelTests(String server, Map<String, String> map, int NTHREADS, final MideaasTest mideaasTest) {
 		/*
 		 * the executor runs all the tests in separate threads, making better use of FNTS
 		 * this way the page doesn't have to hang until the tests have been executed, they will be reported the instant
@@ -103,16 +106,17 @@ public class XmlRpcContact {
 		
 		ExecutorService executor = Executors.newFixedThreadPool(NTHREADS);
 		ScriptContainer.SetRunnableTests(list);
+		mideaasTest.updateTable();
 		int i = 1;
 		for (HashMap<String, String> block : blocks) {
 
 			System.out.println("index is " + i);
-			//String script = getScriptFromFile(test);
+			//String script = getScriptFromFile(test); TODO
 			String script = " ";
 			
 			map.put("testingEngine", block.get("engine"));
 			
-			Runnable worker = new XmlRpcRunnable(server, block.get("scriptNames"), script, map, i);
+			Runnable worker = new XmlRpcRunnable(server, block.get("scriptNames"), script, map, i, mideaasTest);
 		    executor.execute(worker);
 			i++;
 			
@@ -132,7 +136,7 @@ public class XmlRpcContact {
 	    executor.shutdown();
 	}
 	
-	public static synchronized Object getServerDetails(String server) {
+	public static synchronized Object getServerDetails(String server, String checkDetail) {
 		Object result = null;
 		Map<String, String> map = new HashMap<String, String>();
 		map.put("key", "value");
@@ -141,11 +145,21 @@ public class XmlRpcContact {
 			config.setServerURL(new URL(server));
 			XmlRpcClient client = new XmlRpcClient();
 			client.setConfig(config);
-        	
-            result = client.execute("getServerDetails", new Object[] {map});
-        }
-        catch ( Exception ex ) {
-        	ex.printStackTrace();
+			if (checkDetail.matches("engines")) {
+        	    System.out.println("checking engines");
+                result = client.execute("getServerEngines", new Object[] {map});
+			} else if (checkDetail.matches("details")) {
+				System.out.println("checking server details");
+                result = client.execute("getServerDetails", new Object[] {map});
+			} else {
+				System.out.println("This shouldn't have happened...");
+				Map<String, String> resmap = new HashMap<String, String>();
+				resmap.put("error", "something went wrong");
+				result = resmap;
+			}
+        } catch ( Exception ex ) {
+        	//ex.printStackTrace();
+        	System.out.println((String)result);
         	Map<String, String> resmap = new HashMap<String, String>();
         	resmap.put("error", "Something went wrong: " + ex.toString());
         	result = resmap;
@@ -153,6 +167,7 @@ public class XmlRpcContact {
 		System.out.println(result.toString());
 		return result; 
 	}
+	
 	
 	public static String getScriptFromFile(String scriptName) {
 		System.out.println(scriptName);

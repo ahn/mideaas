@@ -41,14 +41,15 @@ public class MideaasTestEditor extends CustomComponent {
     final com.vaadin.ui.ComboBox cmbEngine = new com.vaadin.ui.ComboBox("Preferred engine");
     
     String savemode;
+    Set<?> selection;
 	
-	public Window createEditor(String save) {
+	public Window createEditor(String save, Set<?> newSelection) {
     	
 		savemode = save;
+		selection = newSelection;
 		
 		// Create the window
         editwindow = new Window("Edit script");
-        // let's give it a size (optional)
         editwindow.setWidth("640px");
         editwindow.setHeight("530px");
 		
@@ -106,6 +107,7 @@ public class MideaasTestEditor extends CustomComponent {
             					testData.add(textName.getValue());
             					testData.add(textLocation.getValue());
             					testData.add(textDescription.getValue());
+            					testData.add(cmbEngine.getValue());
             					testData.add(false);
             		
             					//write test into a file
@@ -119,7 +121,8 @@ public class MideaasTestEditor extends CustomComponent {
             						e.printStackTrace();
             					}
             		
-            					MideaasTest.updateItemInTable(testData);
+            					//MideaasTest.updateItemInTable(testData);
+            					ScriptContainer.addTestToContainer(testData);
             					UI.getCurrent().removeWindow(editwindow);
             				} else {
                     			Notification.show("Whoops", "Description is required", Notification.Type.ERROR_MESSAGE);
@@ -135,8 +138,8 @@ public class MideaasTestEditor extends CustomComponent {
             			if (textLocation.getValue() != "") {
             				if (textDescription.getValue() != "") {
             					//edit the selected item 
-            					Set<?> value = MideaasTest.getTableSelection();
-            					Script item = (Script) value.iterator().next();
+            					//Set<?> value = MideaasTest.getTableSelection();
+            					Script item = (Script) selection.iterator().next();
             					item.setName(textName.getValue());
             					item.setDescription(textDescription.getValue());
             					item.setLocation(textLocation.getValue());
@@ -154,9 +157,9 @@ public class MideaasTestEditor extends CustomComponent {
             					}
             		
             					//remove the old item and add a new one
-            					MideaasTest.removeItemFromTable(item);
+            					//MideaasTest.removeItemFromTable(item);
             					ScriptContainer.addTestObjectToContainer(item);
-            					MideaasTest.updateTable();
+            					//MideaasTest.updateTable();
             					
             					UI.getCurrent().removeWindow(editwindow);
             				} else {
@@ -186,16 +189,17 @@ public class MideaasTestEditor extends CustomComponent {
         return editwindow;
 	}
 	
-	public Window editTest(String save) {
+	public Window editTest(String save, Set<?> newSelection) {
     		// Open the subwindow by adding it to the parent
 			// window
     		if (editwindow.getParent() == null) {
     			try {
     				savemode = save;
     				
-    				Set<?> value = MideaasTest.getTableSelection();
+    				//Set<?> value = MideaasTest.getTableSelection();
+    				selection = newSelection;
     			
-    				Script item = (Script) value.iterator().next();
+    				Script item = ScriptContainer.getScriptFromContainer((String)selection.iterator().next());
     				textName.setValue(item.getName());
     				textLocation.setValue(item.getLocation());
     				textDescription.setValue(item.getDescription());
