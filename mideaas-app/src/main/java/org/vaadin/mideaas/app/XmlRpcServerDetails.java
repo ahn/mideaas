@@ -14,6 +14,7 @@ import org.vaadin.mideaas.model.XmlRpcContact;
 
 import com.vaadin.data.Property;
 import com.vaadin.data.Property.ValueChangeEvent;
+import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.HorizontalLayout;
@@ -27,7 +28,8 @@ public class XmlRpcServerDetails extends Window {
 	
 	final com.vaadin.ui.ComboBox cmbServers = new com.vaadin.ui.ComboBox("Servers");
     final com.vaadin.ui.TextField newServer = new com.vaadin.ui.TextField("New FNTS server");
-	final com.vaadin.ui.TextArea listEngines = new com.vaadin.ui.TextArea("Engines");
+	final com.vaadin.ui.TextArea listEngines = new com.vaadin.ui.TextArea();
+	final com.vaadin.ui.TextArea listDetails = new com.vaadin.ui.TextArea();
 	
 	protected Window newWindow(){
 		Window settings = new Window("FNTS Server details");
@@ -35,10 +37,31 @@ public class XmlRpcServerDetails extends Window {
 		settings.setWidth("640px");
         settings.setHeight("480px");
         
+        Panel labelPanel = new Panel();
+        HorizontalLayout labelPanelLayout = new HorizontalLayout();
+        Label label = new Label("This label should contain instructions of how to use the tool,</br>" +
+        		"but instead it contains a boring placeholder!</br></br>" + 
+        		"just checking how this works.");
+        label.setContentMode(ContentMode.HTML);
+        Label gap = new Label("&nbsp;");
+        gap.setContentMode(ContentMode.HTML);
+        gap.setWidth("15px");
+        labelPanelLayout.addComponent(gap);
+        labelPanelLayout.addComponent(label);
+        labelPanel.setContent(labelPanelLayout);
+        
         VerticalLayout main = new VerticalLayout();
         HorizontalLayout top = new HorizontalLayout();
         
         Panel topPanel = new Panel();
+        Panel enginePanel = new Panel("Available engines");
+        enginePanel.setContent(listEngines);
+        
+        Label space = new Label("");
+        space.setWidth("15px");
+        
+        Panel detailPanel = new Panel("Server details");
+        detailPanel.setContent(listDetails);
         
         try {
         	for (Server server : ServerContainer.getServerContainer().getItemIds()) {
@@ -54,6 +77,11 @@ public class XmlRpcServerDetails extends Window {
         		listEngines.setValue(listEngines.getValue() + engine.trim() + "\n");
         	}
         	listEngines.setReadOnly(true);
+        	
+        	listDetails.setReadOnly(false);
+            listDetails.setValue(ServerContainer.getServer(first).getDetails());
+            listDetails.setReadOnly(true);
+            
         } catch (NullPointerException e) {
         	//no servers to connect to, leaving the options empty
         }
@@ -74,14 +102,17 @@ public class XmlRpcServerDetails extends Window {
             			try {
             				cmbServers.addItem(newServer.getValue());
             				cmbServers.setValue(newServer.getValue());
-            				Map<String, String> result = (HashMap<String, String>)XmlRpcContact.getServerDetails(newServer.getValue());
-            				ServerContainer.addServer(newServer.getValue(), Arrays.asList(result.get("engines").split(" ")));
+            				Map<String, String> result = (HashMap<String, String>)XmlRpcContact.getServerDetails(newServer.getValue(), "details");
+            				ServerContainer.addServer(newServer.getValue(), Arrays.asList(result.get("engines").split(" ")), result.get("details"));
             				listEngines.setReadOnly(false);
         					listEngines.setValue("");
         					for (String engine : ServerContainer.getServerEngines((String)cmbServers.getValue())){
         						listEngines.setValue(listEngines.getValue() + engine.trim() + "\n");
         					}
         					listEngines.setReadOnly(true);
+        					listDetails.setReadOnly(false);
+        					listDetails.setValue(ServerContainer.getServer((String)cmbServers.getValue()).getDetails());
+        					listDetails.setReadOnly(true);
             				newServer.setValue("");
             				Notification.show("Server saved!", Notification.Type.HUMANIZED_MESSAGE);
             			}
@@ -95,6 +126,8 @@ public class XmlRpcServerDetails extends Window {
             					ServerContainer.removeServer(newServer.getValue());
             				}
             				newServer.setValue("");
+            				listEngines.setReadOnly(true);
+            				listDetails.setReadOnly(true);
             			}
             		} else {
             			Notification.show("Whoops", "Could not reach the server, check the URL", Notification.Type.ERROR_MESSAGE);
@@ -114,15 +147,41 @@ public class XmlRpcServerDetails extends Window {
             	}
             }});
         
+        final com.vaadin.ui.Button btnRefresh = new com.vaadin.ui.Button("Refresh info", new Button.ClickListener() {
+            // inline click-listener
+            public void buttonClick(ClickEvent event) { 
+            	try {
+    				Map<String, String> result = (HashMap<String, String>)XmlRpcContact.getServerDetails((String)cmbServers.getValue(), "details");
+    				ServerContainer.updateServerdata((String)cmbServers.getValue(), Arrays.asList(result.get("engines").split(" ")), result.get("details"));
+    				listEngines.setReadOnly(false);
+					listEngines.setValue("");
+					for (String engine : ServerContainer.getServerEngines((String)cmbServers.getValue())){
+						listEngines.setValue(listEngines.getValue() + engine.trim() + "\n");
+					}
+					listEngines.setReadOnly(true);
+					listDetails.setReadOnly(false);
+					listDetails.setValue(ServerContainer.getServer((String)cmbServers.getValue()).getDetails());
+					listDetails.setReadOnly(true);
+            	} catch (Exception e) {
+            		Notification.show("Whoops", "Something went wrong while refreshing server data", Notification.Type.ERROR_MESSAGE);
+        			e.printStackTrace();
+            	}
+            }});
+        
         Panel serverDetails = new Panel();
-        VerticalLayout mainServerDetails = new VerticalLayout();
+        //HorizontalLayout mainServerDetails = new HorizontalLayout();
         HorizontalLayout detailSection = new HorizontalLayout();
+        //mainServerDetails.setMargin(true);
         detailSection.setMargin(true);
         
         
         listEngines.setRows(10);
-        listEngines.setColumns(25);
+        listEngines.setColumns(24);
         listEngines.setReadOnly(true);
+        
+        listDetails.setReadOnly(true);
+        listDetails.setRows(10);
+        listDetails.setColumns(24);
         
         cmbServers.addListener(new Property.ValueChangeListener() {
 			
@@ -136,29 +195,41 @@ public class XmlRpcServerDetails extends Window {
 					}
 					listEngines.commit();
 					listEngines.setReadOnly(true);
+					listDetails.setReadOnly(false);
+					listDetails.setValue(ServerContainer.getServer((String)cmbServers.getValue()).getDetails());
+					listDetails.setReadOnly(true);
 				} catch (NullPointerException e) {
 					listEngines.setReadOnly(true);
 				}
 			}
 		});
         
-        detailSection.addComponent(listEngines);
+        detailSection.addComponent(enginePanel);
+        detailSection.addComponent(space);
+        detailSection.addComponent(detailPanel);
         
+        Label topgap = new Label("&nbsp;");
+        topgap.setContentMode(ContentMode.HTML);
+        topgap.setWidth("15px");
+        top.addComponent(topgap);
         top.addComponent(cmbServers);
         top.addComponent(newServer);
         top.addComponent(btnAdd);
+        //top.setMargin(true);
         //top.addComponent(btnRemove);	//might not be a good idea to remove servers...
         topPanel.setContent(top);
 		
-		Label label = new Label("Server Details");
+		//Label detailLabel = new Label("Server Details");
 		
-		mainServerDetails.addComponent(label);
-		mainServerDetails.addComponent(detailSection);
-		serverDetails.setContent(mainServerDetails);
+		//mainServerDetails.addComponent(detailLabel);
+		//mainServerDetails.addComponent(detailSection);
+		serverDetails.setContent(detailSection);
 		
+		main.addComponent(labelPanel);
 		main.addComponent(topPanel);
 		main.addComponent(serverDetails);
-		main.setMargin(true);
+		main.addComponent(btnRefresh);
+		//main.setMargin(true);
 		
 		settings.setContent(main);
 		settings.center();

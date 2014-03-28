@@ -11,13 +11,17 @@ import org.vaadin.mideaas.model.Server;
 import org.vaadin.mideaas.model.ServerContainer;
 import org.vaadin.mideaas.model.XmlRpcContact;
 import org.vaadin.mideaas.test.Script;
+import org.vaadin.mideaas.test.ScriptContainer;
+import org.vaadin.mideaas.app.MideaasTest;
 
 import com.vaadin.data.Property;
 import com.vaadin.data.Property.ValueChangeEvent;
+import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Panel;
+import com.vaadin.ui.Label;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
@@ -29,24 +33,39 @@ public class TestRunConfirmation extends Window {
 	
 	final Window confirmTests = new Window("Confirm runnable tests");
 	
-    final com.vaadin.ui.TextArea listTests = new com.vaadin.ui.TextArea("Selected tests");
+    final com.vaadin.ui.TextArea listTests = new com.vaadin.ui.TextArea();
 	final com.vaadin.ui.TextField textCaseName = new com.vaadin.ui.TextField("Test run name");
     //final com.vaadin.ui.ComboBox cmbEngine = new com.vaadin.ui.ComboBox("Testing engine");
 	final com.vaadin.ui.TextField textTolerance = new com.vaadin.ui.TextField("Tolerance");
     final com.vaadin.ui.TextField textRuntimes = new com.vaadin.ui.TextField("Run # of times");
     final com.vaadin.ui.ComboBox cmbServer = new com.vaadin.ui.ComboBox("XMLRPC Server");
 	
-	protected Window newWindow(HashSet<Object> rows){
+	protected Window newWindow(HashSet<Object> rows, final MideaasTest mideaasTest){
 		markedRows.addAll(rows);
 		
 		//the test confirmation window
         confirmTests.setWidth("640px");
-        confirmTests.setHeight("480px");
+        confirmTests.setHeight("390px");
+        
+        Panel labelPanel = new Panel();
+        HorizontalLayout labelPanelLayout = new HorizontalLayout();
+        Label label = new Label("This window contains the test run specific options and all the tests selected from the table. ");
+        label.setContentMode(ContentMode.HTML);
+        Label gap = new Label("&nbsp;");
+        gap.setContentMode(ContentMode.HTML);
+        gap.setWidth("15px");
+        labelPanelLayout.addComponent(gap);
+        labelPanelLayout.addComponent(label);
+        labelPanel.setContent(labelPanelLayout);
+        
+        Panel p = new Panel("Selected tests");
+        p.setContent(listTests);
         
         //fields that contain the info needed for running the tests
         listTests.setRows(10);
         listTests.setColumns(25);
         listTests.setReadOnly(false);
+        listTests.setEnabled(true);
         
         
         try {
@@ -113,7 +132,7 @@ public class TestRunConfirmation extends Window {
 					//adding test script names
 					String tests = "";
 					for (Iterator i = markedRows.iterator(); i.hasNext();) {
-						Script item = (Script) i.next();
+						Script item = ScriptContainer.getScriptFromContainer((String)i.next());
 						if (tests == "") {
 							tests = item.getName();
 						} else {
@@ -129,11 +148,13 @@ public class TestRunConfirmation extends Window {
 					//map.put("gitRepository", "ironclad.labranet.jamk.fi:robot_testing_scripts");
 					//map.put("tag", "");
 					
-					XmlRpcContact.executeParallelTests((String)cmbServer.getValue(), map, MideaasConfig.getExecutorNumber());
+					XmlRpcContact.executeParallelTests((String)cmbServer.getValue(), map, MideaasConfig.getExecutorNumber(), mideaasTest);
 					UI.getCurrent().removeWindow(confirmTests);
 				}
 			}
 		});
+        btnAccept.setDescription("Run selected tests using the selected XMLRPC Server");
+        
         Button btnCancel = new Button("Cancel", new Button.ClickListener() {
 			public void buttonClick(ClickEvent event) {
 				// go back to main window
@@ -149,11 +170,20 @@ public class TestRunConfirmation extends Window {
         textAreaLayout.addComponent(textRuntimes);
         textAreaLayout.addComponent(cmbServer);
         
+        //descriptions
+        textCaseName.setDescription("Test run name is used for sorting the tests and in reports by some engines");
+        textTolerance.setDescription("Tolerance tells how many percent of the tests must pass in order to the test run to pass");
+        textRuntimes.setDescription("How many times all tests need to be run");
+        cmbServer.setDescription("The server where the tests will be run");
+        listTests.setDescription("List of tests selected for this test run");
+        
         HorizontalLayout optionLayout = new HorizontalLayout();
-        optionLayout.addComponent(listTests);
+        optionLayout.addComponent(p);
         optionLayout.addComponent(textAreaLayout);
         optionLayout.setMargin(true);
         optionLayout.setSpacing(true);
+        Panel optionPanel = new Panel();
+        optionPanel.setContent(optionLayout);
         Panel confButtonPanel = new Panel();
         HorizontalLayout confButtonLayout = new HorizontalLayout();
         confButtonLayout.addComponent(btnAccept);
@@ -162,7 +192,8 @@ public class TestRunConfirmation extends Window {
         confButtonLayout.setMargin(true);
         confButtonLayout.setSpacing(true);
         VerticalLayout confWindowLayout = new VerticalLayout();
-        confWindowLayout.addComponent(optionLayout);
+        confWindowLayout.addComponent(labelPanel);
+        confWindowLayout.addComponent(optionPanel);
         confWindowLayout.addComponent(confButtonPanel);
         confirmTests.setContent(confWindowLayout);
         
@@ -216,7 +247,7 @@ public class TestRunConfirmation extends Window {
 	}
 	
 	public synchronized String[] getServerDetails(String server) {
-    	Map<String, String> result = (HashMap<String, String>)XmlRpcContact.getServerDetails(server);
+    	Map<String, String> result = (HashMap<String, String>)XmlRpcContact.getServerDetails(server, "engines");
     	System.out.println(result.toString());
     	String[] engines = null; 
     	if (result.containsKey("engines")) {

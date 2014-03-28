@@ -18,7 +18,7 @@ public class ServerContainer extends BeanItemContainer<Server> implements
         super(Server.class);
     }
     
-    public static void addServer(String ip, List<String> engines) {
+    public static void addServer(String ip, List<String> engines, String details) {
     	if (sc == null) {
     		try {
     			sc = new ServerContainer();
@@ -31,7 +31,8 @@ public class ServerContainer extends BeanItemContainer<Server> implements
     	Server p = new Server();
     	p.setIP(ip);
     	p.setEngines(engines);
-    	System.out.println(ip + " and " + engines.toString());
+    	p.setDetails(details);
+    	//System.out.println(ip + " and " + engines.toString());
     	sc.addItem(p);
     	
     	XmlTestWriter.WriteTestsToXml();
@@ -100,5 +101,15 @@ public class ServerContainer extends BeanItemContainer<Server> implements
     		engines = null;
     	}
     	return engines;
+    }
+    
+    public static synchronized void updateServerdata(String serverIP, List<String> engines, String details) {
+    	for (Server p : sc.getAllItemIds()) {
+    		if (p.getIP().matches(serverIP)) {
+    			p.setEngines(engines);
+    			p.setDetails(details);
+    		}
+    	}
+    	XmlTestWriter.WriteTestsToXml();
     }
 }

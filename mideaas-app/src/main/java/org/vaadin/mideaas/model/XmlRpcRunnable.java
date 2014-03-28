@@ -15,14 +15,16 @@ public class XmlRpcRunnable implements Runnable {
 	private final String script;
 	private final Map<String, String> map;
 	private final int i; 
+	private final MideaasTest mideaasTest;
 	
-	XmlRpcRunnable(String server, String testName, String script, Map<String, String> map, int i) {
+	XmlRpcRunnable(String server, String testName, String script, Map<String, String> map, int i, MideaasTest mideaasTest) {
 		this.server = server;
 		this.testName = testName;
 		this.script = script;
 		this.map = map;
 		this.i = i;
 		System.out.println(this.map.toString());
+		this.mideaasTest = mideaasTest;
 	}
 	
 	@Override
@@ -45,7 +47,7 @@ public class XmlRpcRunnable implements Runnable {
 				ScriptContainer.updateResult((HashMap<String, String>) result, test);
 			}
 			
-			MideaasTest.updateTable();
+			mideaasTest.updateTable();	//testing
 		}
 		catch ( Exception ex ) {
 			ex.printStackTrace();

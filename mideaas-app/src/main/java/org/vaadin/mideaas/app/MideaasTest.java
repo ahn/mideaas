@@ -46,7 +46,7 @@ public class MideaasTest extends CustomComponent {
     //Window confirmTests;
 
     // XXX should not be static?
-    static public Table table = new Table();
+    public Table table = new Table();
     
     final MideaasTestEditor testeditor = new MideaasTestEditor();
 
@@ -90,19 +90,20 @@ public class MideaasTest extends CustomComponent {
         table.setColumnReorderingAllowed(true);
         table.setColumnCollapsingAllowed(true);
 
-        table.addContainerProperty("check", com.vaadin.ui.CheckBox.class, null);
+        //table.addContainerProperty("check", com.vaadin.ui.CheckBox.class, null);
+        table.addContainerProperty("check", java.lang.Boolean.class, null);
         table.addContainerProperty("name", String.class, null);
         table.addContainerProperty("description", String.class, null);
-        table.addContainerProperty("notes", String.class, null);
-        table.addContainerProperty("location", String.class, null);
+        //table.addContainerProperty("notes", String.class, null);
+        //table.addContainerProperty("location", String.class, null);
         table.addContainerProperty("result", String.class, null);
         
         table.setColumnWidth("check", 45);
         table.setColumnAlignment("check, ", Align.CENTER);
-        table.setColumnWidth("notes", 0);
-        table.setColumnWidth("location", 0);
-        table.setColumnCollapsed("notes", true);
-        table.setColumnCollapsed("location", true);
+        //table.setColumnWidth("notes", 0);
+        //table.setColumnWidth("location", 0);
+        //table.setColumnCollapsed("notes", true);
+        //table.setColumnCollapsed("location", true);
         
         table.setVisibleColumns(new Object[] { "check", "name", "description", "result" });
         
@@ -112,18 +113,28 @@ public class MideaasTest extends CustomComponent {
         table.setColumnHeader("description", "Description");
         table.setColumnHeader("result", "Result");
         
+        table.setDescription("Available tests</br></br>" +
+        		"Left click to select a test</br>" +
+        		"Hold ctrl and left click to select multiple tests</br>" +
+        		"Right click to bring up the action menu");
+        
         //load and set data if possible
         String loadResult = XmlTestWriter.SAXloadTestsFromXml();
         if (loadResult.matches("ok")) {
-        	table.setContainerDataSource(ScriptContainer.getContainer());
+        	//table.setContainerDataSource(ScriptContainer.getContainer());
         	for (Script p : ScriptContainer.getContainer().getItemIds()) {
-        		System.out.println(p.getNotes());
-        		if (p.getCheck().getValue() == true) {
-        			markedRows.add(p);
+        		table.addItem(new Object[] {p.getCheck(), p.getName(), p.getDescription(), p.getResult()}, p.getName());
+        		//System.out.println(p.getNotes());
+        		//if (p.getCheck().getValue() == true) {
+        		if (p.getCheck() == true){
+        			markedRows.add(p.getName());
         		}
         	}
         } else {
-        	table.setContainerDataSource(ScriptContainer.createWithTestData());
+        	//table.setContainerDataSource(ScriptContainer.createWithTestData());
+        	for (Script p : ScriptContainer.createWithTestData().getItemIds()) {
+        		table.addItem(new Object[] {p.getCheck(), p.getName(), p.getDescription(), p.getResult()}, p.getName());
+        	}
         	
         	// getting servers from the config file
             List<String> servers = Arrays.asList(MideaasConfig.getFNTSServers().split("\\s*,\\s*"));
@@ -131,8 +142,8 @@ public class MideaasTest extends CustomComponent {
             String errServers = "";
             for (String server : servers) {
             	try {
-            		Map<String, String> result = (HashMap<String, String>)xmlrpc.getServerDetails(server);
-            		ServerContainer.addServer(server, Arrays.asList(result.get("engines").split(" ")));
+            		Map<String, String> result = (HashMap<String, String>)xmlrpc.getServerDetails(server, "details");
+            		ServerContainer.addServer(server, Arrays.asList(result.get("engines").split(" ")), result.get("details"));
             	} catch (Exception e) {
             		if (errServers == "") {
             			errServers = server;
@@ -146,12 +157,12 @@ public class MideaasTest extends CustomComponent {
             }
         }
         
-        testeditor.createEditor("add");
+        testeditor.createEditor("add", (Set<?>) table.getValue());
         
         // Actions (a.k.a context menu)
         table.addActionHandler(new Action.Handler() {
             public Action[] getActions(Object target, Object sender) {
-                if (markedRows.contains(target)) {
+                if (markedRows.contains((String)target)) {
                     return ACTIONS_MARKED;
                 } else {
                     return ACTIONS_UNMARKED;
@@ -162,40 +173,39 @@ public class MideaasTest extends CustomComponent {
                 if (ACTION_MARK == action) {
                 	Set<?> value = (Set<?>) table.getValue();
                 	for (Object object : value) {
-                		if (!markedRows.contains(object)) {
-                			markedRows.add(object);
-                			Script item = (Script)object;
+                		if (!markedRows.contains((String)object)) {
+                			markedRows.add((String)object);
+                			Script item = (Script)ScriptContainer.getScriptFromContainer((String)object);
                 			item.setCheck(true);
                 		}
                 	}
-                    //markedRows.add(target);
-                    //System.out.println(markedRows);
-                    /*for (Iterator i = value.iterator(); i.hasNext();) {
-                    	Script item = (Script)i.next();
-                    	item.setCheck(true);
-                    }*/
-                    table.markAsDirty();
+                    markedRows.add((String)target);
+                    System.out.println(markedRows);
+                    ScriptContainer.updateScriptCheckValue(markedRows);
+                    Set<?> selection = (Set<?>) table.getValue();
+                    updateTable();
+                    table.setValue(selection);
+                    
                     
                 } else if (ACTION_UNMARK == action) {
                     Set<?> value = (Set<?>) table.getValue();
                     for (Object object : value) {
-                		if (markedRows.contains(object)) {
-                			markedRows.remove(object);
-                			Script item = (Script)object;
+                		if (markedRows.contains((String)object)) {
+                			markedRows.remove((String)object);
+                			Script item = (Script)ScriptContainer.getScriptFromContainer((String)object);
                 			item.setCheck(false);
                 		}
                 	}
-                    //markedRows.remove(target);
+                    markedRows.remove((String)target);
                     System.out.println(markedRows);
-                    /*for (Iterator i = value.iterator(); i.hasNext();) {
-                    	Script item = (Script)i.next();
-                    	item.setCheck(false);
-                    }*/
-                    table.markAsDirty();
+                    ScriptContainer.updateScriptCheckValue(markedRows);
+                    Set<?> selection = (Set<?>) table.getValue();
+                    updateTable();
+                    table.setValue(selection);
+                    
                     
                 } else if (ACTION_EDIT == action) {
                 	// should open the window for editing
-                	// where is it saved?
                 	savemode = "edit";
                 	Set<?> value = (Set<?>) table.getValue();
                 	if (null == value || value.size() == 0) {
@@ -203,7 +213,7 @@ public class MideaasTest extends CustomComponent {
                 	} else if (value.size() > 1) {
                 		selected.setValue("Please select only one test");
                 	} else {
-                		editwindow = testeditor.editTest(savemode);
+                		editwindow = testeditor.editTest(savemode, (Set<?>) table.getValue());
                 		UI.getCurrent().addWindow(editwindow);
                 		// Center the window
                 		editwindow.center();
@@ -215,12 +225,13 @@ public class MideaasTest extends CustomComponent {
                 	} else {
                 		//should remove the selected item from the table
                 		for (Iterator i = value.iterator(); i.hasNext(); ) {
-                			table.removeItem(i.next());
+                			String strValue = (String)i.next();
+                			removeItemFromTable(strValue);
+                			table.removeItem(strValue);
                 		}
                 	}
                 }
             }
-
         });        
         
         
@@ -238,7 +249,7 @@ public class MideaasTest extends CustomComponent {
                 } else {
                     selected.setValue("Selected: " + table.getValue());
                     if (value.size() == 1) {
-                    	Script item = (Script) value.iterator().next();
+                    	Script item = (Script) ScriptContainer.getScriptFromContainer((String)value.iterator().next());
                     	testNotes.setReadOnly(false);
                 		testNotes.setValue(item.getNotes());
                 		testNotes.setReadOnly(true);
@@ -252,13 +263,13 @@ public class MideaasTest extends CustomComponent {
         });        
         
         final TestRunConfirmation conf = new TestRunConfirmation();
-        final Window confirmTests = conf.newWindow(markedRows);
+        final Window confirmTests = conf.newWindow(markedRows, this);
         final Window settings = new XmlRpcServerDetails().newWindow();
         
         //buttons to the main window
         Panel buttonPanel = new Panel();
         HorizontalLayout buttonLayout = new HorizontalLayout();
-        Button center = new Button("New Script",
+        Button newScript = new Button("New Script",
                 new Button.ClickListener() {
                     // inline click-listener
                     public void buttonClick(ClickEvent event) {
@@ -266,60 +277,79 @@ public class MideaasTest extends CustomComponent {
                     	UI.getCurrent().addWindow(editwindow);
                     	// Center the window
                         editwindow.center();
+                        
+                        //updateTable();
                     }
                 });
-        buttonLayout.addComponent(center);
-        buttonLayout.addComponent(new Button("Run Marked Scripts",
+        newScript.setDescription("Add a new test to the list");
+        buttonLayout.addComponent(newScript);
+        
+        Button runScripts = new Button("Run Marked Scripts",
         	new Button.ClickListener() {
             	// inline click-listener
             	public void buttonClick(ClickEvent event) {
             		conf.updateData(markedRows);
             		UI.getCurrent().addWindow(confirmTests);
             	}
-        }));
-        buttonLayout.addComponent(new Button("FNTS Server details",
+        });
+        runScripts.setDescription("Change settings and run marked tests");
+        buttonLayout.addComponent(runScripts);
+        
+        Button serverDetails = new Button("FNTS Server details",
             	new Button.ClickListener() {
                 	// inline click-listener
                 	public void buttonClick(ClickEvent event) {
                 		UI.getCurrent().addWindow(settings);
                 	}
-            }));
+            });
+        serverDetails.setDescription("Add and inspect XMLRPC servers");
+        buttonLayout.addComponent(serverDetails);
+        
         buttonLayout.setMargin(true);
         buttonPanel.setContent(buttonLayout);
         mainLayout.addComponent(buttonPanel);
 
-        mainLayout.addComponent(selected);
-        mainLayout.addComponent(testNotes);
+        Panel labelPanel = new Panel();
+        Panel notePanel = new Panel();
+        labelPanel.setContent(selected);
+        mainLayout.addComponent(labelPanel);
+        notePanel.setContent(testNotes);
+        mainLayout.addComponent(notePanel);
         mainPanel.setContent(mainLayout);
         setCompositionRoot(mainPanel);
         
         
     }
     
-    public static synchronized void updateTable() {
-    	table.setContainerDataSource(ScriptContainer.getContainer());
-    	table.markAsDirty();
+    public synchronized void updateTable() {
+    	//table.setContainerDataSource(ScriptContainer.getContainer());
+    	//table.markAsDirty();
+    	table.removeAllItems();
+    	for (Script p : ScriptContainer.getContainer().getItemIds()) {
+    		table.addItem(new Object[] {p.getCheck(), p.getName(), p.getDescription(), p.getResult()}, p.getName());
+    	}
     }
     
     public synchronized String[] getServerDetails(String server) {
     	XmlRpcContact xmlrpc = new XmlRpcContact();
-    	Map<String, String> result = (HashMap<String, String>)xmlrpc.getServerDetails(server);
+    	Map<String, String> result = (HashMap<String, String>)xmlrpc.getServerDetails(server, "engines");
     	System.out.println(result.toString());
     	String[] engines = result.get("engines").split(" ");
     	return engines;
     }
     
-    public static synchronized void updateItemInTable(List testData) {
-    	table.setContainerDataSource(ScriptContainer.addTestToContainer(testData));
+    public synchronized void updateItemInTable(List testData) {
+    	//table.setContainerDataSource(ScriptContainer.addTestToContainer(testData));
+    	ScriptContainer.addTestToContainer(testData).getItemIds();
+    	table.addItem(new Object[] {false, (String)testData.get(0), (String)testData.get(2), "NOT RUN"}, (String)testData.get(0));
+    	
     }
     
-    public static synchronized void removeItemFromTable(Object item) {
-    	table.removeItem(table.getValue());
-		table.addItem(item);
-		table.markAsDirty();
+    public synchronized void removeItemFromTable(String testname) {
+		ScriptContainer.removeScriptFromContainer(testname);
     }
     
-    public static synchronized Set<?> getTableSelection() {
+    public synchronized Set<?> getTableSelection() {
     	return (Set<?>) table.getValue();
     }
 }

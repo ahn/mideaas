@@ -2,6 +2,7 @@ package org.vaadin.mideaas.test;
 
 import java.io.Serializable;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
 
@@ -107,7 +108,7 @@ public class ScriptContainer extends BeanItemContainer<Script> implements
     				}
     			}
     		}
-    		MideaasTest.updateTable();
+    		//MideaasTest.updateTable();
     	} catch (Exception e) {
     		e.printStackTrace();
     	}
@@ -145,6 +146,27 @@ public class ScriptContainer extends BeanItemContainer<Script> implements
     		}
     	}
     	return item;
+    }
+    
+    public static synchronized void removeScriptFromContainer(String testName) {
+    	for (Script item : c.getAllItemIds()) {
+    		if (item.getName().matches(testName)) {
+    			c.removeItem(item);
+    			break;
+    		}
+    	}
+    	XmlTestWriter.WriteTestsToXml();
+    }
+    
+    public static synchronized void updateScriptCheckValue(HashSet<Object> markedRows) {
+    	for (Script item : c.getAllItemIds()) {
+    		if (markedRows.contains(item.getName())) {
+    			item.setCheck(true);
+    		} else {
+    			item.setCheck(false);
+    		}
+    	}
+    	XmlTestWriter.WriteTestsToXml();
     }
 }
 
