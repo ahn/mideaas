@@ -14,7 +14,7 @@ public class XmlWriter {
 
     public synchronized void startWriting() {
         try {
-        	out = new BufferedWriter(new FileWriter(MideaasConfig.getProjectsDir() + "test/" + "TestDataStorage.xml")); //TODO: replace project name
+        	out = new BufferedWriter(new FileWriter(MideaasConfig.getProjectsDir() + "/test/" + "TestDataStorage.xml")); //TODO: replace project name
 
         	this.childLoop(ScriptContainer.getContainer(), ServerContainer.getServerContainer());
 

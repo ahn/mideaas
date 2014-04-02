@@ -43,7 +43,7 @@ public class MideaasTestEditor extends CustomComponent {
     String savemode;
     Set<?> selection;
 	
-	public Window createEditor(String save, Set<?> newSelection) {
+	public Window createEditor(String save, Set<?> newSelection, final MideaasTest mideaastest) {
     	
 		savemode = save;
 		selection = newSelection;
@@ -112,7 +112,7 @@ public class MideaasTestEditor extends CustomComponent {
             		
             					//write test into a file
             					try {
-            						File path = new File(MideaasConfig.getProjectsDir() + "test/" + textLocation.getValue() + textName.getValue() + ".txt"); //TODO: project name needs to be dynamic
+            						File path = new File(MideaasConfig.getProjectsDir() + "/test/" + textLocation.getValue() + textName.getValue() + ".txt"); //TODO: project name needs to be dynamic
             						BufferedWriter out = new BufferedWriter(new FileWriter(path));
             						out.write(editor.getValue());
             						out.close();
@@ -122,7 +122,8 @@ public class MideaasTestEditor extends CustomComponent {
             					}
             		
             					//MideaasTest.updateItemInTable(testData);
-            					ScriptContainer.addTestToContainer(testData);
+            					//ScriptContainer.addTestToContainer(testData);
+            					mideaastest.updateItemInTable(testData);
             					UI.getCurrent().removeWindow(editwindow);
             				} else {
                     			Notification.show("Whoops", "Description is required", Notification.Type.ERROR_MESSAGE);
@@ -139,7 +140,7 @@ public class MideaasTestEditor extends CustomComponent {
             				if (textDescription.getValue() != "") {
             					//edit the selected item 
             					//Set<?> value = MideaasTest.getTableSelection();
-            					Script item = (Script) selection.iterator().next();
+            					Script item = ScriptContainer.getScriptFromContainer((String)selection.iterator().next());
             					item.setName(textName.getValue());
             					item.setDescription(textDescription.getValue());
             					item.setLocation(textLocation.getValue());
@@ -147,7 +148,7 @@ public class MideaasTestEditor extends CustomComponent {
             		
             					//write test into a file
             					try {
-            						String path = MideaasConfig.getProjectsDir() + "test/" + textLocation.getValue() + textName.getValue() + ".txt"; //TODO: project name needs to be dynamic
+            						String path = MideaasConfig.getProjectsDir() + "/test/" + textLocation.getValue() + textName.getValue() + ".txt"; //TODO: project name needs to be dynamic
             						BufferedWriter out = new BufferedWriter(new FileWriter(path));
             						out.write(editor.getValue());
             						out.close();
@@ -159,7 +160,7 @@ public class MideaasTestEditor extends CustomComponent {
             					//remove the old item and add a new one
             					//MideaasTest.removeItemFromTable(item);
             					ScriptContainer.addTestObjectToContainer(item);
-            					//MideaasTest.updateTable();
+            					mideaastest.updateTable();
             					
             					UI.getCurrent().removeWindow(editwindow);
             				} else {
@@ -205,7 +206,7 @@ public class MideaasTestEditor extends CustomComponent {
     				textDescription.setValue(item.getDescription());
     				cmbEngine.setValue(item.getEngine());
     				
-    				String path = MideaasConfig.getProjectsDir() + "test/" + textLocation.getValue() + textName.getValue() + ".txt"; //TODO: project name needs to be dynamic
+    				String path = MideaasConfig.getProjectsDir() + "/test/" + textLocation.getValue() + textName.getValue() + ".txt"; //TODO: project name needs to be dynamic
     				BufferedReader br = new BufferedReader(new FileReader(path));
     			    try {
     			        StringBuilder sb = new StringBuilder();

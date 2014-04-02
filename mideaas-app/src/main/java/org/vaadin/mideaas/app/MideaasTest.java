@@ -122,7 +122,7 @@ public class MideaasTest extends CustomComponent {
         		}
         	}
         } else {
-        	//table.setContainerDataSource(ScriptContainer.createWithTestData());
+        	System.out.println(loadResult);
         	for (Script p : ScriptContainer.createWithTestData().getItemIds()) {
         		table.addItem(new Object[] {p.getCheck(), p.getName(), p.getDescription(), p.getResult()}, p.getName());
         	}
@@ -136,7 +136,7 @@ public class MideaasTest extends CustomComponent {
             		Map<String, String> result = (HashMap<String, String>)xmlrpc.getServerDetails(server, "details");
             		ServerContainer.addServer(server, Arrays.asList(result.get("engines").split(" ")), result.get("details"));
             	} catch (Exception e) {
-            		if (errServers == "") {
+            		if (errServers.equals("")) {
             			errServers = server;
             		} else {
             			errServers = errServers + "\n" + server;
@@ -148,7 +148,7 @@ public class MideaasTest extends CustomComponent {
             }
         }
         
-        testeditor.createEditor("add", (Set<?>) table.getValue());
+        testeditor.createEditor("add", (Set<?>) table.getValue(), this);
         
         // Actions (a.k.a context menu)
         table.addActionHandler(new Action.Handler() {

@@ -253,7 +253,7 @@ public class XmlTestWriter{
   	      		}
   	      	};
 
-  	      	File file = new File(MideaasConfig.getProjectsDir() + "test/" + "TestDataStorage.xml");	//TODO: needs changeable project name
+  	      	File file = new File(MideaasConfig.getProjectsDir() + "/test/" + "TestDataStorage.xml");	//TODO: needs changeable project name
   	      	InputStream inputStream= new FileInputStream(file);
   	      	Reader reader = new InputStreamReader(inputStream,"UTF-8");
 
@@ -265,6 +265,7 @@ public class XmlTestWriter{
   	      	return "ok";
 
 		} catch (IOException e) {
+			//e.printStackTrace();
 			return "Something went wrong while loading file!";
 		} catch (Exception e) {
   	      	e.printStackTrace();

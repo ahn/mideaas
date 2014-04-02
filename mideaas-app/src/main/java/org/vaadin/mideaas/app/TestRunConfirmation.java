@@ -14,8 +14,6 @@ import org.vaadin.mideaas.test.Script;
 import org.vaadin.mideaas.test.ScriptContainer;
 import org.vaadin.mideaas.app.MideaasTest;
 
-import com.vaadin.data.Property;
-import com.vaadin.data.Property.ValueChangeEvent;
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
