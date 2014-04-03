@@ -27,7 +27,6 @@ public class ScriptContainer extends BeanItemContainer<Script> implements
     }
 
     public static ScriptContainer createWithTestData() {
-        //ScriptContainer c = null;
         Random r = new Random(0);
         try {
             c = new ScriptContainer();
@@ -52,7 +51,6 @@ public class ScriptContainer extends BeanItemContainer<Script> implements
     }
     
     public static ScriptContainer addTestToContainer(List testData) {
-    	//ScriptContainer c = null;
     	Script p = new Script();
     	
     	p.setName((String)testData.get(0));
@@ -80,10 +78,6 @@ public class ScriptContainer extends BeanItemContainer<Script> implements
             }
     	}
     	c.addItem(script);
-    	
-    	//Script item = getScriptFromContainer(script.getName());
-    	//System.out.println("notes given: " + script.getNotes());
-    	//System.out.println("notes written in the container: " + item.getNotes());
     }
     
     public static void setScriptContainer(ScriptContainer container) {
@@ -108,7 +102,6 @@ public class ScriptContainer extends BeanItemContainer<Script> implements
     				}
     			}
     		}
-    		//MideaasTest.updateTable();
     	} catch (Exception e) {
     		e.printStackTrace();
     	}
@@ -138,10 +131,7 @@ public class ScriptContainer extends BeanItemContainer<Script> implements
     public static synchronized Script getScriptFromContainer(String scriptName) {
     	Script item = null;
     	for (Script p : (List<Script>) c.getItemIds()) {
-    		//System.out.println("found item " + p.getName() + " from container");
-    		//System.out.println("checking if item '" + p.getName() + "' is '" + scriptName + "'...");
     		if (p.getName().matches(scriptName)) {
-    			//System.out.println("found it!");
     			item = p;
     		}
     	}

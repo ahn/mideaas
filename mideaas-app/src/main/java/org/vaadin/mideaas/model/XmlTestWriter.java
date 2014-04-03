@@ -73,7 +73,6 @@ public class XmlTestWriter{
 				test.appendChild(location);
 				
 				Element checked = doc.createElement("checked");
-				//checked.appendChild(doc.createTextNode(String.valueOf(p.getCheck().getValue())));
 				checked.appendChild(doc.createTextNode(String.valueOf(p.getCheck())));
 				test.appendChild(checked);
 				
@@ -237,7 +236,6 @@ public class XmlTestWriter{
 	      				scr.setCheck(Boolean.valueOf(new String(ch, start, length).trim()));
 	      			} else if (testnotes) {
 	      				notes = notes + new String(ch, start, length).trim() + "\n";
-	      				//System.out.println("Got notes from file: " + scr.getNotes());
 	      			} else if (testengine) {
 	      				scr.setEngine(new String(ch, start, length).trim());
 	      			} else if (serverengines) {

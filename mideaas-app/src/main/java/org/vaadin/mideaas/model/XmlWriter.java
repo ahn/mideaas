@@ -54,7 +54,6 @@ public class XmlWriter {
         	this.endElement("result");
         	
         	this.startElement("check", "", "");
-        	//this.characters(String.valueOf(script.getCheck().getValue()));
         	this.characters(String.valueOf(script.getCheck()));
         	this.endElement("check");
         	

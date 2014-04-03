@@ -167,9 +167,7 @@ public class XmlRpcServerDetails extends Window {
             }});
         
         Panel serverDetails = new Panel();
-        //HorizontalLayout mainServerDetails = new HorizontalLayout();
         HorizontalLayout detailSection = new HorizontalLayout();
-        //mainServerDetails.setMargin(true);
         detailSection.setMargin(true);
         
         
@@ -213,21 +211,15 @@ public class XmlRpcServerDetails extends Window {
         top.addComponent(cmbServers);
         top.addComponent(newServer);
         top.addComponent(btnAdd);
-        //top.setMargin(true);
         //top.addComponent(btnRemove);	//might not be a good idea to remove servers...
         topPanel.setContent(top);
-		
-		//Label detailLabel = new Label("Server Details");
-		
-		//mainServerDetails.addComponent(detailLabel);
-		//mainServerDetails.addComponent(detailSection);
+        
 		serverDetails.setContent(detailSection);
 		
 		main.addComponent(labelPanel);
 		main.addComponent(topPanel);
 		main.addComponent(serverDetails);
 		main.addComponent(btnRefresh);
-		//main.setMargin(true);
 		
 		settings.setContent(main);
 		settings.center();

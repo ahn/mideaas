@@ -72,7 +72,6 @@ public class MideaasTestEditor extends CustomComponent {
         textLocation.setRequired(true);
         textDescription.setRequired(true);
         
-        //System.out.println("Servers: " + ServerContainer.getServerContainer().getItemIds());
         for (Server server : ServerContainer.getServerContainer().getItemIds()) {
         	for (String engine : server.getEngines()) {
         		if (!cmbEngine.containsId(engine)) {
@@ -121,8 +120,6 @@ public class MideaasTestEditor extends CustomComponent {
             						e.printStackTrace();
             					}
             		
-            					//MideaasTest.updateItemInTable(testData);
-            					//ScriptContainer.addTestToContainer(testData);
             					mideaastest.updateItemInTable(testData);
             					UI.getCurrent().removeWindow(editwindow);
             				} else {
@@ -139,7 +136,6 @@ public class MideaasTestEditor extends CustomComponent {
             			if (textLocation.getValue() != "") {
             				if (textDescription.getValue() != "") {
             					//edit the selected item 
-            					//Set<?> value = MideaasTest.getTableSelection();
             					Script item = ScriptContainer.getScriptFromContainer((String)selection.iterator().next());
             					item.setName(textName.getValue());
             					item.setDescription(textDescription.getValue());
@@ -158,7 +154,6 @@ public class MideaasTestEditor extends CustomComponent {
             					}
             		
             					//remove the old item and add a new one
-            					//MideaasTest.removeItemFromTable(item);
             					ScriptContainer.addTestObjectToContainer(item);
             					mideaastest.updateTable();
             					
@@ -197,7 +192,6 @@ public class MideaasTestEditor extends CustomComponent {
     			try {
     				savemode = save;
     				
-    				//Set<?> value = MideaasTest.getTableSelection();
     				selection = newSelection;
     			
     				Script item = ScriptContainer.getScriptFromContainer((String)selection.iterator().next());

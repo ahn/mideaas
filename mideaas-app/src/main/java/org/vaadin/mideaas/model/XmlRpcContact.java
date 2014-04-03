@@ -6,7 +6,6 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -41,7 +40,6 @@ public class XmlRpcContact {
             return (String)result.get("ping");
         }
         catch ( Exception ex ) {
-        	//ex.printStackTrace();
         	return "Connection failed";
         }
 	}
@@ -102,8 +100,6 @@ public class XmlRpcContact {
 			scriptList = list;
 		}*/
 		
-		//List<Thread> threads = new ArrayList<Thread>();
-		
 		ExecutorService executor = Executors.newFixedThreadPool(NTHREADS);
 		ScriptContainer.SetRunnableTests(list);
 		mideaasTest.updateTable();
@@ -121,16 +117,6 @@ public class XmlRpcContact {
 			i++;
 			
 		}
-		/*for (String test : list) {
-
-			System.out.println("index is " + i);
-			String script = getScriptFromFile(test);
-			
-			Runnable worker = new XmlRpcRunnable(server, test, script, map, i);
-		    executor.execute(worker);
-			i++;
-			
-		}*/
 		// This will make the executor to not accept new threads
 	    // and finish all existing threads in the queue
 	    executor.shutdown();
@@ -158,7 +144,6 @@ public class XmlRpcContact {
 				result = resmap;
 			}
         } catch ( Exception ex ) {
-        	//ex.printStackTrace();
         	System.out.println((String)result);
         	Map<String, String> resmap = new HashMap<String, String>();
         	resmap.put("error", "Something went wrong: " + ex.toString());

@@ -47,7 +47,7 @@ public class XmlRpcRunnable implements Runnable {
 				ScriptContainer.updateResult((HashMap<String, String>) result, test);
 			}
 			
-			mideaasTest.updateTable();	//testing
+			mideaasTest.updateTable();
 		}
 		catch ( Exception ex ) {
 			ex.printStackTrace();
@@ -61,7 +61,6 @@ public class XmlRpcRunnable implements Runnable {
 	
 	private Map<String, String> setupTest(Map<String, String> map, String testName) {
 		
-		//testName = testName + ".txt";
 		String name = map.get("testCaseName");
 		System.out.println("testcasename: " + name);
 		name = name + Integer.toString(i);

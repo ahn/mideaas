@@ -30,7 +30,6 @@ public class ServerContainer extends BeanItemContainer<Server> implements
     	p.setIP(ip);
     	p.setEngines(engines);
     	p.setDetails(details);
-    	//System.out.println(ip + " and " + engines.toString());
     	sc.addItem(p);
     	
     	XmlTestWriter.WriteTestsToXml();
@@ -90,7 +89,6 @@ public class ServerContainer extends BeanItemContainer<Server> implements
     	List<String> engines = new ArrayList<String>();
     	try {
     		for (Server server : sc.getItemIds()) {
-    			//System.out.println(server.getEngines());
     			if (server.getIP().matches(serverIP)) {
     				engines = server.getEngines();
     			}

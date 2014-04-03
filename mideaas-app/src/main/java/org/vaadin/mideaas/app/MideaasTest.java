@@ -34,9 +34,7 @@ import com.vaadin.ui.Window;
 public class MideaasTest extends CustomComponent {
 
     Window editwindow;
-    //Window confirmTests;
 
-    // XXX should not be static?
     public Table table = new Table();
     
     final MideaasTestEditor testeditor = new MideaasTestEditor();
@@ -52,7 +50,6 @@ public class MideaasTest extends CustomComponent {
     static final Action[] ACTIONS_MARKED = new Action[] { ACTION_UNMARK,
             ACTION_EDIT, ACTION_REMOVE };
     
-    //private final com.vaadin.ui.TextArea editor;
     private static final String initialText = "Write script here";
     
     private String savemode = "add";
@@ -81,21 +78,13 @@ public class MideaasTest extends CustomComponent {
         table.setColumnReorderingAllowed(true);
         table.setColumnCollapsingAllowed(true);
 
-        //table.addContainerProperty("check", com.vaadin.ui.CheckBox.class, null);
         table.addContainerProperty("check", java.lang.Boolean.class, null);
         table.addContainerProperty("name", String.class, null);
         table.addContainerProperty("description", String.class, null);
-        //table.addContainerProperty("notes", String.class, null);
-        //table.addContainerProperty("location", String.class, null);
         table.addContainerProperty("result", String.class, null);
         
         table.setColumnWidth("check", 45);
         table.setColumnAlignment("check, ", Align.CENTER);
-        //table.setColumnWidth("notes", 0);
-        //table.setColumnWidth("location", 0);
-        //table.setColumnCollapsed("notes", true);
-        //table.setColumnCollapsed("location", true);
-        
         table.setVisibleColumns(new Object[] { "check", "name", "description", "result" });
         
         // set column headers
@@ -112,17 +101,13 @@ public class MideaasTest extends CustomComponent {
         //load and set data if possible
         String loadResult = XmlTestWriter.SAXloadTestsFromXml();
         if (loadResult.matches("ok")) {
-        	//table.setContainerDataSource(ScriptContainer.getContainer());
         	for (Script p : ScriptContainer.getContainer().getItemIds()) {
         		table.addItem(new Object[] {p.getCheck(), p.getName(), p.getDescription(), p.getResult()}, p.getName());
-        		//System.out.println(p.getNotes());
-        		//if (p.getCheck().getValue() == true) {
         		if (p.getCheck() == true){
         			markedRows.add(p.getName());
         		}
         	}
         } else {
-        	System.out.println(loadResult);
         	for (Script p : ScriptContainer.createWithTestData().getItemIds()) {
         		table.addItem(new Object[] {p.getCheck(), p.getName(), p.getDescription(), p.getResult()}, p.getName());
         	}
@@ -313,8 +298,6 @@ public class MideaasTest extends CustomComponent {
     }
     
     public synchronized void updateTable() {
-    	//table.setContainerDataSource(ScriptContainer.getContainer());
-    	//table.markAsDirty();
     	table.removeAllItems();
     	for (Script p : ScriptContainer.getContainer().getItemIds()) {
     		table.addItem(new Object[] {p.getCheck(), p.getName(), p.getDescription(), p.getResult()}, p.getName());
@@ -330,7 +313,6 @@ public class MideaasTest extends CustomComponent {
     }
     
     public synchronized void updateItemInTable(List testData) {
-    	//table.setContainerDataSource(ScriptContainer.addTestToContainer(testData));
     	ScriptContainer.addTestToContainer(testData).getItemIds();
     	table.addItem(new Object[] {false, (String)testData.get(0), (String)testData.get(2), "NOT RUN"}, (String)testData.get(0));
     	
