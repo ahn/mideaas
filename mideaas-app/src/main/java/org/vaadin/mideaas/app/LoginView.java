@@ -14,19 +14,29 @@ import org.vaadin.mideaas.social.OAuthService.Service;
 import org.vaadin.mideaas.social.UserProfile;
 import org.vaadin.mideaas.social.UserToken;
 
+import com.vaadin.client.ui.layout.Margins;
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
+import com.vaadin.shared.Position;
+import com.vaadin.shared.ui.MarginInfo;
 import com.vaadin.shared.ui.label.ContentMode;
+import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Button.ClickListener;
+import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Notification;
+import com.vaadin.ui.Panel;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
+import com.vaadin.ui.themes.Runo;
 
 @SuppressWarnings("serial")
+//public class LoginView extends VerticalLayout implements View {
 public class LoginView extends VerticalLayout implements View {
+	
+	private Panel LoginPanel = null;
 	
     private final MideaasUI ui;
 	private final String nextView;
@@ -38,8 +48,9 @@ public class LoginView extends VerticalLayout implements View {
     public LoginView(MideaasUI ui, String nextView) {
     	this.ui = ui;
     	this.nextView = nextView;
-        setMargin(true);
-        setSpacing(true);
+    	setSizeFull();
+        //setMargin(true);
+        //setSpacing(true);
         initLogin();
     }
     
@@ -76,14 +87,41 @@ public class LoginView extends VerticalLayout implements View {
 	 * Inits the loginscreen.
 	 */
 	private void initLogin() {
+		
+		LoginPanel = new Panel("Log In");
+		LoginPanel.addStyleName("round-panel");
+		LoginPanel.setWidth("400px");
+		//LoginPanel.setHeight(Siz);
+		addComponent(LoginPanel);
+		setComponentAlignment(LoginPanel, Alignment.MIDDLE_CENTER);
+		
+		VerticalLayout panelContent = new VerticalLayout();
+		LoginPanel.setContent(panelContent);
+		panelContent.setMargin(true);
+		panelContent.setSpacing(true);
+		//panelContent.setSizeFull();
+		
+		HorizontalLayout regularLogin = new HorizontalLayout();
+		panelContent.addComponent(regularLogin);
+		panelContent.setComponentAlignment(regularLogin, Alignment.TOP_CENTER);
+		//regularLogin.setMargin(true);
+		regularLogin.setSpacing(true);
+		
+		//regularLogin.setWidth("100%");
+		//regularLogin.setHeight("600px");
+		
+		
 		loginField = new TextField("Nick:");
-		addComponent(loginField);
+		//loginField.setStyleName(Runo.TEXTFIELD_SMALL);
+		regularLogin.addComponent(loginField);
 		
 		emailField = new TextField("Email (optional):");
-		addComponent(emailField);
+		//emailField.setStyleName(Runo.TEXTFIELD_SMALL);
+		regularLogin.addComponent(emailField);
 		
 		//button that fires the login action
 		Button simpleLoginButton = new Button("Login");
+		//simpleLoginButton.setStyleName(Runo.BUTTON_DEFAULT);
 		simpleLoginButton.addClickListener(new ClickListener() {
 			public void buttonClick(ClickEvent event) {
 				String nick = (String) loginField.getValue();
@@ -92,24 +130,40 @@ public class LoginView extends VerticalLayout implements View {
 				}
 			}
 		});
-		addComponent(simpleLoginButton);
+		regularLogin.addComponent(simpleLoginButton);
+		regularLogin.setComponentAlignment(simpleLoginButton, Alignment.BOTTOM_CENTER);
 		
-		addComponent(new Label("&nbsp;", ContentMode.HTML));
+		VerticalLayout otherLogins = new VerticalLayout();
+		panelContent.addComponent(otherLogins);
+		//otherLogins.setHeight("150px");
+		//panelContent.setComponentAlignment(otherLogins, Alignment.MIDDLE_CENTER);
+		otherLogins.setMargin(new MarginInfo(true, true, false, true));
+		otherLogins.setSpacing(true);
+		//otherLogins.setSizeUndefined();
+		//panelContent.setComponentAlignment(otherLogins, Alignment.BOTTOM_LEFT);
+		//otherLogins.setWidth("100%");
+		//otherLogins.setSizeFull();
+		
+		//addComponent(new Label("&nbsp;", ContentMode.HTML));
 		
 		OAuthPopupButton fbButton = createFacebookButton();
 		if (fbButton!=null) {
-			addComponent(fbButton);
+			otherLogins.addComponent(fbButton);
+			otherLogins.setComponentAlignment(fbButton, Alignment.BOTTOM_LEFT);
 		}
 		
 		OAuthPopupButton twButton = createTwitterButton();
 		if (twButton!=null) {
-			addComponent(twButton);
+			otherLogins.addComponent(twButton);
+			otherLogins.setComponentAlignment(twButton, Alignment.BOTTOM_LEFT);
 		}
 		
 		OAuthPopupButton ghButton = createGitHubButton();
 		if (ghButton!=null) {
-			addComponent(ghButton);
+			otherLogins.addComponent(ghButton);
+			otherLogins.setComponentAlignment(ghButton, Alignment.BOTTOM_LEFT);
 		}
+		
 	}
 	
 	private OAuthPopupButton createFacebookButton() {

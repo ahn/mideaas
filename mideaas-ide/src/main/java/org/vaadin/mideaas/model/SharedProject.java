@@ -126,6 +126,10 @@ public class SharedProject {
 	}
 
 	private static String getProjectPackageFor(String projectName) {
+		
+		//System.out.println("1: " + projectRootPackage);
+		//System.out.println("2: " + projectPackageName(projectName));
+		
 		return projectRootPackage + "." + projectPackageName(projectName);
 	}
 	
@@ -911,6 +915,9 @@ public class SharedProject {
 	}
 
 	public File getTargetPathFor(User u) {
+		
+		//System.out.println( "absolute path of project directory: " + this.projectDir.getAbsolutePath());
+		
 		return new File(this.getProjectDir().getAbsolutePath(), MavenUtil.targetDirFor(u));
 	}
 

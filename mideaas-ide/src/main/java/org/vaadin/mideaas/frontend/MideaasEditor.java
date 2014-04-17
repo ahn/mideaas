@@ -110,6 +110,7 @@ public class MideaasEditor extends CustomComponent implements Listener {
 		initMenuBar();
 
 		layout.addComponent(menu);
+		menu.setWidth("100%");
 
 		split = new HorizontalSplitPanel();
 		split.setSizeFull();

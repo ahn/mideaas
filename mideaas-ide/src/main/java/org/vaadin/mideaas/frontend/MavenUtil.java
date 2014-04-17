@@ -95,6 +95,9 @@ public class MavenUtil {
 	}
 	
 	public static String targetDirFor(User u) {
+		
+		//System.out.println( "userID: " + u.getUserId());
+		
 		return "target-"+u.getUserId();
 	}
 	

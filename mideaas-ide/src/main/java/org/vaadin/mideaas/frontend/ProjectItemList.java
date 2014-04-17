@@ -15,6 +15,7 @@ import com.vaadin.data.Property.ValueChangeListener;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Button.ClickListener;
+import com.vaadin.ui.Alignment;
 import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
@@ -49,6 +50,7 @@ public class ProjectItemList extends CustomComponent implements ProjectListener,
 		super();
 		this.project = proj;
 		this.user = user;
+		
 		VerticalLayout mainLayout = new VerticalLayout();
 		Panel p = new Panel("Project Contents");
 		mainLayout.addComponent(p);
@@ -59,9 +61,11 @@ public class ProjectItemList extends CustomComponent implements ProjectListener,
 		la.addComponent(tree);
 		la.setExpandRatio(tree, 1);
 		
-		HorizontalLayout ho = new HorizontalLayout();
-		ho.setMargin(true);
-		ho.setSizeFull();
+		//HorizontalLayout ho = new HorizontalLayout();
+		VerticalLayout ve = new VerticalLayout(); 
+		ve.setMargin(true);
+		
+		ve.setSizeFull();
 		
 		Button addButton = new Button("Add New");
 		addButton.addClickListener(new ClickListener() {
@@ -71,7 +75,7 @@ public class ProjectItemList extends CustomComponent implements ProjectListener,
 			}
 		});
 		
-		Button deleteButton = new Button("Del");
+		Button deleteButton = new Button("Delete");
 		deleteButton.addClickListener(new ClickListener() {
 			@Override
 			public void buttonClick(ClickEvent event) {
@@ -79,15 +83,17 @@ public class ProjectItemList extends CustomComponent implements ProjectListener,
 			}
 		});
 		
-		ho.setSpacing(true);
-		ho.addComponent(addButton);
-		ho.addComponent(deleteButton);
-		addButton.setWidth("100%");
+		ve.setSpacing(true);
+		ve.addComponent(addButton);
+		ve.addComponent(deleteButton);
+		//addButton.setWidth("100%");
 		addButton.setIcon(Icons.PLUS);
 		deleteButton.setIcon(Icons.CROSS);
-		ho.setExpandRatio(addButton, 1);
+		ve.setComponentAlignment(addButton, Alignment.MIDDLE_CENTER);
+		ve.setComponentAlignment(deleteButton, Alignment.MIDDLE_CENTER);
+		//ho.setExpandRatio(addButton, 1);
 		
-		mainLayout.addComponent(ho);
+		mainLayout.addComponent(ve);
 		
 		setCompositionRoot(mainLayout);
 	}

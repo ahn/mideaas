@@ -8,6 +8,7 @@ import org.vaadin.mideaas.model.User;
 import org.vaadin.mideaas.model.UserSettings;
 
 import com.vaadin.server.ThemeResource;
+import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Button.ClickListener;
@@ -57,6 +58,7 @@ public class BuildComponent extends CustomComponent implements BuildListener {
 		layout.setMargin(true);
 		
 		layout.addComponent(buildButton);
+		
 		layout.addComponent(resultLayout);
 		layout.addComponent(loadingImg);
 		layout.addComponent(cancelButton);
@@ -64,6 +66,11 @@ public class BuildComponent extends CustomComponent implements BuildListener {
 		loadingImg.setVisible(false);
 		cancelButton.setVisible(false);
 		layout.setExpandRatio(buildButton, 1);
+		
+		layout.setComponentAlignment(buildButton, Alignment.MIDDLE_CENTER);
+		layout.setComponentAlignment(loadingImg, Alignment.MIDDLE_CENTER);
+		layout.setComponentAlignment(cancelButton, Alignment.MIDDLE_CENTER);
+		layout.setComponentAlignment(showLogButton, Alignment.MIDDLE_CENTER);
 
 		buildButton.addClickListener(new ClickListener() {
 
@@ -126,13 +133,17 @@ public class BuildComponent extends CustomComponent implements BuildListener {
 	private void buildFail(String s) {
 		Label lab = new Label(s);
 		lab.setIcon(Icons.CROSS_CIRCLE);
+		lab.setSizeUndefined();
 		resultLayout.addComponent(lab);
+		resultLayout.setComponentAlignment(lab, Alignment.MIDDLE_CENTER);
 	}
 
 	private void buildSuccess() {
 		Label lab = new Label("Build successful");
 		lab.setIcon(Icons.TICK_CIRCLE);
+		lab.setSizeUndefined();
 		resultLayout.addComponent(lab);
+		resultLayout.setComponentAlignment(lab, Alignment.MIDDLE_CENTER);
 	}
 
 	@Override

@@ -13,7 +13,8 @@ public class CFAppsView extends CustomComponent{
 
 	private Table table = new Table();
 	private LogView logView;
-	private final Deployer deployer;
+	//private final Deployer deployer;
+	private Deployer deployer;
 
 	public CFAppsView(Deployer deployer, LogView logView) {
 		super();
@@ -39,7 +40,8 @@ public class CFAppsView extends CustomComponent{
 	
 	public void updateView(){
 		table.removeAllItems();
-		ClientResponse response = Deployer.findApplications();
+		ClientResponse response = deployer.findApplications();
+		//ClientResponse response = deployer.findApplications();
 		String responseString = response.getEntity(new GenericType<String>(){});
         logView.newLine(responseString);
 

@@ -18,6 +18,7 @@ import org.vaadin.mideaas.model.User;
 import org.vaadin.mideaas.model.UserSettings;
 import org.vaadin.mideaas.model.ZipUtils;
 
+import com.google.gwt.editor.client.impl.Refresher;
 import com.vaadin.annotations.PreserveOnRefresh;
 import com.vaadin.annotations.Push;
 import com.vaadin.annotations.Theme;
@@ -29,12 +30,16 @@ import com.vaadin.server.SystemMessagesProvider;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.server.VaadinService;
 import com.vaadin.ui.Notification;
+import com.vaadin.ui.Notification.Type;
 import com.vaadin.ui.UI;
 
 
 @PreserveOnRefresh
 @SuppressWarnings("serial")
-@Theme("reindeer")
+//@Theme("reindeer")
+@Theme("mideaas")
+//@Theme("mideaas")
+//@Theme("runo")
 @Push
 public class MideaasUI extends UI {
 
@@ -43,8 +48,8 @@ public class MideaasUI extends UI {
 		synchronized (MideaasUI.class) {
 			loggedInUsers.add(user);
 		}
-		LobbyView.getLobbyChat().addLine(user.getName()+" logged in");
-		LobbyBroadcaster.broadcastLoggedInUsersChanged(getLoggedInUsers());
+		//LobbyView.getLobbyChat().addLine(user.getName()+" logged in");
+		LobbyBroadcaster.broadcastLoggedInUsersChanged(getLoggedInUsers(), user, true);
 	}
 	
 	static void removeUser(User user) {
@@ -52,11 +57,11 @@ public class MideaasUI extends UI {
 			loggedInUsers.remove(user);
 		}
 		SharedProject.removeFromProjects(user);
-		LobbyView.getLobbyChat().addLine(user.getName()+" left");
-		LobbyBroadcaster.broadcastLoggedInUsersChanged(getLoggedInUsers());
+		//LobbyView.getLobbyChat().addLine(user.getName()+" left");
+		LobbyBroadcaster.broadcastLoggedInUsersChanged(getLoggedInUsers(), user, false);
 	}
 	
-	synchronized static Set<User> getLoggedInUsers() {
+	synchronized static TreeSet<User> getLoggedInUsers() {
 		return new TreeSet<User>(loggedInUsers);
 	}
 	
@@ -103,15 +108,19 @@ public class MideaasUI extends UI {
 	@Override
 	protected void init(VaadinRequest request) {
 		
+		//System.out.println("init of MideeasUI is called");
+		
 		navigator = new Navigator(this, this);
 		
 		navigator.addView("", new LoginView(this, "lobby"));
+		
 		navigator.addView("lobby", new LobbyView(this));
 		
 		navigator.addProvider(new EditorViewProvider(this, settings));
 		
-		navigator.setErrorView(new LobbyView(this));
+		//navigator.setErrorView(new LobbyView(this));
 		
+		/*
 		// cutomizing System messages
 		VaadinService.getCurrent().setSystemMessagesProvider( new SystemMessagesProvider() {
 		    
@@ -123,18 +132,29 @@ public class MideaasUI extends UI {
 				
 				//messages.setSessionExpiredCaption("farshad");
 				//messages.setSessionExpiredMessage("ahmadi");
-				messages.setSessionExpiredNotificationEnabled(false);
-				messages.setSessionExpiredURL("/mideaas");
-		    	
+				//messages.setSessionExpiredNotificationEnabled(false);
+				//messages.setSessionExpiredURL("/mideaastest");
+				//messages.setSessionExpiredURL("/mideaas");
+				messages.setSessionExpiredNotificationEnabled(true);
+				
 		    	return messages;
 			}
 		});
+		*/
 	}
 
 	@Override
 	public void detach() {
-		logout();
 		super.detach();
+		logout();
+		//setPushConnection(null);
+	}
+	
+	@Override
+	public void attach() {
+		//logout();
+		super.attach();
+		//System.out.println("UI attached");
 	}
 	
 	public void logout() {
@@ -243,8 +263,8 @@ public class MideaasUI extends UI {
 			addUser(user);
 		}
 		else {
-			//navigateTo("");
-			getSession().close();
+			navigateTo("");
+			//getSession().close();
 			
 		}
 	}

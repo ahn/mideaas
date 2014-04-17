@@ -1,6 +1,7 @@
 package org.vaadin.mideaas.model;
 
 import java.util.Set;
+import java.util.TreeSet;
 
 // TODO: Auto-generated Javadoc
 /**
@@ -18,5 +19,7 @@ import java.util.Set;
 public interface LobbyBroadcastListener {
 	public void projectsChanged();
 
-	public void loggedInUsersChanged(Set<User> users);	 
+	//public void loggedInUsersChanged(Set<User> users);
+	//public void loggedInUsersChanged(TreeSet<User> users);
+	public void loggedInUsersChanged(TreeSet<User> users, User user, boolean loggedin);
 }

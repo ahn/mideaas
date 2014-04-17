@@ -34,7 +34,8 @@ public class SelectProjectPanel extends Panel implements
 	/** The table for projects. */
 	private Table table = new Table();
 	{
-		table.setWidth("100%");
+		//table.setWidth("100%");
+		table.setSizeFull();
 		table.addContainerProperty("Project name", String.class, null);
 		table.addContainerProperty("Collaborators", String.class, null);
 		table.setSelectable(true);
@@ -78,9 +79,11 @@ public class SelectProjectPanel extends Panel implements
  	* @param ui the ui
  	*/
 	public SelectProjectPanel(MideaasUI ui) {
-		super("Open Project");
+		super("Select a project to open");
+		//super();
+		setSizeFull();
 		this.ui = ui;
-		setIcon(Icons.BOX_ARROW);
+		//setIcon(Icons.BOX_ARROW);
 		
 		update();
 	}
@@ -97,7 +100,9 @@ public class SelectProjectPanel extends Panel implements
 
 		// creates layouts and layouts components
 		VerticalLayout layout = new VerticalLayout();
+		layout.setSizeFull();
 		layout.addComponent(table);
+		layout.setExpandRatio(table, 1);
 
 		HorizontalLayout hl = new HorizontalLayout();
 		hl.setWidth("100%");

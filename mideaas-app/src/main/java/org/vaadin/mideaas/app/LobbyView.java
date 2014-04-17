@@ -1,25 +1,32 @@
 package org.vaadin.mideaas.app;
 
-import java.util.Set;
+import java.util.TreeSet;
 
 import org.vaadin.chatbox.ChatBox;
 import org.vaadin.chatbox.SharedChat;
 import org.vaadin.chatbox.client.ChatUser;
 import org.vaadin.mideaas.frontend.HorizontalUserList;
+import org.vaadin.mideaas.frontend.Icons;
 import org.vaadin.mideaas.model.LobbyBroadcastListener;
 import org.vaadin.mideaas.model.LobbyBroadcaster;
 import org.vaadin.mideaas.model.User;
 
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
+import com.vaadin.server.ThemeResource;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Button.ClickListener;
-import com.vaadin.ui.HorizontalLayout;
+import com.vaadin.ui.MenuBar;
+import com.vaadin.ui.MenuBar.MenuItem;
+import com.vaadin.ui.Notification.Type;
+import com.vaadin.ui.Notification;
 import com.vaadin.ui.Panel;
+import com.vaadin.ui.TabSheet;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
-import com.vaadin.ui.themes.BaseTheme;
+import com.vaadin.ui.themes.Reindeer;
+import com.vaadin.ui.themes.Runo;
 
 @SuppressWarnings("serial")
 public class LobbyView extends VerticalLayout implements View, LobbyBroadcastListener {
@@ -37,6 +44,8 @@ public class LobbyView extends VerticalLayout implements View, LobbyBroadcastLis
 	private SelectProjectPanel selectProjectPanel;
 	
 	private HorizontalUserList userList;
+	
+	private ChatBox box = null;
 
 	public LobbyView(MideaasUI ui) {
 		this.ui = ui;
@@ -47,7 +56,11 @@ public class LobbyView extends VerticalLayout implements View, LobbyBroadcastLis
 	public void enter(ViewChangeEvent event) {
 		user = ui.getUser();
 		if (user!=null) {
+			//System.out.println("loby view entered");
 			setMargin(true);
+			//setSizeUndefined();
+			setSpacing(true);
+			setSizeFull();
 			initLobbyPanel();
 			LobbyBroadcaster.register(this);
 		}
@@ -57,16 +70,51 @@ public class LobbyView extends VerticalLayout implements View, LobbyBroadcastLis
 		}
 	}
 
+	
 	@Override
 	public void detach() {
 		super.detach();
+		//System.out.println("lobby viw detached");
+		unregisetrFromLobbyBroadcaster();
+		//LobbyBroadcaster.unregister(this);
+	}
+	
+	@Override
+	public void attach() {
+		super.attach();
+		//System.out.println("Lobby View attached");
+	}
+	 
+	
+	public void unregisetrFromLobbyBroadcaster() {
 		LobbyBroadcaster.unregister(this);
 	}
 
+	
 	private void initLobbyPanel() {
 
 		removeAllComponents();
 
+		addComponent(initLogoutButton(user));
+		
+		TabSheet tabSheet = new TabSheet();
+		tabSheet.addStyleName(Runo.TABSHEET_SMALL);
+		addComponent(tabSheet);
+		tabSheet.setSizeFull();
+		
+		tabSheet.addTab(getSelectProjectPanel(),"Open Project", Icons.BOX_ARROW);
+		
+		tabSheet.addTab(initCreateProjectPanel(), "Create New Project");
+		
+		if (MideaasConfig.easiCloudsFeaturesTurnedOn()) {
+			tabSheet.addTab(initUploadPanel(), "Upload Project", Icons.BOX_LABEL);
+		}
+		
+		tabSheet.addTab(initGitProjectPanel(), "Clone Project From Git URL");
+		
+		setExpandRatio(tabSheet, 2);
+		
+		/*
 		HorizontalLayout horizLayout = new HorizontalLayout();
 		horizLayout.setWidth("100%");
 
@@ -92,18 +140,77 @@ public class LobbyView extends VerticalLayout implements View, LobbyBroadcastLis
 			rightLayout.addComponent(initUploadPanel());
 		}
 		rightLayout.addComponent(initGitProjectPanel());
-		
+		*/
 		userList = new HorizontalUserList(MideaasUI.getLoggedInUsers());
-		
 		addComponent(userList);
 		
-		ChatBox box = new ChatBox(chat);
+		
+		Panel chatPanel = new Panel();
+		//chatPanel.setHeight("200px");
+		
+		VerticalLayout chatPanelLayout = new VerticalLayout();
+		//chatPanelLayout.setHeight("150px");
+		chatPanel.setContent(chatPanelLayout);
+		
+		MenuBar chatPanelMenubar = new MenuBar();
+		chatPanelLayout.addComponent(chatPanelMenubar);
+		chatPanelMenubar.setWidth("100%");
+		
+		MenuBar.Command hideChatBox = new MenuBar.Command() {
+			
+			@Override
+			public void menuSelected(MenuItem selectedItem) {
+				// TODO Auto-generated method stub				
+				 if ( box.isVisible()) {
+					 box.setVisible(false);
+					 selectedItem.setIcon(new ThemeResource("icons/arrow-up.png"));
+					 selectedItem.setDescription("Show Chat Box");
+				 }
+				 else {
+					 box.setVisible(true);
+					 selectedItem.setIcon(new ThemeResource("icons/arrow-down.png"));
+					 selectedItem.setDescription("Hide Chat Box");
+				 }
+				 
+			}
+		};
+		MenuItem hideChatMeuItem = chatPanelMenubar.addItem("Hide/Show", new ThemeResource("icons/arrow-down.png"), hideChatBox);
+		hideChatMeuItem.setDescription("Hide Chat Box");
+
+		MenuBar.Command hideLoggedinUsers = new MenuBar.Command() {
+			
+			@Override
+			public void menuSelected(MenuItem selectedItem) {
+				// TODO Auto-generated method stub
+				if (userList.isVisible()) {
+					userList.setVisible(false);
+					selectedItem.setDescription("Show Users");
+				}
+				else {
+					userList.setVisible(true);
+					selectedItem.setDescription("Hide Users");
+				}
+			}
+		};
+		
+		MenuItem showLogedinUsersMenuItem = chatPanelMenubar.addItem("Show/Hide Users", new ThemeResource("icons/users.png"), hideLoggedinUsers);
+		showLogedinUsersMenuItem.setDescription("Hide Users");
+		
+		box = new ChatBox(chat);
 		box.setSizeFull();
 		box.setWidth("100%");
-		box.setHeight("200px");
+		box.setHeight("150px");
 		box.setUser(new ChatUser(user.getUserId(), user.getName(), "user1"));
 		box.setShowSendButton(false);
-		addComponent(new Panel("Lobby Chat", box));
+		chatPanelLayout.addComponent(box);
+		
+		//chatPanelLayout.setExpandRatio(box, 1);
+		//Panel chatPanel = new Panel("Lobby Chat", box);
+		//chatPanel.addStyleName("f-v-panel");
+		//addComponent(new Panel("Lobby Chat", box));
+		//addComponent(chatPanel);
+		addComponent(chatPanel);
+		
 	}
 
 	private Panel initGitProjectPanel() {
@@ -130,9 +237,11 @@ public class LobbyView extends VerticalLayout implements View, LobbyBroadcastLis
 
 	private Button initLogoutButton(User user) {
 		Button button = new Button("Log Out " + user.getName());
-		button.setStyleName(BaseTheme.BUTTON_LINK);
+		//button.setStyleName(BaseTheme.BUTTON_LINK);
+		button.setStyleName(Reindeer.BUTTON_LINK);
 		button.addClickListener(new ClickListener() {
 			public void buttonClick(ClickEvent event) {
+				unregisetrFromLobbyBroadcaster();
 				ui.logout();
 			}
 		});
@@ -165,15 +274,43 @@ public class LobbyView extends VerticalLayout implements View, LobbyBroadcastLis
 		});
 	}
 
+	/*
 	@Override
 	public void loggedInUsersChanged(final Set<User> users) {
 		getUI().access(new Runnable() {
 			@Override
 			public void run() {
 				userList.setUsers(users);
+				
+				//Notification.show(users., "logged in", Type.TRAY_NOTIFICATION);
 			}
 		});
 	}
-
+	 */
 	
+	@Override
+	public void loggedInUsersChanged(final TreeSet<User> users, final User user1, final boolean loggedin) {
+		getUI().access(new Runnable() {
+			@Override
+			public void run() {
+				userList.setUsers(users);
+				
+			    Notification notif = new Notification( user1.getName(), Type.TRAY_NOTIFICATION);
+			    // Customize it
+			    notif.setDelayMsec(1000);
+			    // Show it in the page
+			    
+				if (loggedin) {
+					notif.setDescription("logged in");
+					//notif.show(ui.getPage());
+				}
+				else {
+					//if (user.getUserId() != this.)
+					
+					notif.setDescription("logged out");
+				}
+				notif.show(ui.getPage());
+			}
+		});
+	}
 }

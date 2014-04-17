@@ -72,7 +72,8 @@ public class CreateProjectPanel extends Panel {
 	 */
 	public CreateProjectPanel(MideaasUI ui) {
 		super("Create New Project");
-		this.setWidth("100%");
+		//this.setWidth("100%");
+		this.setSizeFull();
 		this.ui = ui;
 		init();
 	}

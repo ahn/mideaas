@@ -7,6 +7,11 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.vaadin.server.ServiceException;
+import com.vaadin.server.SessionDestroyEvent;
+import com.vaadin.server.SessionDestroyListener;
+import com.vaadin.server.SessionInitEvent;
+import com.vaadin.server.SessionInitListener;
 import com.vaadin.server.VaadinServlet;
 
 /*
@@ -15,11 +20,19 @@ import com.vaadin.server.VaadinServlet;
  */
 
 @SuppressWarnings("serial")
-public class MideaasServlet extends VaadinServlet {
+public class MideaasServlet extends VaadinServlet implements SessionDestroyListener, SessionInitListener {
 	
-
+	@Override
+	public void servletInitialized() throws ServletException {
+		super.servletInitialized();
+		//System.out.println("servlet initialized");
+		getService().addSessionInitListener(this);
+		getService().addSessionDestroyListener(this);
+	}
+	
 	public MideaasServlet() {
 		super();
+		//System.out.println("Servlet Constructor");
 		
 		// Ugly...
 		// Needed for SharedView to call putModelXml when xml changes
@@ -47,6 +60,7 @@ public class MideaasServlet extends VaadinServlet {
 			}
 		}
 		else {
+			//System.out.println("request sent");
 			super.service(request, response);
 		}
 	}
@@ -57,6 +71,18 @@ public class MideaasServlet extends VaadinServlet {
 	
 	private String getModelXml(String modelId) {
 		return modelXmls.get(modelId);
+	}
+
+	@Override
+	public void sessionDestroy(SessionDestroyEvent event) {
+		// TODO Auto-generated method stub
+		//System.out.println("Session Expired");
+	}
+
+	@Override
+	public void sessionInit(SessionInitEvent event) throws ServiceException {
+		// TODO Auto-generated method stub
+		//System.out.println("Session created");
 	}
     
 }

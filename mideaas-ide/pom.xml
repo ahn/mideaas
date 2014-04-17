@@ -164,7 +164,11 @@
 			<artifactId>jersey-multipart</artifactId>
 			<version>LATEST</version>
 		</dependency>
-            
+		<dependency>
+			<groupId>org.vaadin.addons</groupId>
+			<artifactId>refresher</artifactId>
+			<version>1.2.3.7</version>
+		</dependency>
 	</dependencies>
 
 	<build>
