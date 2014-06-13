@@ -51,11 +51,19 @@
 
     
 
+    
+
+    
+
+    
+
+    
+
+    <inherits name="org.vaadin.mideaas.app.AppWidgetSet" />
+
     <inherits name="fi.jasoft.qrcode.QrcodeWidgetset" />
 
     <inherits name="org.vaadin.aceeditor.AceEditorWidgetSet" />
-
-    
 
     <inherits name="org.vaadin.chatbox.WidgetSet" />
 </module>
