@@ -1,40 +1,58 @@
 package org.vaadin.mideaas.editor;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import org.apache.commons.io.FileUtils;
 import org.vaadin.aceeditor.client.AceDoc;
+import org.vaadin.mideaas.editor.DocDiffMediator;
+import org.vaadin.mideaas.editor.DocDiffMediator.Filter;
 import org.vaadin.mideaas.editor.DocDiffMediator.Guard;
+import org.vaadin.mideaas.editor.DocDifference;
+import org.vaadin.mideaas.editor.EditorUser;
+import org.vaadin.mideaas.editor.SharedDoc;
+import org.vaadin.mideaas.editor.SharedDoc.Listener;
 
-public class MultiUserDoc implements SharedDoc.Listener {
-	
+public class MultiUserDoc implements Listener {
+
 	public interface DifferingChangedListener {
 		public void differingChanged(Map<EditorUser, DocDifference> diffs);
 	}
 	
-	private final Guard guard;
-	private final File saveBaseTo;
-	private final SharedDoc base;
-	private final HashMap<EditorUser, UserDoc> userDocs
-		= new HashMap<EditorUser, UserDoc>();
-	
 	private final CopyOnWriteArrayList<DifferingChangedListener> dcListeners =
 			new CopyOnWriteArrayList<DifferingChangedListener>();
+
+	private final SharedDoc base;
+	private final Guard upwardsGuard;
+	private final Guard downwardsGuard;
+	private final Filter filter;
 	
-	// ...
+	private final HashMap<EditorUser, ChildDoc> childDocs = new HashMap<EditorUser, ChildDoc>();
+	
 	private final Timer baseChangeTimer = new Timer();
 	private boolean fireScheduled = false;
-		
-	public MultiUserDoc(AceDoc initial, File saveBaseTo,  Guard guard) {
-		this.saveBaseTo = saveBaseTo;
-		this.guard = guard;
-		base = new SharedDoc(initial);
+
+	private final AsyncErrorChecker checker;
+	
+	private static class ChildDoc {
+		final EditorUser user;
+		final SharedDoc doc;
+		final DocDiffMediator med;
+		public ChildDoc(EditorUser user, SharedDoc doc, DocDiffMediator med) {
+			this.user = user;
+			this.doc = doc;
+			this.med = med;
+		}
+	}
+	
+	public MultiUserDoc(AceDoc initial, Filter filter, Guard upwardsGuard, Guard downwardsGuard, AsyncErrorChecker checker) {
+		this.base = new SharedDoc(initial, checker);
+		this.filter = filter;
+		this.upwardsGuard = upwardsGuard;
+		this.downwardsGuard = downwardsGuard;
+		this.checker = checker;
 		base.addListener(this);
 	}
 	
@@ -42,41 +60,67 @@ public class MultiUserDoc implements SharedDoc.Listener {
 		return base;
 	}
 	
-	public synchronized UserDoc getUserDoc(EditorUser user) {
-		UserDoc ud = userDocs.get(user);
-		if (ud==null) {
-			ud = createUserDoc(user);
-			userDocs.put(user, ud);
-		}
-		return ud;
+	public String getBaseText() {
+		return base.getDoc().getText();
 	}
 	
-	public synchronized void removeUserDoc(EditorUser user) {
-		UserDoc ud = userDocs.remove(user);
-		if (ud!=null) {
-			ud.getDoc().removeListener(this);
-			ud.getMed().detach();
-		}
+	synchronized public SharedDoc getChildDoc(EditorUser user) {
+		return childDocs.get(user).doc;
 	}
 	
-	public synchronized Map<EditorUser, DocDifference> getDifferences() {
-		HashMap<EditorUser, DocDifference> diffs = new HashMap<EditorUser, DocDifference>();
-		for (UserDoc ud : userDocs.values()) {
-			DocDifference dd = ud.getDiff();
-			if (dd.isChanged()) {
-				diffs.put(ud.getUser(), dd);
-			}
+	synchronized public SharedDoc getChildDocCreateIfNeeded(EditorUser user) {
+		ChildDoc cd = childDocs.get(user);
+		if (cd == null) {
+			return createChildDoc(user);
 		}
-		return diffs;
+		return cd.doc;
 	}
 	
-	private UserDoc createUserDoc(EditorUser user) {
-		SharedDoc doc = new SharedDoc(getBase().getDoc());
-		DocDiffMediator med = new DocDiffMediator(base, doc);
-		med.setUpwardsGuard(guard);
-		UserDoc ud = new UserDoc(user, doc, med, base);
+	synchronized public SharedDoc createChildDoc(EditorUser user) {
+		SharedDoc doc = new SharedDoc(base.getDoc(), checker);
+		DocDiffMediator med = new DocDiffMediator(filter, base, doc);
+		setGuards(med);
+//		setFilter(med);
+		ChildDoc cd = new ChildDoc(user, doc, med);
+		childDocs.put(user, cd);
+		
 		doc.addListener(this);
-		return ud;
+		fireDifferingChanged(getDifferences());
+		return cd.doc;
+	}
+
+	private void setGuards(DocDiffMediator med) {
+		if (upwardsGuard != null) {
+			med.setUpwardsGuard(upwardsGuard);
+		}
+		if (downwardsGuard != null) {
+			med.setDownwardsGuard(downwardsGuard);
+		}
+	}
+	
+//	private void setFilter(DocDiffMediator med) {
+//		if (filter != null) {
+//			med.setFilter(filter);
+//		}
+//	}
+	
+	synchronized public SharedDoc removeChildDoc(EditorUser user) {
+		ChildDoc cd = childDocs.remove(user);
+		if (cd == null) {
+			return null;
+		}
+		cd.doc.removeListener(this);
+		cd.med.stop();
+		fireDifferingChanged(getDifferences());
+		return cd.doc;
+	}
+	
+	public synchronized void addDifferingChangedListener(DifferingChangedListener li) {
+		dcListeners.add(li);
+	}
+	
+	public synchronized void removeDifferingChangedListener(DifferingChangedListener li) {
+		dcListeners.remove(li);
 	}
 
 	@Override
@@ -91,9 +135,9 @@ public class MultiUserDoc implements SharedDoc.Listener {
 				@Override
 				public void run() {
 					synchronized (baseChangeTimer) {
-						if (saveBaseTo!=null) {
-							saveBaseToDisk();
-						}
+//						if (saveBaseTo!=null) {
+//							saveBaseToDisk();
+//						}
 						fireDifferingChanged(getDifferences());
 						fireScheduled = false;
 					}
@@ -102,21 +146,16 @@ public class MultiUserDoc implements SharedDoc.Listener {
 			fireScheduled = true;
 		}
 	}
-	
-	protected void saveBaseToDisk() {
-		try {
-			FileUtils.write(saveBaseTo, getBaseText());
-		} catch (IOException e) {
-			System.err.println("WARNING: could not save to "+saveBaseTo);
-		}
-	}
 
-	public synchronized void addDifferingChangedListener(DifferingChangedListener li) {
-		dcListeners.add(li);
-	}
-	
-	public synchronized void removeDifferingChangedListener(DifferingChangedListener li) {
-		dcListeners.remove(li);
+	public synchronized Map<EditorUser, DocDifference> getDifferences() {
+		HashMap<EditorUser, DocDifference> diffs = new HashMap<EditorUser, DocDifference>();
+		for (ChildDoc cd : childDocs.values()) {
+			DocDifference dd = new DocDifference(cd.user, base.getDoc(), cd.doc.getDoc());
+			//if (dd.isChanged()) {
+				diffs.put(cd.user, dd);
+			//}
+		}
+		return diffs;
 	}
 	
 	private void fireDifferingChanged(Map<EditorUser, DocDifference> diffs) {
@@ -125,12 +164,4 @@ public class MultiUserDoc implements SharedDoc.Listener {
 		}
 	}
 
-	public String getBaseText() {
-		return base.getDoc().getText();
-	}
-
-	public void setBaseNoFire(String xml) {
-		base.setDoc(new AceDoc(xml));
-	}
-	
 }

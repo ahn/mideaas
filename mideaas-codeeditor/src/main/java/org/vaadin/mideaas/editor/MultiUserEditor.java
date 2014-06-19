@@ -1,229 +1,169 @@
 package org.vaadin.mideaas.editor;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
-import org.vaadin.aceeditor.AceEditor;
-import org.vaadin.aceeditor.AceEditor.DiffEvent;
-import org.vaadin.aceeditor.AceEditor.DiffListener;
 import org.vaadin.aceeditor.AceEditor.SelectionChangeListener;
+import org.vaadin.aceeditor.AceEditor;
 import org.vaadin.aceeditor.AceMode;
-import org.vaadin.aceeditor.AceTheme;
 import org.vaadin.aceeditor.SuggestionExtension;
 import org.vaadin.aceeditor.TextRange;
-import org.vaadin.aceeditor.client.AceAnnotation;
-import org.vaadin.aceeditor.client.AceAnnotation.MarkerAnnotation;
 import org.vaadin.aceeditor.client.AceDoc;
-import org.vaadin.aceeditor.client.AceMarker;
-import org.vaadin.aceeditor.client.AceRange;
-import org.vaadin.mideaas.editor.AsyncErrorChecker.ResultListener;
-import org.vaadin.mideaas.editor.ErrorChecker.Error;
-import org.vaadin.mideaas.editor.MultiUserEditorUserGroup.EditorStateChangedEvent;
-import org.vaadin.mideaas.editor.MultiUserEditorUserGroup.EditorStateChangedListener;
+import org.vaadin.mideaas.editor.MultiUserDoc.DifferingChangedListener;
 
-import com.vaadin.annotations.StyleSheet;
 import com.vaadin.event.FieldEvents.TextChangeListener;
 import com.vaadin.ui.CustomComponent;
-import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
-import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 
-@StyleSheet("ace-markers.css")
 @SuppressWarnings("serial")
-public class MultiUserEditor extends CustomComponent implements ResultListener, org.vaadin.mideaas.editor.SharedDoc.Listener {
-		
+public class MultiUserEditor extends CustomComponent implements DifferingChangedListener {
+
 	private final EditorUser user;
 	private final MultiUserDoc mud;
-	private final AceEditor editor;
-	private SharedDoc activeDoc;
-	
-	private final HorizontalLayout hBar = new HorizontalLayout();
-	private MultiUserEditorUserGroup group;
-	private AsyncErrorChecker checker;
-	
-	private final Label titleLabel = new Label();
+	private MultiUserEditorTopBar topBar;
+	private CollaborativeAceEditor editor;
+	private EditorUser visibleUser;
+
+	private AceMode aceMode;
+	private SuggestionExtension suggestionExtension;
+	private boolean wordWrap;
+	private SelectionChangeListener selectionChangeListener;
+	private TextChangeListener textChangeListener;
 
 	public MultiUserEditor(EditorUser user, MultiUserDoc mud) {
-		super();
 		this.user = user;
 		this.mud = mud;
-		editor = new AceEditor();
-		
-		editor.setSizeFull();
-		
-		VerticalLayout layout = new VerticalLayout();
-		layout.setSizeFull();
-		layout.addComponent(hBar);
-		hBar.addComponent(titleLabel);
-		layout.addComponent(editor);
-		layout.setExpandRatio(editor, 1);
-		setCompositionRoot(layout);
-	}
-	
-	//setAcePath("/mideaas/static/ace");
-	public void setAcePath(String path) {
-		editor.setThemePath(path);
-		editor.setModePath(path);
-		editor.setWorkerPath(path); 
-	}
-	
-	public void setTitle(String title) {
-		titleLabel.setValue(title);
-	}
-	
-	public void setErrorChecker(AsyncErrorChecker checker) {
-		this.checker = checker;
-	}
-	
-	public void setMode(AceMode mode) {
-		editor.setMode(mode);
-	}
-	
-	public void setTheme(AceTheme theme) {
-		editor.setTheme(theme);
-	}
-	
-	public void setWordWrap(boolean b) {
-		editor.setWordWrap(true);
-	}
-
-	public void addSelectionChangeListener(SelectionChangeListener listener) {
-		editor.addSelectionChangeListener(listener);
-	}
-
-	public void addTextChangeListener(TextChangeListener listener) {
-		editor.addTextChangeListener(listener);
-	}
-
-	public TextRange getSelection() {
-		return editor.getSelection();
-	}
-
-	public AceDoc getDoc() {
-		return editor.getDoc();
-	}
-
-	public void setSuggestionExtension(SuggestionExtension se) {
-		se.extend(editor);
 	}
 	
 	@Override
 	public void attach() {
 		super.attach();
-		
-		group = new MultiUserEditorUserGroup(user, mud);
-		setEditorState(group.getEditorState());
-		hBar.addComponent(group);
-		group.addDocStateChangedListener(new EditorStateChangedListener() {
-			@Override
-			public void stateChanged(EditorStateChangedEvent e) {
-				setEditorState(e.state);
-				editor.focus();
-			}
-		});
-		
-		SharedDoc myDoc = mud.getUserDoc(user).getDoc();
-		myDoc.addListener(this);
+		setVisibleUser(user);
+		mud.addDifferingChangedListener(this);
 	}
-	
 
 	@Override
 	public void detach() {
+		mud.removeDifferingChangedListener(this);
 		super.detach();
-		
-		if (activeDoc!=null) {
-			activeDoc.detachEditor(editor);
-		}
-		
-		SharedDoc myDoc = mud.getUserDoc(user).getDoc();
-		myDoc.removeListener(this);
-	}
-	
-
-	private void setEditorState(EditorState editorState) {
-		
-		EditorUser u = editorState.getUser();
-		if (u!=null) {
-			setActiveDocToUser(u);
-		}
-		else if (editorState.type==EditorState.DocType.BASE) {
-			setActiveDocToBase();
-		}
-	}
-	
-	private void setActiveDocToBase() {
-		setActiveDoc(mud.getBase());
-		editor.setReadOnly(true);
 	}
 
-	
-	private void setActiveDocToUser(EditorUser user) {
-		setActiveDoc(mud.getUserDoc(user).getDoc());
-		editor.setReadOnly(!this.user.equals(user));
-	}
-	
-	private void setActiveDoc(SharedDoc doc) {
-		if (activeDoc!=null) {
-			activeDoc.detachEditor(editor);
+	private void createLayout() {
+		VerticalLayout layout = new VerticalLayout();
+		layout.setSizeFull();
+		topBar = new MultiUserEditorTopBar(this, visibleUser);
+		topBar.setDiffering(mud.getDifferences());
+		layout.addComponent(topBar);
+		
+		SharedDoc doc = createDoc();
+		if (doc != null) {
+			editor = new CollaborativeAceEditor(doc, visibleUser==user ? user : null);
+			configureEditor(editor);
+			editor.setSizeFull();
+			layout.addComponent(editor);
+			layout.setExpandRatio(editor, 1);
 		}
-		activeDoc = doc;
-		activeDoc.attachEditor(editor);
-	}
-	
-	@Override
-	public void errorsChecked(final List<Error> errors) {
-		UI ui = getUI();
-		if (ui!=null) {
-			ui.access(new Runnable() {
-				@Override
-				public void run() {
-					setEditorDoc(docWithErrors(getDoc(), errors));
-				}
-			});
+		else {
+			layout.addComponent(new Label("Error: document not found"));
 		}
+		setCompositionRoot(layout);
+	}
+
+	private void setVisibleUser(EditorUser u) {
+		visibleUser = u;
+		createLayout();
+	}
+
+	protected void configureEditor(CollaborativeAceEditor ed) {
+//		ed.setWordWrap(wordWrap);
+//		ed.setMode(aceMode);
+//		if (visibleUser == user && suggestionExtension != null) {
+//			suggestionExtension.extend(ed);
+//		}
+//		if (selectionChangeListener != null) {
+//			ed.addSelectionChangeListener(selectionChangeListener);
+//		}
+//		if (textChangeListener != null) {
+//			ed.addTextChangeListener(null);
+//		}
+//		return ed;
 	}
 	
-	private void setEditorDoc(AceDoc doc) {
-		boolean wasReadOnly = editor.isReadOnly();
-		editor.setReadOnly(false);
-		editor.setDoc(doc);
-		editor.setReadOnly(wasReadOnly);
+	protected AceEditor getCurrentEditor() {
+		return editor;
 	}
 	
-	private AceDoc docWithErrors(AceDoc doc, List<Error> errors) {
-		HashMap<String, AceMarker> markers = new HashMap<String, AceMarker>(errors.size());
-		HashSet<MarkerAnnotation> manns = new HashSet<MarkerAnnotation>(errors.size());
-		for (Error err : errors) {
-			AceMarker m = markerFromError(newMarkerId(), err, doc.getText());
-			markers.put(m.getMarkerId(), m);
-			AceAnnotation ann = new AceAnnotation(err.message, AceAnnotation.Type.error);
-			manns.add(new MarkerAnnotation(m.getMarkerId(), ann));
+	public String getCurrentText() {
+		return editor==null ? null : editor.getDoc().getText();
+	}
+	
+	public TextRange getCurrentSelection() {
+		return editor==null ? null : editor.getSelection();
+	}
+	
+	private SharedDoc createDoc() {
+		if (visibleUser == null) {
+			return mud.getBase();
+		} 
+		else if (visibleUser == user) {
+			return mud.getChildDocCreateIfNeeded(user);
 		}
-		return doc.withMarkers(markers).withMarkerAnnotations(manns);		
-	}
-	
-	private long latestMarkerId = 0L;
-	private String newMarkerId() {
-		// TODO ?
-		return "error" + this.hashCode() + (++latestMarkerId);
-	}
-	
-	private static AceMarker markerFromError(String markerId, Error e, String text) {
-		AceRange range = new TextRange(text, e.start, e.start==e.end ? e.start+1 : e.end);
-		String cssClass = "myerrormarker1";
-		AceMarker.Type type = AceMarker.Type.text;
-		boolean inFront = true;
-		AceMarker.OnTextChange onChange = AceMarker.OnTextChange.ADJUST;
-		return new AceMarker(markerId, range, cssClass, type, inFront, onChange);
+		else {
+			return mud.getChildDoc(visibleUser);
+		}
 	}
 
 	@Override
-	public void changed() {
-		if (checker!=null) {
-			checker.checkErrors(editor.getValue(), this);
+	public void differingChanged(final Map<EditorUser, DocDifference> diffs) {
+		System.out.println(this + " differing changed " + diffs.size());
+		for (Entry<EditorUser, DocDifference> e : diffs.entrySet()) {
+			System.out.println(e.getValue());
 		}
+		getUI().access(new Runnable() {
+			@Override
+			public void run() {
+				topBar.setDiffering(diffs);
+			}
+		});
 	}
 
+	public void userClicked(EditorUser newUser) {
+		setVisibleUser(newUser);
+	}
+
+	/*
+	public void setMode(AceMode aceMode) {
+		this.aceMode = aceMode;
+	}
+
+	public void setSuggestionExtension(SuggestionExtension suggestionExtension) {
+		this.suggestionExtension = suggestionExtension;
+		
+	}
+
+	public void setWordWrap(boolean wordWrap) {
+		this.wordWrap = wordWrap;
+		
+	}
+
+	public void setSelectionChangeListener(SelectionChangeListener li) {
+		this.selectionChangeListener = li;
+		
+	}
+
+	public void setTextChangeListener(TextChangeListener li) {
+		this.textChangeListener = li;
+	}
+
+	public String getCurrentText() {
+		return editor.getDoc().getText();
+	}
+
+	public TextRange getSelection() {
+		return editor.getSelection();
+	}
+	*/
+
+	
 }

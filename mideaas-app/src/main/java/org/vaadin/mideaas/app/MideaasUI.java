@@ -2,7 +2,6 @@ package org.vaadin.mideaas.app;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Set;
 import java.util.TreeSet;
 
 import org.eclipse.jgit.api.errors.GitAPIException;
@@ -18,28 +17,18 @@ import org.vaadin.mideaas.model.User;
 import org.vaadin.mideaas.model.UserSettings;
 import org.vaadin.mideaas.model.ZipUtils;
 
-import com.google.gwt.editor.client.impl.Refresher;
 import com.vaadin.annotations.PreserveOnRefresh;
 import com.vaadin.annotations.Push;
 import com.vaadin.annotations.Theme;
 import com.vaadin.navigator.Navigator;
-import com.vaadin.server.CustomizedSystemMessages;
-import com.vaadin.server.SystemMessages;
-import com.vaadin.server.SystemMessagesInfo;
-import com.vaadin.server.SystemMessagesProvider;
 import com.vaadin.server.VaadinRequest;
-import com.vaadin.server.VaadinService;
 import com.vaadin.ui.Notification;
-import com.vaadin.ui.Notification.Type;
 import com.vaadin.ui.UI;
 
 
 @PreserveOnRefresh
 @SuppressWarnings("serial")
-//@Theme("reindeer")
 @Theme("mideaas")
-//@Theme("mideaas")
-//@Theme("runo")
 @Push
 public class MideaasUI extends UI {
 

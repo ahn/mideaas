@@ -176,11 +176,11 @@ public class AddNewWindow extends Window {
 		else if (CLASS_TYPE.equals(type)) {
 			String cls = project.getPackageName()+"."+className;
 			String filename = className+".java";
-			ProjectFile f = ProjectFile.newJavaFile(filename, JavaUtil.generateClass(cls, null), project.getSourceFileLocation(filename), project.getLog());
+			ProjectFile f = new ProjectFile(project, filename, JavaUtil.generateClass(cls, null));
 			project.addFile(f, user);
 		}
 		else if (FILE_TYPE.equals(type)) {
-			ProjectFile f = new ProjectFile(className, "", null, project.getSourceFileLocation(className), project.getLog());
+			ProjectFile f = new ProjectFile(project, className, "");
 			project.addFile(f, user);
 		}
 		else {
@@ -189,8 +189,6 @@ public class AddNewWindow extends Window {
 		
 		close();
 	}
-
-
 
 	private static boolean badJavaFileName(String name) {
 		return name.endsWith(".java")

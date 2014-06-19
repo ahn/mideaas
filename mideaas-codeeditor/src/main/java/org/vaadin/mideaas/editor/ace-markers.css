@@ -3,3 +3,107 @@
     border-bottom: 2px dotted red;
     position: absolute;
 }
+
+
+/*
+ * Cursor markers
+ * The -col0- are special cases for cursors in the 0th column (= beginning of line)
+ */
+
+.ace_marker-layer .acecursor-col0-0 {
+	border-left: 2px solid DarkGreen;
+	position: absolute;
+}
+
+.ace_marker-layer .acecursor-0 {
+	border-right: 2px solid DarkGreen;
+	position: absolute;
+}
+
+.ace_marker-layer .acecursor-col0-1 {
+	border-left: 2px solid Brown;
+	position: absolute;
+}
+
+.ace_marker-layer .acecursor-1 {
+	border-right: 2px solid Brown;
+	position: absolute;
+}
+
+.ace_marker-layer .acecursor-col0-2 {
+	border-left: 2px solid GoldenRod;
+	position: absolute;
+}
+
+.ace_marker-layer .acecursor-2 {
+	border-right: 2px solid GoldenRod;
+	position: absolute;
+}
+
+.ace_marker-layer .acecursor-col0-3 {
+	border-left: 2px solid FireBrick;
+	position: absolute;
+}
+
+.ace_marker-layer .acecursor-3 {
+	border-right: 2px solid FireBrick;
+	position: absolute;
+}
+
+.ace_marker-layer .acecursor-col0-4 {
+	border-left: 2px solid Teal;
+	position: absolute;
+}
+
+.ace_marker-layer .acecursor-4 {
+	border-right: 2px solid Teal;
+	position: absolute;
+}
+
+.ace_marker-layer .acecursor-col0-5 {
+	border-left: 2px solid MediumVioletRed;
+	position: absolute;
+}
+
+.ace_marker-layer .acecursor-5 {
+	border-right: 2px solid MediumVioletRed;
+	position: absolute;
+}
+
+
+/*
+ * Cursor row markers
+ */
+
+.ace_marker-layer .acecursorrow-0 {
+	background-color: #B2D0B2;
+	position: absolute;	
+}
+
+.ace_marker-layer .acecursorrow-1 {
+	background-color: #EDD4D4;
+	position: absolute;	
+}
+
+.ace_marker-layer .acecursorrow-2 {
+	background-color: LightGoldenRodYellow;
+	position: absolute;	
+}
+
+.ace_marker-layer .acecursorrow-3 {
+	background-color: #F0D3D3;
+	position: absolute;	
+}
+
+.ace_marker-layer .acecursorrow-4 {
+	background-color: #CCE6E6;
+	position: absolute;	
+}
+
+.ace_marker-layer .acecursorrow-5 {
+	background-color: #F4D0E7;
+	position: absolute;	
+}
+
+
+

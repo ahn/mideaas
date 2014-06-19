@@ -97,9 +97,8 @@ public class MideaasEditor extends CustomComponent implements Listener {
 	
 	@Override
 	public void detach() {
-		project.removeUser(user);
-		
 		super.detach();
+		project.removeUser(user);
 	}
 
 	private void createLayout() {
@@ -203,15 +202,6 @@ public class MideaasEditor extends CustomComponent implements Listener {
 
 	private void setActiveFile(ProjectFile f) {
 		MultiUserEditor ed = f.createEditor(user);
-		if (f.getName().endsWith(".java")) {
-			String cls = f.getName().substring(0, f.getName().length()-5);
-			String fullCls = project.getPackageName() + "." + cls;
-			JavaErrorChecker checker = new JavaErrorChecker(fullCls, project.getCompiler());
-			ed.setErrorChecker(checker);
-			JavaSuggester sugger = new JavaSuggester(project.getCompiler().getInMemoryCompiler(), fullCls, f.getMud());
-			ed.setSuggestionExtension(new SuggestionExtension(sugger));
-		}
-
 		ed.setSizeFull();
 		activeEditor = ed;
 		split.setSecondComponent(activeEditor);

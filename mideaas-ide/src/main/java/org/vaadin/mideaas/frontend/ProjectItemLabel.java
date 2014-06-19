@@ -43,11 +43,13 @@ public class ProjectItemLabel extends Label implements DifferingChangedListener 
 		@Override
 		public void run() {
 			String caption = item.getName();
-			if (!diffs.isEmpty()) {
-				ArrayList<String> names = new ArrayList<String>(diffs.size());
-				for (DocDifference dd : diffs.values()) {
+			ArrayList<String> names = new ArrayList<String>(diffs.size());
+			for (DocDifference dd : diffs.values()) {
+				if (dd.isChanged()) {
 					names.add(dd.getUser().getName());
 				}
+			}
+			if (!names.isEmpty()) {
 				caption += " (" + StringUtils.join(names, ", ") + ")";
 			}
 			setValue(caption);

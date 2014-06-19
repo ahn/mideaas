@@ -14,12 +14,7 @@ import java.util.Set;
 
 import org.vaadin.aceeditor.AceEditor;
 import org.vaadin.aceeditor.AceEditor.SelectionChangeListener;
-import org.vaadin.aceeditor.AceMode;
-import org.vaadin.aceeditor.client.AceDoc;
 import org.vaadin.mideaas.editor.MultiUserDoc;
-import org.vaadin.mideaas.editor.MultiUserEditor;
-import org.vaadin.mideaas.editor.UserDoc;
-import org.vaadin.mideaas.editor.XmlAsyncErrorChecker;
 import org.vaadin.mideaas.model.User;
 import org.vaadin.teemu.clara.Clara;
 import org.xml.sax.InputSource;
@@ -57,7 +52,7 @@ public class ClaraEditor extends CustomComponent implements
 	private LinkedList<ClaraEditorListener> listeners = new LinkedList<ClaraEditorListener>();
 
 	private HorizontalSplitPanel split = new HorizontalSplitPanel();
-	private MultiUserEditor editor;
+	private XmlMultiUserEditor editor;
 	private final MultiUserDoc mud;
 	private VerticalLayout componentContext = new VerticalLayout();
 
@@ -91,11 +86,8 @@ public class ClaraEditor extends CustomComponent implements
 		super();
 		this.user = user;
 		mud = modelMud;
-		editor = new MultiUserEditor(user.getEditorUser(), mud);
-		editor.setMode(AceMode.xml);
+		editor = new XmlMultiUserEditor(user.getEditorUser(), mud);
 		editor.setSizeFull();
-		editor.setWordWrap(true);
-		editor.setErrorChecker(new XmlAsyncErrorChecker());
 		
 		storeModel(mud.getBaseText());
 
@@ -143,8 +135,8 @@ public class ClaraEditor extends CustomComponent implements
 	public void attach() {
 		super.attach();
 		
-		editor.addSelectionChangeListener(this);
-		editor.addTextChangeListener(this);
+		editor.setSelectionChangeListener(this);
+		editor.setTextChangeListener(this);
 		
 		//mud.addBaseChangedListenerWeak(this);
 
@@ -152,17 +144,16 @@ public class ClaraEditor extends CustomComponent implements
 	}
 
 	private String getXml() {
-		return editor.getDoc().getText();
+		return editor.getCurrentText();
 	}
 	
 	public void setXml(String xml) {
-		UserDoc ud = mud.getUserDoc(user.getEditorUser());
-		ud.getDoc().setDoc(new AceDoc(xml));
+		// TODO
 	}
 
 	private ClaraXmlHandler parseDocument(InputStream is) {
 
-		ClaraXmlHandler myHandler = new ClaraXmlHandler(editor.getSelection());
+		ClaraXmlHandler myHandler = new ClaraXmlHandler(editor.getCurrentSelection());
 
 		try {
 			XMLReader reader = XMLReaderFactory.createXMLReader();

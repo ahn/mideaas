@@ -7,7 +7,7 @@
 }
 
 .v-vaadin-version:after {
-	content: "7.1.8";
+	content: "7.2.6";
 }
 
 .v-generated-body {
@@ -15,6 +15,10 @@
 	height: 100%;
 	border: 0;
 	margin: 0;
+	overflow: hidden;
+}
+
+.v-modal-window-open {
 	overflow: hidden;
 }
 
@@ -246,15 +250,15 @@
 }
 
 .v-debugwindow-row.FINE {
-	color: #777;
+	color: #737373;
 }
 
 .v-debugwindow-row.FINER {
-	color: #888;
+	color: gray;
 }
 
 .v-debugwindow-row.FINEST {
-	color: #888;
+	color: #8c8c8c;
 }
 
 .v-debugwindow-row > span.caption {
@@ -265,6 +269,14 @@
 
 .v-debugwindow-row > span.value {
 	width: 100%;
+}
+
+.v-debugwindow-selector > span.value {
+	width: 100%;
+}
+
+.v-debugwindow-selector :hover {
+	background: rgba(255, 32, 32, 0.5);
 }
 
 .v-debugwindow-log {
@@ -306,6 +318,23 @@
 
 .v-debugwindow-network .v-debugwindow-row > span {
 	display: inline;
+}
+
+@font-face {
+	font-family: FontAwesome;
+	src: url(../base/fonts/fontawesome-webfont.eot);
+	src: url(../base/fonts/fontawesome-webfont.eot?#iefix) format("embedded-opentype"), url(../base/fonts/fontawesome-webfont.woff) format("woff"), url(../base/fonts/fontawesome-webfont.ttf) format("truetype"), url(../base/fonts/fontawesome-webfont.svg) format("svg");
+	font-weight: normal;
+	font-style: normal;
+}
+
+.FontAwesome {
+	font-family: FontAwesome;
+	font-style: normal;
+	font-weight: normal;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+	display: inline-block;
 }
 
 /** sprite: verticals; sprite-image: url(common/img/vertical-sprites.png); sprite-layout: vertical */
@@ -388,6 +417,14 @@
 .mytheme .v-accordion-item-content {
 	position: absolute;
 	width: 100%;
+}
+
+.mytheme .v-browserframe {
+	font-size: 0;
+}
+
+.mytheme .v-browserframe > span {
+	font-size: 12px;
 }
 
 .mytheme .v-button {
@@ -1231,6 +1268,11 @@ body .mytheme.v-app .v-app-loading {
 	margin: 0;
 }
 
+.mytheme .v-contextmenu .gwt-MenuBar {
+	overflow-y: auto;
+	overflow-x: hidden;
+}
+
 .mytheme .v-contextmenu .gwt-MenuItem div {
 	cursor: pointer;
 	vertical-align: middle;
@@ -1309,6 +1351,10 @@ body .mytheme.v-app .v-app-loading {
 	overflow: auto;
 	font-size: 0;
 	line-height: normal;
+}
+
+.v-ff .mytheme .v-scrollable {
+	font-size: 12px;
 }
 
 .v-ios.v-webkit .mytheme .v-scrollable {
@@ -1546,10 +1592,6 @@ body .mytheme.v-app .v-app-loading {
 	padding-right: 12px;
 }
 
-.mytheme .v-customcomponent {
-	overflow: hidden;
-}
-
 .mytheme .v-customlayout {
 	overflow: hidden;
 }
@@ -1621,7 +1663,7 @@ body .mytheme.v-app .v-app-loading {
 	border: 1px solid #ddd;
 }
 
-.mytheme .v-disabled .v-datefield-calendarpanel-day, .mytheme .v-disabled .v-datefield-calendarpanel-day-today {
+.mytheme .v-disabled .v-datefield-calendarpanel-day, .mytheme .v-disabled .v-datefield-calendarpanel-day-today, .mytheme .v-disabled.v-datefield-popupcalendar .v-datefield-button {
 	cursor: default;
 }
 
@@ -1733,7 +1775,7 @@ body .mytheme.v-app .v-app-loading {
 	border: 1px solid #ddd;
 }
 
-.mytheme .v-disabled .v-inline-datefield-calendarpanel-day, .mytheme .v-disabled .v-inline-datefield-calendarpanel-day-today {
+.mytheme .v-disabled .v-inline-datefield-calendarpanel-day, .mytheme .v-disabled .v-inline-datefield-calendarpanel-day-today, .mytheme .v-disabled.v-inline-datefield-popupcalendar .v-inline-datefield-button {
 	cursor: default;
 }
 
@@ -1784,6 +1826,8 @@ body .mytheme.v-app .v-app-loading {
 	-webkit-border-radius: 4px;
 	border-radius: 4px;
 	position: relative;
+	-ms-touch-action: none;
+	touch-action: none;
 }
 
 .mytheme [draggable=true] {
@@ -2645,6 +2689,8 @@ body .mytheme.v-app .v-app-loading {
 	height: 12px;
 	margin-top: -5px;
 	font-size: 0;
+	-ms-touch-action: none;
+	touch-action: none;
 }
 
 .mytheme .v-slider-vertical {
@@ -2700,6 +2746,8 @@ body .mytheme.v-app .v-app-loading {
 	background: #ddd;
 	cursor: e-resize;
 	cursor: col-resize;
+	-ms-touch-action: none;
+	touch-action: none;
 }
 
 .mytheme .v-disabled .v-splitpanel-hsplitter div {
@@ -2715,6 +2763,8 @@ body .mytheme.v-app .v-app-loading {
 	background: #ddd;
 	cursor: s-resize;
 	cursor: row-resize;
+	-ms-touch-action: none;
+	touch-action: none;
 }
 
 .mytheme .v-disabled .v-splitpanel-vsplitter div {
@@ -3125,6 +3175,14 @@ body .mytheme.v-app .v-app-loading {
 	cursor: default;
 }
 
+.mytheme .v-tabsheet-tabitem-focus .v-captiontext {
+	text-decoration: underline;
+}
+
+.mytheme .v-tabsheet-tabitem-selected.v-tabsheet-tabitem-focus .v-captiontext {
+	text-decoration: inherit;
+}
+
 .mytheme .v-tabsheet-content {
 	border: 1px solid #aaa;
 	border-top: none;
@@ -3412,7 +3470,6 @@ body .mytheme.v-app .v-app-loading {
 }
 
 .mytheme .v-treetable .v-table-row .v-table-cell-content, .mytheme .v-treetable .v-table-row-odd .v-table-cell-content {
-	position: relative;
 	z-index: 10;
 }
 
@@ -5064,7 +5121,7 @@ body .mytheme.v-app .v-app-loading {
 	width: 6px;
 }
 
-.mytheme .v-verticallayout-blue, .mytheme .v-horizontallayout-blue, .mytheme .v-orderedlayout-blue, .mytheme .v-gridlayout-blue, .mytheme .v-csslayout-blue, .mytheme .v-formlayout-blue, .mytheme .v-splitpanel-vertical-blue, .mytheme .v-splitpanel-horizontal-blue {
+.mytheme .v-verticallayout-blue, .mytheme .v-horizontallayout-blue, .mytheme .v-orderedlayout-blue, .mytheme .v-gridlayout-blue, .mytheme .v-csslayout-blue, .mytheme .v-formlayout-blue, .mytheme .v-absolutelayout-blue, .mytheme .v-splitpanel-vertical-blue, .mytheme .v-splitpanel-horizontal-blue {
 	background-color: #bcd3de;
 }
 
@@ -5072,7 +5129,7 @@ body .mytheme.v-app .v-app-loading {
 	background-color: #bcd3de;
 }
 
-.mytheme .v-verticallayout-white, .mytheme .v-horizontallayout-white, .mytheme .v-orderedlayout-white, .mytheme .v-gridlayout-white, .mytheme .v-csslayout-white, .mytheme .v-formlayout-white, .mytheme .v-splitpanel-vertical-white, .mytheme .v-splitpanel-horizontal-white {
+.mytheme .v-verticallayout-white, .mytheme .v-horizontallayout-white, .mytheme .v-orderedlayout-white, .mytheme .v-gridlayout-white, .mytheme .v-csslayout-white, .mytheme .v-formlayout-white, .mytheme .v-absolutelayout-white, .mytheme .v-splitpanel-vertical-white, .mytheme .v-splitpanel-horizontal-white {
 	background-color: #fff;
 	color: #222;
 }
@@ -5082,7 +5139,7 @@ body .mytheme.v-app .v-app-loading {
 	color: #222;
 }
 
-.mytheme .v-verticallayout-black, .mytheme .v-horizontallayout-black, .mytheme .v-orderedlayout-black, .mytheme .v-gridlayout-black, .mytheme .v-csslayout-black, .mytheme .v-formlayout-black, .mytheme .v-splitpanel-vertical-black, .mytheme .v-splitpanel-horizontal-black {
+.mytheme .v-verticallayout-black, .mytheme .v-horizontallayout-black, .mytheme .v-orderedlayout-black, .mytheme .v-gridlayout-black, .mytheme .v-csslayout-black, .mytheme .v-formlayout-black, .mytheme .v-absolutelayout-black, .mytheme .v-splitpanel-vertical-black, .mytheme .v-splitpanel-horizontal-black {
 	background: #1e2022 url(../reindeer/layouts/img/black-bg.png) repeat-x;
 }
 
@@ -6200,6 +6257,10 @@ body .mytheme.v-app .v-app-loading {
 	display: inline-block;
 }
 
+.v-sa .mytheme .v-tabsheet-tabs .v-icon {
+	vertical-align: top;
+}
+
 .mytheme .v-tabsheet-tabs .v-icon {
 	width: 16px !important;
 	height: 16px !important;
@@ -7006,4 +7067,60 @@ body .mytheme.v-app .v-app-loading {
 	border: none;
 	background: transparent repeat-x;
 	background-image: url(../reindeer/window/img/black/content-bg.png);/** sprite-ref: black-verticals; sprite-alignment: repeat */
+}
+
+.mytheme .collabeditor-layout-0 {
+	background-color: LightGreen;
+}
+
+.mytheme .collabeditor-layout-1 {
+	background-color: LightSalmon;
+}
+
+.mytheme .collabeditor-layout-2 {
+	background-color: LightGoldenRodYellow;
+}
+
+.mytheme .collabeditor-layout-3 {
+	background-color: LightCoral;
+}
+
+.mytheme .collabeditor-layout-4 {
+	background-color: LightSeaGreen;
+}
+
+.mytheme .collabeditor-layout-5 {
+	background-color: LightPink;
+}
+
+.mytheme .collab-button {
+	border: 1px solid black;
+}
+
+.mytheme .collab-button.collab-user-me {
+	font-weight: bold;
+}
+
+.mytheme .collab-button.collab-user-0 {
+	background-color: LightGreen;
+}
+
+.mytheme .collab-button.collab-user-1 {
+	background-color: LightSalmon;
+}
+
+.mytheme .collab-button.collab-user-2 {
+	background-color: LightGoldenRodYellow;
+}
+
+.mytheme .collab-button.collab-user-3 {
+	background-color: LightCoral;
+}
+
+.mytheme .collab-button.collab-user-4 {
+	background-color: LightSeaGreen;
+}
+
+.mytheme .collab-button.collab-user-5 {
+	background-color: LightPink;
 }

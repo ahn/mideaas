@@ -55,7 +55,7 @@
 		<dependency>
 			<groupId>org.vaadin.mideaas</groupId>
 			<artifactId>mideaas-ide</artifactId>
-            <version>${version}</version>
+			<version>${version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.scribe</groupId>
@@ -73,7 +73,7 @@
 			<artifactId>oauthpopup</artifactId>
 			<version>0.0.3</version>
 		</dependency>
-			            
+
 	</dependencies>
 
 	<build>
@@ -132,7 +132,9 @@
 						</configuration>
 						<goals>
 							<goal>resources</goal>
+							<goal>update-theme</goal>
 							<goal>update-widgetset</goal>
+							<goal>compile-theme</goal>
 							<goal>compile</goal>
 						</goals>
 					</execution>

@@ -203,7 +203,7 @@ public class SharedProject {
 	
 	private void addUiClass() {
 		String code = ProjectFileUtils.generateApp(getPackageName());
-		ProjectFile pf = ProjectFile.newJavaFile("App.java", code, getSourceFileLocation("App.java"), getLog());
+		ProjectFile pf = new ProjectFile(this, "App.java", code);
 		addFile(pf, null);
 	}
 
@@ -387,7 +387,7 @@ public class SharedProject {
 				return null;
 			}
 
-			c = new SharedView(getPackageName(), name, getSourceDir(), log);
+			c = new SharedView(getPackageName(), name, getSourceDir(), this);
 			addView(c, byUser);
 		}
 
@@ -520,17 +520,13 @@ public class SharedProject {
 				String vn = n.substring(0, n.length() - 5);
 				String xmlName = vn + ".clara.xml";
 				if (claraXmls.containsKey(xmlName)) {
-					SharedView v = new SharedView(getPackageName(), vn, getSourceDir(), log);
-					v.setControllerBase(e.getValue());
-					v.setModelBase(claraXmls.get(xmlName));
+					SharedView v = new SharedView(getPackageName(), vn, getSourceDir(), this, e.getValue(), claraXmls.get(xmlName));
 					views.put(vn, v);
 				} else {
-					File saveTo = new File(getSourceDir(), n);
-					projFiles.put(n, ProjectFile.newJavaFile(n, e.getValue(), saveTo, log));
+					projFiles.put(n, new ProjectFile(this, n, e.getValue()));
 				}
 			} else {
-				File saveTo = new File(getSourceDir(), n);
-				projFiles.put(n, new ProjectFile(n, e.getValue(), null, saveTo, log));
+				projFiles.put(n, new ProjectFile(this, n, e.getValue()));
 			}
 		}
 		projectItems = new TreeMap<String, ProjectItem>(views);

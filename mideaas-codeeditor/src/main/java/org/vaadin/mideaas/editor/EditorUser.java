@@ -14,6 +14,13 @@ public class EditorUser {
 		return name;
 	}
 	
+	/**
+	 * 
+	 */
+	public long getStyleIndex() {
+		return Math.abs(id.hashCode()) % 6;
+	}
+	
 	@Override
 	public boolean equals(Object o) {
 		if (o instanceof EditorUser) {

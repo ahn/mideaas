@@ -73,4 +73,15 @@ public class DocDifference {
 	public String toString() {
 		return "DD "+user.getName()+" +" + getInserts() + " -" + getDeletes();
 	}
+
+	public String buttonText() {
+		int inserts = getInserts();
+		int deletes = getDeletes();
+		if (inserts>0 || deletes>0) {
+			return user.getName() + " +"+inserts+" -"+deletes;
+		}
+		else {
+			return user.getName();
+		}
+	}
 }

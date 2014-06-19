@@ -18,7 +18,6 @@ public class User implements Comparable<User> {
 	private final EditorUser editorUser;
 	
 	private UserProfile activeProfile;
-	
 
 	private HashMap<OAuthService.Service, UserProfile> profiles =
 			new HashMap<OAuthService.Service, UserProfile>();

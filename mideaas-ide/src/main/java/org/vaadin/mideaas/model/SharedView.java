@@ -14,14 +14,14 @@ import org.vaadin.aceeditor.ServerSideDocDiff;
 import org.vaadin.aceeditor.client.AceDoc;
 import org.vaadin.mideaas.editor.ClaraXmlUtil;
 import org.vaadin.mideaas.editor.DocDiffMediator;
+import org.vaadin.mideaas.editor.RemoveErrorsFilter;
+import org.vaadin.mideaas.editor.DocDiffMediator.Filter;
 import org.vaadin.mideaas.editor.JavaSyntaxGuard;
 import org.vaadin.mideaas.editor.MultiUserDoc;
 import org.vaadin.mideaas.editor.MultiUserDoc.DifferingChangedListener;
-import org.vaadin.mideaas.editor.ErrorChecker;
-import org.vaadin.mideaas.editor.XmlSyntaxErrorChecker;
 import org.vaadin.mideaas.editor.XmlSyntaxGuard;
 import org.vaadin.mideaas.frontend.Icons;
-import org.vaadin.mideaas.java.JavaSyntaxErrorChecker;
+import org.vaadin.mideaas.frontend.Util;
 import org.vaadin.mideaas.java.util.CompilingService;
 import org.vaadin.mideaas.model.ControllerCode.Modifier;
 
@@ -90,48 +90,32 @@ public class SharedView extends ProjectItem {
 		RESERVED_COMPONENT_NAMES.add(ProjectFileUtils.getAppClassName());
 	}
 
-	private String javaPackage;
+	private final String javaPackage;
 
 	private final String name;
+	
+	private final Filter removeErrorsFilter = new RemoveErrorsFilter();
 
-//	private final String modelId = generateModelId();
+	private final MultiUserDoc controllerMud;
+	private final MultiUserDoc modelMud;
 
-	private MultiUserDoc controllerMud;
-	private MultiUserDoc modelMud;
-
-	/**
-	 * Instantiates a new shared component.
-	 * 
-	 * @param javaPackage
-	 *            the java package
-	 * @param name
-	 *            the name
-	 */
-	public SharedView(String javaPackage, String name, File saveBaseToDir, ProjectLog log) {
+	public SharedView(String javaPackage, String name, File saveBaseToDir, SharedProject project) {
+		this(javaPackage, name, saveBaseToDir, project,
+				ControllerCode.createInitial(javaPackage, name).getCode(),
+				ClaraXmlUtil.createHelloWorld("VerticalLayout", "This is " + name));
+	}
+	
+	public SharedView(String javaPackage, String name, File saveBaseToDir, SharedProject project, String code, String xml) {
 		super(name);
-		// TODO: it doesn't always make sense to assign something to the muds
-		// if we know we're going to set them right away, such as when reading from disk.
-		
 		this.javaPackage = javaPackage;
 		this.name = name;
-		String code = ControllerCode.createInitial(javaPackage, name).getCode();
-		File codeFile = new File(saveBaseToDir, name+".java");
-		controllerMud = new MultiUserDoc(new AceDoc(code), codeFile, new JavaSyntaxGuard());
-		String xml = ClaraXmlUtil.createHelloWorld("VerticalLayout", "This is " + getName());
-		File modelFile = new File(saveBaseToDir, name+".clara.xml");
-		modelMud = new MultiUserDoc(new AceDoc(xml), modelFile, new XmlSyntaxGuard());
+		controllerMud = new MultiUserDoc(new AceDoc(code), removeErrorsFilter, new JavaSyntaxGuard(), null, Util.checkerForName(project, getControllerFilename()));
+		modelMud = new MultiUserDoc(new AceDoc(xml), removeErrorsFilter, new XmlSyntaxGuard(), null, Util.checkerForName(project, getModelFilename()));
 		
-//		storeModelForVisualDesigner();
+//		storeModelForVisualDesigner(); // ???
 	}
 
-	//
-	/**
-	 * Gets the component part.
-	 * 
-	 * @param filename
-	 *            the filename
-	 * @return the component part
-	 */
+
 	public static ViewPartInfo getViewPart(String filename) {
 		for (ViewPart part : ViewPart.values()) {
 			String name = part.componentNameOf(filename);
@@ -150,17 +134,14 @@ public class SharedView extends ProjectItem {
 		return name;
 	}
 	
-	synchronized public String getControllerFullName() {
+	public String getControllerFullName() {
 		return javaPackage + "." + getControllerName();
 	}
+	
+	public String getModelFilename() {
+		return getName() + ".clara.xml";
+	}
 
-	/**
-	 * Checks if is valid name.
-	 * 
-	 * @param name
-	 *            the name
-	 * @return true, if is valid name
-	 */
 	public static boolean isvalidName(String name) {
 		return REGEX_NAME.matcher(name).matches();
 	}
@@ -184,15 +165,6 @@ public class SharedView extends ProjectItem {
 		FileUtils.write(new File(dir, getControllerName() + ".java"), ctrl);
 		FileUtils.write(new File(dir, name + ".clara.xml"), model);
 	}
-
-	public void setModelBase(String xml) {
-		modelMud.setBaseNoFire(xml);
-	}
-	
-	public void setControllerBase(String code) {
-		controllerMud.setBaseNoFire(code);
-	}
-
 
 	// TODO: below
 	
@@ -260,9 +232,15 @@ public class SharedView extends ProjectItem {
 	}
 	
 	@Override
+	public void addUser(User user) {
+		getControllerMud().createChildDoc(user.getEditorUser());
+		getModelMud().createChildDoc(user.getEditorUser());
+	}
+	
+	@Override
 	public void removeUser(User user) {
-		getControllerMud().removeUserDoc(user.getEditorUser());
-		getModelMud().removeUserDoc(user.getEditorUser());
+		getControllerMud().removeChildDoc(user.getEditorUser());
+		getModelMud().removeChildDoc(user.getEditorUser());
 	}
 
 	@Override
@@ -281,5 +259,7 @@ public class SharedView extends ProjectItem {
 	public Resource getIcon() {
 		return Icons.APPLICATION_FORM;
 	}
+
+	
 
 }

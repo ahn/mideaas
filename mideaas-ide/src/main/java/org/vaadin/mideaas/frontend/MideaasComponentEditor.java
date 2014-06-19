@@ -30,7 +30,7 @@ public class MideaasComponentEditor extends TabSheet implements
 	
 
 	private final ClaraEditor claraEditor;
-	private final MultiUserEditor controllerEditor;
+	private final JavaMultiUserEditor controllerEditor;
 
 	final private SharedView comp;
 	private HashMap<Component, EditingMode> modeByTab = new HashMap<Component, EditingMode>();
@@ -48,18 +48,12 @@ public class MideaasComponentEditor extends TabSheet implements
 		claraEditor = new ClaraEditor(user, comp.getModelMud());
 		claraEditor.setSizeFull();
 
-
-
-		controllerEditor = new MultiUserEditor(user.getEditorUser(), comp.getControllerMud());
-		controllerEditor.setMode(AceMode.java);
-		controllerEditor.setTitle(comp.getName());
-
-		AsyncErrorChecker ch = new JavaErrorChecker(
-				comp.getControllerFullName(), project.getCompiler());
-		controllerEditor.setErrorChecker(ch);
-		JavaSuggester sugger = new JavaSuggester(project.getCompiler().getInMemoryCompiler(),
-				comp.getControllerFullName(), comp.getControllerMud());
-		controllerEditor.setSuggestionExtension(new SuggestionExtension(sugger));
+		controllerEditor = new JavaMultiUserEditor(
+				user.getEditorUser(),
+				comp.getControllerMud(),
+				project.getCompiler().getInMemoryCompiler(),
+				comp.getControllerFullName());
+		
 		controllerEditor.setSizeFull();
 
 //		if (testingEnabled) {

@@ -1,19 +1,13 @@
 package org.vaadin.mideaas.java;
 
-import japa.parser.ParseException;
-
 import java.util.List;
 
-import org.vaadin.aceeditor.ServerSideDocDiff;
 import org.vaadin.aceeditor.Suggester;
 import org.vaadin.aceeditor.Suggestion;
-import org.vaadin.aceeditor.client.AceDoc;
-import org.vaadin.mideaas.editor.MultiUserDoc;
 import org.vaadin.mideaas.java.util.CompilerSuggester;
 import org.vaadin.mideaas.java.util.CustomMethodSuggestionGenerator;
 import org.vaadin.mideaas.java.util.InMemoryCompiler;
 import org.vaadin.mideaas.java.util.StdJavaSuggestionGenerator;
-import org.vaadin.mideaas.model.ControllerCode;
 
 public class JavaSuggester implements Suggester {
 	
@@ -26,11 +20,9 @@ public class JavaSuggester implements Suggester {
 			// TODO: more?
 	
 	private final CompilerSuggester compSugger;
-	private final MultiUserDoc codeMud;
 
-	public JavaSuggester(InMemoryCompiler compiler, String className, MultiUserDoc codeMud) {
+	public JavaSuggester(InMemoryCompiler compiler, String className) {
 		compSugger = new CompilerSuggester(compiler, className);
-		this.codeMud = codeMud;
 		CustomMethodSuggestionGenerator vaadinSG = new CustomMethodSuggestionGenerator(compiler);
 		vaadinSG.setSuggestions(vaadinSuggestions);
 		compSugger.addSuggestionGenerator(vaadinSG);

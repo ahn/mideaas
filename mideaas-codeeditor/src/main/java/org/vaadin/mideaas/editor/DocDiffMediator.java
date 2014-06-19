@@ -25,7 +25,12 @@ public class DocDiffMediator {
 		 */
 		boolean isAcceptable(AceDoc candidate, ServerSideDocDiff diff);
 	}
+	
+	public interface Filter {
+		AceDoc filter(AceDoc doc);
+	}
 
+	private final Filter filter;
 	private final SharedDoc upstream;
 	private final SharedDoc downstream;
 	private AceDoc shadow;
@@ -46,13 +51,23 @@ public class DocDiffMediator {
 		}
 	};
 	
-	public DocDiffMediator(SharedDoc upstream, SharedDoc downstream) {
+	public DocDiffMediator(Filter filter, SharedDoc upstream, SharedDoc downstream) {
+		this.filter = filter;
 		this.upstream = upstream;
 		this.downstream = downstream;
-		shadow = upstream.getDoc();
+		shadow = filtered(upstream.getDoc());
 		
 		upstream.addListener(upstreamListener);
 		downstream.addListener(downstreamListener);
+	}
+	
+	private AceDoc filtered(AceDoc doc) {
+		return filter != null ? filter.filter(doc) : doc;
+	}
+	
+	public void stop() {
+		upstream.removeListener(upstreamListener);
+		downstream.removeListener(downstreamListener);
 	}
 	
 	public SharedDoc getUpstream() {
@@ -72,10 +87,12 @@ public class DocDiffMediator {
 	}
 
 	private void upstreamChanged() {
+		System.out.println(this + " UP -> DOWN?");
 		tryToApplyFrom(upstream, downstream, downwardsGuard);
 	}
 	
 	private void downstreamChanged() {
+		System.out.println(this + " DOWN -> UP?");
 		tryToApplyFrom(downstream, upstream, upwardsGuard);
 	}
 	
@@ -84,9 +101,10 @@ public class DocDiffMediator {
 		synchronized (upstream) {
 		synchronized (downstream) {
 		synchronized(this) {
-			AceDoc sourceDoc = fromDoc.getDoc();
+			AceDoc sourceDoc = filtered(fromDoc.getDoc());
 			ServerSideDocDiff d = ServerSideDocDiff.diff(shadow,sourceDoc);
 			if (!d.isIdentity()) {
+				//System.out.println(this + " " + d.toString());
 				destDoc = d.applyTo(toDoc.getDoc());
 				if (guard==null || guard.isAcceptable(destDoc, d)) {
 					shadow = sourceDoc;
@@ -100,6 +118,7 @@ public class DocDiffMediator {
 		}
 		}
 		if (destDoc!=null) {
+			System.out.println(this + " APPLIED!");
 			toDoc.fireChanged();
 		}
 	}

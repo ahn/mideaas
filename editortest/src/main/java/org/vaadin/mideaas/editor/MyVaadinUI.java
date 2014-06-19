@@ -13,15 +13,23 @@ import org.vaadin.mideaas.editor.CollaborativeAceEditor;
 import org.vaadin.mideaas.editor.DocDiffMediator;
 import org.vaadin.mideaas.editor.DocDiffMediator.Guard;
 import org.vaadin.mideaas.editor.EditorUser;
+import org.vaadin.mideaas.editor.MultiUserDoc;
+import org.vaadin.mideaas.editor.MultiUserEditor;
 import org.vaadin.mideaas.editor.SharedDoc;
 
 import com.vaadin.annotations.Push;
+import com.vaadin.annotations.StyleSheet;
 import com.vaadin.annotations.Theme;
 import com.vaadin.annotations.VaadinServletConfiguration;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.server.VaadinServlet;
+import com.vaadin.ui.Button;
+import com.vaadin.ui.Button.ClickListener;
+import com.vaadin.ui.Label;
+import com.vaadin.ui.Panel;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
+import com.vaadin.ui.Button.ClickEvent;
 
 
 @Theme("mytheme")
@@ -47,11 +55,15 @@ public class MyVaadinUI extends UI
 	
 	private static int debugId = 0;//iii();
 	
-	private static SharedDoc upstream = new SharedDoc(new AceDoc("joo"));
-	private static SharedDoc downstream1 = new SharedDoc(new AceDoc("joo"));
-	private static SharedDoc downstream2 = new SharedDoc(new AceDoc("joo"));
+	private static final AceDoc initialDoc = new AceDoc("\njoo\n\n\n\n\n\n");
+	
+	/*
+	private static SharedDoc upstream = new SharedDoc(initialDoc);
+	private static SharedDoc downstream1 = new SharedDoc(initialDoc);
+	private static SharedDoc downstream2 = new SharedDoc(initialDoc);
 	private static DocDiffMediator hub1 = new DocDiffMediator(upstream, downstream1);
 	private static DocDiffMediator hub2 = new DocDiffMediator(upstream, downstream2);
+	*/
 	
 	private static final Guard moiGuard = new Guard() {
 		@Override
@@ -99,35 +111,95 @@ public class MyVaadinUI extends UI
 	}
 	
 	static {
-		hub1.setUpwardsGuard(moiGuard);
-		hub2.setUpwardsGuard(moiGuard);
+		//hub1.setUpwardsGuard(moiGuard);
+		//hub2.setUpwardsGuard(moiGuard);
 		
 		//hub1.setUpwardsGuard(new KGuard("a",2));
 		//hub2.setUpwardsGuard(new KGuard("a",3));
 	}
 
-	private final CollaborativeAceEditor editor1 = new CollaborativeAceEditor(downstream1);
-	private final CollaborativeAceEditor editor2 = new CollaborativeAceEditor(downstream2);
+	//private final CollaborativeAceEditor editor1 = new CollaborativeAceEditor(downstream1, 1);
+	//private final CollaborativeAceEditor editor2 = new CollaborativeAceEditor(downstream2, 2);
 	
 	
+	private static final MultiDoc mud = new MultiDoc(initialDoc, moiGuard, null);
+	
+	
+	
+
 	
 	@Override
 	protected void init(VaadinRequest request) {
 		
+		
+		String fragment = getPage().getUriFragment();
+		String loc = getPage().getLocation().getPath().substring(1);
+		
+		String uid = loc.isEmpty() ? "Default" : loc;
+		final EditorUser eu = new EditorUser(uid, uid);
+		
+		System.out.println("uid");
+		//final EditorUser eu = createUser();
+		
+		mud.createChildDoc(eu);
+
+		final MultiEditor mue = new MultiEditor(eu, mud);
+		
+		
+		mue.setSizeFull();
+		
 		final VerticalLayout layout = new VerticalLayout();
-        layout.setMargin(true);
+		
+        layout.setMargin(false);
         layout.setSizeFull();
         setContent(layout);
         
+        
+        layout.addComponent(mue);
+        
+        
+        Button leave = new Button("Leave");
+        
+        leave.addClickListener(new ClickListener() {
+			
+			@Override
+			public void buttonClick(ClickEvent event) {
+				layout.removeAllComponents();
+				mud.removeChildDoc(eu);
+			}
+		});
+        
+        layout.addComponent(leave);
+        
+        /*
+        
+        final VerticalLayout la1 = new VerticalLayout();
+        la1.addStyleName("collabeditor-layout-" + editor1.getStyleIndex());
+        layout.addComponent(la1);
         editor1.setSizeFull();
-        layout.addComponent(editor1);
+        la1.addComponent(editor1);
+        la1.setSizeFull();
+        la1.setMargin(true);
         
+        final VerticalLayout la2 = new VerticalLayout();
+        la2.addStyleName("collabeditor-layout-" + editor2.getStyleIndex());
+        layout.addComponent(la2);
         editor2.setSizeFull();
-        layout.addComponent(editor2);
+        la2.addComponent(editor2);
+        la2.setSizeFull();
+        la2.setMargin(true);
         
-        CollaborativeAceEditor x = new CollaborativeAceEditor(upstream);
-        x.setSizeFull();
-        layout.addComponent(x);
+        CollaborativeAceEditor editor3 = new CollaborativeAceEditor(upstream, 3);
+        
+        final VerticalLayout la3 = new VerticalLayout();
+        la3.addStyleName("collabeditor-layout-" + editor3.getStyleIndex());
+        layout.addComponent(la3);
+        editor3.setSizeFull();
+        la3.addComponent(editor3);
+        la3.setSizeFull();
+        la3.setMargin(true);
+        
+        */
         
 	}
 		
