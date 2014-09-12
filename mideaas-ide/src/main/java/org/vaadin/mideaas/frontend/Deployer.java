@@ -23,7 +23,6 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.util.EntityUtils;
 import org.vaadin.mideaas.model.SharedProject;
-import org.vaadin.mideaas.model.StartOfDeploymentBroadcaster;
 import org.vaadin.mideaas.model.User;
 import org.vaadin.mideaas.model.UserSettings;
 
@@ -614,7 +613,7 @@ public class Deployer extends CoapsCaller  {
 				//Deployer apiClient = new Deployer(file, paasApiUri, null, null);
 				
 				//Adds some visibilitythings to user interface
-				StartOfDeploymentBroadcaster.broadcastDeplyStated(getApiLocation(), appName, user);
+				//StartOfDeploymentBroadcaster.broadcastDeplyStated(getApiLocation(), appName, user);
 				System.out.println("after broadcat");
 				fireNetworkingStarted("deploying application");
 				System.out.println("after finish network");
@@ -711,7 +710,7 @@ public class Deployer extends CoapsCaller  {
 					
 					logView.newLine("Aborted: FileNotFoudException: " + e.getMessage());
 					e.printStackTrace();
-					StartOfDeploymentBroadcaster.broadcastDeplyFinished(getApiLocation(), appName, user);
+					//StartOfDeploymentBroadcaster.broadcastDeplyFinished(getApiLocation(), appName, user);
 					fireNetworkingFinished(false, "File not found: press build", null);
 					deployingProjectsInUris.get(getApiLocation()).remove(appName);
 					return;
@@ -721,7 +720,7 @@ public class Deployer extends CoapsCaller  {
 					// TODO Auto-generated catch block
 					logView.newLine("exception: " + e.getMessage());
 					e.printStackTrace();
-					StartOfDeploymentBroadcaster.broadcastDeplyFinished(getApiLocation(), appName, user);
+					//StartOfDeploymentBroadcaster.broadcastDeplyFinished(getApiLocation(), appName, user);
 					fireNetworkingFinished(false, "Deploying failed", null);
 					deployingProjectsInUris.get(getApiLocation()).remove(appName);
 					return;
@@ -742,11 +741,11 @@ public class Deployer extends CoapsCaller  {
 					buttonLink.setVisible(true);
 		    		qrCode.setValue(uriToService);
 		    		qrCode.setVisible(true);
-					StartOfDeploymentBroadcaster.broadcastDeplyFinished(getApiLocation(), appName, user);
+					//StartOfDeploymentBroadcaster.broadcastDeplyFinished(getApiLocation(), appName, user);
 					fireNetworkingFinished(true, "Deploying successed", uriToService);
 					deployingProjectsInUris.get(getApiLocation()).remove(appName);
 		        }else{
-					StartOfDeploymentBroadcaster.broadcastDeplyFinished(getApiLocation(), appName, user);
+					//StartOfDeploymentBroadcaster.broadcastDeplyFinished(getApiLocation(), appName, user);
 					fireNetworkingFinished(false, "Deploying failed", null);
 					deployingProjectsInUris.get(getApiLocation()).remove(appName);
 		        }

@@ -11,8 +11,6 @@ import org.vaadin.mideaas.frontend.MideaasEditorPlugin;
 import org.vaadin.mideaas.model.GitRepository;
 import org.vaadin.mideaas.model.LobbyBroadcaster;
 import org.vaadin.mideaas.model.SharedProject;
-import org.vaadin.mideaas.model.StartOFDeploymentBroadcastListener;
-import org.vaadin.mideaas.model.StartOfDeploymentBroadcaster;
 import org.vaadin.mideaas.model.User;
 import org.vaadin.mideaas.model.UserSettings;
 

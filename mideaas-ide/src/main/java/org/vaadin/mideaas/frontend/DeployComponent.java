@@ -38,7 +38,7 @@ import com.vaadin.ui.themes.Reindeer;
 import fi.jasoft.qrcode.QRCode;
 
 @SuppressWarnings("serial")
-public class DeployComponent extends CustomComponent implements DeployListener, StartOFDeploymentBroadcastListener {
+public class DeployComponent extends CustomComponent implements DeployListener {
 
 	// IP address of the chosen server (on map application) by user
 	private String ipOfPlaceOfDeploy = null;
@@ -339,7 +339,7 @@ public class DeployComponent extends CustomComponent implements DeployListener, 
 		setUi(UI.getCurrent());
 		deployer.addDeployListener(this);
 		System.out.println(user.getName() + "add to list");
-		StartOfDeploymentBroadcaster.register(this);
+		//StartOfDeploymentBroadcaster.register(this);
 		deployer.checkIFSomeoneIsDeploying(resultLayout, qrCode, loadingImg);
 	}
 
@@ -349,7 +349,7 @@ public class DeployComponent extends CustomComponent implements DeployListener, 
 		super.detach();
 		deployer.removeDeployListener(this);
 		System.out.println(user.getName() + "removed from list");
-		StartOfDeploymentBroadcaster.unregister(this);
+		//StartOfDeploymentBroadcaster.unregister(this);
 	}
 
 	private synchronized void setUi(UI ui) {
@@ -483,6 +483,7 @@ public class DeployComponent extends CustomComponent implements DeployListener, 
 		UI.getCurrent().addWindow(w);
 	}
 
+	/*
 	@Override
 	public void deployStartted(final String apiLocation, final String appName, final User deployerUser) {
 
@@ -537,4 +538,5 @@ public class DeployComponent extends CustomComponent implements DeployListener, 
 			}
 		});
 	}	
+	*/
 }
