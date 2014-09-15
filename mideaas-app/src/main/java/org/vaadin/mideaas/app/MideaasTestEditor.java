@@ -43,15 +43,15 @@ public class MideaasTestEditor extends CustomComponent {
     String savemode;
     Set<?> selection;
 	
-	public Window createEditor(String save, Set<?> newSelection, final MideaasTest mideaastest) {
+	public Window createEditor(String save, Set<?> newSelection, final MideaasTest mideaastest, final String projectName) {
     	
 		savemode = save;
 		selection = newSelection;
 		
 		// Create the window
         editwindow = new Window("Edit script");
-        editwindow.setWidth("640px");
-        editwindow.setHeight("530px");
+        editwindow.setWidth("650px");
+        editwindow.setHeight("550px");
 		
     	final com.vaadin.ui.TextArea testNotes = new com.vaadin.ui.TextArea("Notes", "");
     	testNotes.setWidth("100%");
@@ -72,12 +72,16 @@ public class MideaasTestEditor extends CustomComponent {
         textLocation.setRequired(true);
         textDescription.setRequired(true);
         
-        for (Server server : ServerContainer.getServerContainer().getItemIds()) {
-        	for (String engine : server.getEngines()) {
-        		if (!cmbEngine.containsId(engine)) {
-        			cmbEngine.addItem(engine);
+        try {
+        	for (Server server : ServerContainer.getServerContainer().getItemIds()) {
+        		for (String engine : server.getEngines()) {
+        			if (!cmbEngine.containsId(engine)) {
+        				cmbEngine.addItem(engine);
+        			}
         		}
         	}
+        } catch (NullPointerException e) {
+        	//failed to find any servers
         }
         
         editorLayout.addComponent(textName);
@@ -111,11 +115,16 @@ public class MideaasTestEditor extends CustomComponent {
             		
             					//write test into a file
             					try {
-            						File path = new File(MideaasConfig.getProjectsDir() + "/test/" + textLocation.getValue() + textName.getValue() + ".txt"); //TODO: project name needs to be dynamic
-            						BufferedWriter out = new BufferedWriter(new FileWriter(path));
+            						File path = new File(MideaasConfig.getProjectsDir() + "/" + projectName + "/" + textLocation.getValue());
+            						path.mkdirs();
+            						File file = new File(path.getAbsolutePath() + "/" + textName.getValue() + ".txt");
+            						System.out.println(file);
+            						file.createNewFile();
+            						
+            						BufferedWriter out = new BufferedWriter(new FileWriter(file));
             						out.write(editor.getValue());
             						out.close();
-            					} catch (IOException e) {
+            					} catch (Exception e) {
             						Notification.show("Whoops", "Writing to a file failed", Notification.Type.ERROR_MESSAGE);
             						e.printStackTrace();
             					}
@@ -144,11 +153,17 @@ public class MideaasTestEditor extends CustomComponent {
             		
             					//write test into a file
             					try {
-            						String path = MideaasConfig.getProjectsDir() + "/test/" + textLocation.getValue() + textName.getValue() + ".txt"; //TODO: project name needs to be dynamic
-            						BufferedWriter out = new BufferedWriter(new FileWriter(path));
+            						System.out.println("testing");
+            						File path = new File(MideaasConfig.getProjectsDir() + "/" + projectName + "/" + textLocation.getValue());
+            						path.mkdirs();
+            						File file = new File(path.getAbsolutePath() + "/" + textName.getValue() + ".txt");
+            						System.out.println(file);
+            						file.createNewFile();
+            						
+            						BufferedWriter out = new BufferedWriter(new FileWriter(file));
             						out.write(editor.getValue());
             						out.close();
-            					} catch (IOException e) {
+            					} catch (Exception e) {
             						Notification.show("Whoops", "Writing to a file failed", Notification.Type.ERROR_MESSAGE);
             						e.printStackTrace();
             					}
@@ -176,8 +191,8 @@ public class MideaasTestEditor extends CustomComponent {
         });
         
         HorizontalLayout editorButtonLayout = new HorizontalLayout();
-        editorButtonLayout.addComponent(closeButton);
         editorButtonLayout.addComponent(saveButton);
+        editorButtonLayout.addComponent(closeButton);        
         editorLayout.addComponent(editorButtonLayout);
         csslayout.addComponent(editorLayout);
         editwindow.setContent(editorLayout);
@@ -185,7 +200,7 @@ public class MideaasTestEditor extends CustomComponent {
         return editwindow;
 	}
 	
-	public Window editTest(String save, Set<?> newSelection) {
+	public Window editTest(String save, Set<?> newSelection, String projectName) {
     		// Open the subwindow by adding it to the parent
 			// window
     		if (editwindow.getParent() == null) {
@@ -200,7 +215,7 @@ public class MideaasTestEditor extends CustomComponent {
     				textDescription.setValue(item.getDescription());
     				cmbEngine.setValue(item.getEngine());
     				
-    				String path = MideaasConfig.getProjectsDir() + "/test/" + textLocation.getValue() + textName.getValue() + ".txt"; //TODO: project name needs to be dynamic
+    				String path = MideaasConfig.getProjectsDir() + "/" + projectName + "/" + textLocation.getValue() + textName.getValue() + ".txt"; //TODO: project name needs to be dynamic
     				BufferedReader br = new BufferedReader(new FileReader(path));
     			    try {
     			        StringBuilder sb = new StringBuilder();

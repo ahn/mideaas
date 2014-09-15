@@ -37,7 +37,7 @@ import org.xml.sax.helpers.DefaultHandler;
 
 public class XmlTestWriter{
 	
-	public static synchronized void DOMWriteTestsToXml() {
+	public static synchronized void DOMWriteTestsToXml(String projectName) {
 		try {
 			
 			DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
@@ -109,7 +109,7 @@ public class XmlTestWriter{
 			TransformerFactory transformerFactory = TransformerFactory.newInstance();
 			Transformer transformer = transformerFactory.newTransformer();
 			DOMSource source = new DOMSource(doc);
-			StreamResult result = new StreamResult(new File(MideaasConfig.getProjectsDir() + "test/" + "TestDataStorage.xml"));
+			StreamResult result = new StreamResult(new File(MideaasConfig.getProjectsDir() + "/" + projectName + "/" + "TestDataStorage.xml"));
 	 
 			// Output to console for testing
 			// StreamResult result = new StreamResult(System.out);
@@ -125,12 +125,12 @@ public class XmlTestWriter{
 		}
 	}
 	
-	public static synchronized void WriteTestsToXml() {
+	public static synchronized void WriteTestsToXml(String projectName) {
 		XmlWriter xml = new XmlWriter();
-		xml.startWriting();
+		xml.startWriting(projectName);
 	}
 	
-	public static synchronized String SAXloadTestsFromXml() {
+	public static synchronized String SAXloadTestsFromXml(String projectName) {
 		try {
 			 
 			SAXParserFactory factory = SAXParserFactory.newInstance();
@@ -251,7 +251,7 @@ public class XmlTestWriter{
   	      		}
   	      	};
 
-  	      	File file = new File(MideaasConfig.getProjectsDir() + "/test/" + "TestDataStorage.xml");	//TODO: needs changeable project name
+  	      	File file = new File(MideaasConfig.getProjectsDir() + "/" + projectName + "/" + "TestDataStorage.xml");	//TODO: needs changeable project name
   	      	InputStream inputStream= new FileInputStream(file);
   	      	Reader reader = new InputStreamReader(inputStream,"UTF-8");
 

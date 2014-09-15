@@ -35,7 +35,7 @@ public class ZipPlugin implements MideaasEditorPlugin {
 	}
 	
 	@Override
-	public void extendMenu(MenuBar menuBar) {
+	public void extendMenu(MenuBar menuBar, SharedProject project) {
 	    Runnable zipRunnable = createzipRunnable(project.getName());
 	    MenuBarUtil.addMenuItem(menuBar, "Zip", zipRunnable);
 	}

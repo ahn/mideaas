@@ -9,6 +9,7 @@ import java.util.Map;
 import org.vaadin.mideaas.model.Server;
 import org.vaadin.mideaas.model.ServerContainer;
 import org.vaadin.mideaas.model.XmlRpcContact;
+import org.vaadin.mideaas.model.SharedProject;
 
 import com.vaadin.data.Property;
 import com.vaadin.data.Property.ValueChangeEvent;
@@ -29,7 +30,8 @@ public class XmlRpcServerDetails extends Window {
 	final com.vaadin.ui.TextArea listEngines = new com.vaadin.ui.TextArea();
 	final com.vaadin.ui.TextArea listDetails = new com.vaadin.ui.TextArea();
 	
-	protected Window newWindow(){
+	protected Window newWindow(final SharedProject project){
+
 		Window settings = new Window("FNTS Server details");
 		
 		settings.setWidth("640px");
@@ -77,7 +79,7 @@ public class XmlRpcServerDetails extends Window {
         	listEngines.setReadOnly(true);
         	
         	listDetails.setReadOnly(false);
-            listDetails.setValue(ServerContainer.getServer(first).getDetails());
+        	listDetails.setValue(ServerContainer.getServer((String)cmbServers.getValue()).getDetails());
             listDetails.setReadOnly(true);
             
         } catch (NullPointerException e) {
@@ -101,7 +103,7 @@ public class XmlRpcServerDetails extends Window {
             				cmbServers.addItem(newServer.getValue());
             				cmbServers.setValue(newServer.getValue());
             				Map<String, String> result = (HashMap<String, String>)XmlRpcContact.getServerDetails(newServer.getValue(), "details");
-            				ServerContainer.addServer(newServer.getValue(), Arrays.asList(result.get("engines").split(" ")), result.get("details"));
+            				ServerContainer.addServer(newServer.getValue(), Arrays.asList(result.get("engines").split(" ")), result.get("details"), project.getName());
             				listEngines.setReadOnly(false);
         					listEngines.setValue("");
         					for (String engine : ServerContainer.getServerEngines((String)cmbServers.getValue())){
@@ -115,13 +117,13 @@ public class XmlRpcServerDetails extends Window {
             				Notification.show("Server saved!", Notification.Type.HUMANIZED_MESSAGE);
             			}
             			catch (NullPointerException e) {
-            				Notification.show("Whoops", "Something went wrong while adding new server", Notification.Type.ERROR_MESSAGE);
+            				Notification.show("Whoops", "Something went wrong while adding a new server", Notification.Type.ERROR_MESSAGE);
             				e.printStackTrace();
             				if (cmbServers.containsId(newServer.getValue())) {
             					cmbServers.removeItem(newServer.getValue());
             				}
             				if (ServerContainer.getServer(newServer.getValue()) != null) {
-            					ServerContainer.removeServer(newServer.getValue());
+            					ServerContainer.removeServer(newServer.getValue(), project.getName());
             				}
             				newServer.setValue("");
             				listEngines.setReadOnly(true);
@@ -137,7 +139,7 @@ public class XmlRpcServerDetails extends Window {
             public void buttonClick(ClickEvent event) { 
             	// TODO: a quick check if the user is sure
             	try {
-            		ServerContainer.removeServer((String)cmbServers.getValue());
+            		ServerContainer.removeServer((String)cmbServers.getValue(), project.getName());
             		cmbServers.removeItem(cmbServers.getValue());
             	} catch (Exception e) {
             		Notification.show("Whoops", "Something went wrong while removing server", Notification.Type.ERROR_MESSAGE);
@@ -150,7 +152,9 @@ public class XmlRpcServerDetails extends Window {
             public void buttonClick(ClickEvent event) { 
             	try {
     				Map<String, String> result = (HashMap<String, String>)XmlRpcContact.getServerDetails((String)cmbServers.getValue(), "details");
-    				ServerContainer.updateServerdata((String)cmbServers.getValue(), Arrays.asList(result.get("engines").split(" ")), result.get("details"));
+    				System.out.println(result.values());
+    				System.out.println(result.get("details"));
+    				ServerContainer.updateServerdata((String)cmbServers.getValue(), Arrays.asList(result.get("engines").split(" ")), result.get("details"), project.getName());
     				listEngines.setReadOnly(false);
 					listEngines.setValue("");
 					for (String engine : ServerContainer.getServerEngines((String)cmbServers.getValue())){
@@ -158,7 +162,7 @@ public class XmlRpcServerDetails extends Window {
 					}
 					listEngines.setReadOnly(true);
 					listDetails.setReadOnly(false);
-					listDetails.setValue(ServerContainer.getServer((String)cmbServers.getValue()).getDetails());
+        			listDetails.setValue(ServerContainer.getServer((String)cmbServers.getValue()).getDetails());
 					listDetails.setReadOnly(true);
             	} catch (Exception e) {
             		Notification.show("Whoops", "Something went wrong while refreshing server data", Notification.Type.ERROR_MESSAGE);

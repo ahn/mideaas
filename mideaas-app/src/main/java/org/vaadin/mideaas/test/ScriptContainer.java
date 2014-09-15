@@ -50,7 +50,7 @@ public class ScriptContainer extends BeanItemContainer<Script> implements
         return c;
     }
     
-    public static ScriptContainer addTestToContainer(List testData) {
+    public static ScriptContainer addTestToContainer(List testData, String projectName) {
     	Script p = new Script();
     	
     	p.setName((String)testData.get(0));
@@ -62,7 +62,7 @@ public class ScriptContainer extends BeanItemContainer<Script> implements
         p.setNotes("This test has not been executed yet");
     	c.addItem(p);
     	
-    	XmlTestWriter.WriteTestsToXml();
+    	XmlTestWriter.WriteTestsToXml(projectName);
     
     	return c;
     }
@@ -109,7 +109,7 @@ public class ScriptContainer extends BeanItemContainer<Script> implements
     }
     
     
-    public static synchronized void updateResult(HashMap<String, String> map, String testName) {
+    public static synchronized void updateResult(HashMap<String, String> map, String testName, String projectName) {
     	for (Script p : c.getItemIds()) {
     		if (p.getName().equals(testName)) {
     			//found the correct test
@@ -125,7 +125,7 @@ public class ScriptContainer extends BeanItemContainer<Script> implements
     			break;	//no need to look for more tests
     		}
     	}
-    	XmlTestWriter.WriteTestsToXml();
+    	XmlTestWriter.WriteTestsToXml(projectName);
     }
     
     public static synchronized Script getScriptFromContainer(String scriptName) {
@@ -138,17 +138,17 @@ public class ScriptContainer extends BeanItemContainer<Script> implements
     	return item;
     }
     
-    public static synchronized void removeScriptFromContainer(String testName) {
+    public static synchronized void removeScriptFromContainer(String testName, String projectName) {
     	for (Script item : c.getAllItemIds()) {
     		if (item.getName().matches(testName)) {
     			c.removeItem(item);
     			break;
     		}
     	}
-    	XmlTestWriter.WriteTestsToXml();
+    	XmlTestWriter.WriteTestsToXml(projectName);
     }
     
-    public static synchronized void updateScriptCheckValue(HashSet<Object> markedRows) {
+    public static synchronized void updateScriptCheckValue(HashSet<Object> markedRows, String projectName) {
     	for (Script item : c.getAllItemIds()) {
     		if (markedRows.contains(item.getName())) {
     			item.setCheck(true);
@@ -156,7 +156,7 @@ public class ScriptContainer extends BeanItemContainer<Script> implements
     			item.setCheck(false);
     		}
     	}
-    	XmlTestWriter.WriteTestsToXml();
+    	XmlTestWriter.WriteTestsToXml(projectName);
     }
 }
 

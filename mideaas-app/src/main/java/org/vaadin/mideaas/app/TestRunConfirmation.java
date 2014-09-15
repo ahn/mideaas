@@ -37,7 +37,7 @@ public class TestRunConfirmation extends Window {
     final com.vaadin.ui.TextField textRuntimes = new com.vaadin.ui.TextField("Run # of times");
     final com.vaadin.ui.ComboBox cmbServer = new com.vaadin.ui.ComboBox("XMLRPC Server");
 	
-	protected Window newWindow(HashSet<Object> rows, final MideaasTest mideaasTest){
+	protected Window newWindow(HashSet<Object> rows, final MideaasTest mideaasTest, final String projectName){
 		markedRows.addAll(rows);
 		
 		//the test confirmation window
@@ -122,7 +122,7 @@ public class TestRunConfirmation extends Window {
 					map.put("tolerance", (String)textTolerance.getValue());
 					map.put("runtimes", (String)textRuntimes.getValue());
 					
-					XmlRpcContact.executeParallelTests((String)cmbServer.getValue(), map, MideaasConfig.getExecutorNumber(), mideaasTest);
+					XmlRpcContact.executeParallelTests((String)cmbServer.getValue(), map, MideaasConfig.getExecutorNumber(), mideaasTest, projectName);
 					UI.getCurrent().removeWindow(confirmTests);
 				}
 			}
@@ -181,13 +181,17 @@ public class TestRunConfirmation extends Window {
 		markedRows.clear();
 		markedRows.addAll(rows);
 		//TODO: fntsservers!
-		cmbServer.removeAllItems();
-		String ping = "";
-		for (Server server : ServerContainer.getServerContainer().getItemIds()) {
-			ping = XmlRpcContact.ping(server.getIP());
-			if (ping.matches("pong")) {
-				cmbServer.addItem(server.getIP());
+		try {
+			cmbServer.removeAllItems();
+			String ping = "";
+			for (Server server : ServerContainer.getServerContainer().getItemIds()) {
+				ping = XmlRpcContact.ping(server.getIP());
+				if (ping.matches("pong")) {
+					cmbServer.addItem(server.getIP());
+				}
 			}
+		} catch (NullPointerException e) {
+			//no servers were found 
 		}
 		
 		this.updateList();

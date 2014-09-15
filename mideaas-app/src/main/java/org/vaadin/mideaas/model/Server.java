@@ -29,6 +29,15 @@ public class Server implements Serializable {
         return details;
     }
     public void setDetails(String details) {
-        this.details = details;
+    	try {
+    		if (!details.matches("null")) {
+    			this.details = details;
+    		} else {
+    			this.details = "Details were not found, the server might be outdated";
+    		}
+    	} catch (Exception e) {
+    		this.details = "Details were not found, the server might be outdated";
+    	}
+        
     }
 }

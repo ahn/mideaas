@@ -5,6 +5,7 @@ import java.io.IOException;
 
 import org.apache.commons.io.FileUtils;
 import org.vaadin.mideaas.frontend.MideaasEditorPlugin;
+import org.vaadin.mideaas.model.SharedProject;
 
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
@@ -28,7 +29,7 @@ public class FeedbackPlugin implements MideaasEditorPlugin {
 
 	@SuppressWarnings("serial")
 	@Override
-	public void extendMenu(MenuBar menuBar) {
+	public void extendMenu(MenuBar menuBar, SharedProject project) {
 		menuBar.addItem("Feedback", null).addItem("Send feedback", new Command() {
 
 			@Override

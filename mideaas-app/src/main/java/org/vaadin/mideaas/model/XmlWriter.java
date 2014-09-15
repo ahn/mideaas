@@ -12,9 +12,9 @@ public class XmlWriter {
     static int indentation = 0;
     static BufferedWriter out = null;
 
-    public synchronized void startWriting() {
+    public synchronized void startWriting(String projectName) {
         try {
-        	out = new BufferedWriter(new FileWriter(MideaasConfig.getProjectsDir() + "/test/" + "TestDataStorage.xml")); //TODO: replace project name
+        	out = new BufferedWriter(new FileWriter(MideaasConfig.getProjectsDir() + "/" + projectName + "/" + "TestDataStorage.xml")); //TODO: replace project name
 
         	this.childLoop(ScriptContainer.getContainer(), ServerContainer.getServerContainer());
 

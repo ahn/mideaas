@@ -62,7 +62,7 @@ public class XmlRpcContact {
 		return result;
 	}
 	
-	public static void executeParallelTests(String server, Map<String, String> map, int NTHREADS, final MideaasTest mideaasTest) {
+	public static void executeParallelTests(String server, Map<String, String> map, int NTHREADS, final MideaasTest mideaasTest, String projectName) {
 		/*
 		 * the executor runs all the tests in separate threads, making better use of FNTS
 		 * this way the page doesn't have to hang until the tests have been executed, they will be reported the instant
@@ -72,7 +72,7 @@ public class XmlRpcContact {
 		List<String> list = Arrays.asList(map.get("scriptNames").split("\\s*,\\s*"));
 		map.remove("scriptNames");
 		
-		List<HashMap<String, String>> blocks = CreateTestBlocks(list);
+		List<HashMap<String, String>> blocks = CreateTestBlocks(list, projectName);
 		
 		//commented just in case it's needed for some reason
 		/*if (list.size()/NTHREADS > 1) {
@@ -125,7 +125,7 @@ public class XmlRpcContact {
 	public static synchronized Object getServerDetails(String server, String checkDetail) {
 		Object result = null;
 		Map<String, String> map = new HashMap<String, String>();
-		map.put("key", "value");
+		//map.put("key", "value");
 		try{
 			XmlRpcClientConfigImpl config = new XmlRpcClientConfigImpl();
 			config.setServerURL(new URL(server));
@@ -133,16 +133,19 @@ public class XmlRpcContact {
 			client.setConfig(config);
 			if (checkDetail.matches("engines")) {
         	    System.out.println("checking engines");
-                result = client.execute("getServerEngines", new Object[] {map});
+        	    map.put("getdetails", "false");
+                //result = client.execute("getServerDet", new Object[] {map});
 			} else if (checkDetail.matches("details")) {
 				System.out.println("checking server details");
-                result = client.execute("getServerDetails", new Object[] {map});
+				map.put("getdetails", "true");
+                //result = client.execute("getServerDetails", new Object[] {map});
 			} else {
 				System.out.println("This shouldn't have happened...");
 				Map<String, String> resmap = new HashMap<String, String>();
 				resmap.put("error", "something went wrong");
 				result = resmap;
 			}
+			result = client.execute("getServerDetails", new Object[] {map});
         } catch ( Exception ex ) {
         	System.out.println((String)result);
         	Map<String, String> resmap = new HashMap<String, String>();
@@ -154,13 +157,13 @@ public class XmlRpcContact {
 	}
 	
 	
-	public static String getScriptFromFile(String scriptName) {
+	public static String getScriptFromFile(String scriptName, String projectName) {
 		System.out.println(scriptName);
 		Script item = ScriptContainer.getScriptFromContainer(scriptName);
 		System.out.println(item.toString());
 		String script = "";
 		try {
-			String path = MideaasConfig.getProjectsDir() + "test/" + item.getLocation() + scriptName + ".txt"; //TODO: project name needs to be dynamic
+			String path = MideaasConfig.getProjectsDir() + "/" + projectName + "/" + item.getLocation() + scriptName + ".txt"; //TODO: project name needs to be dynamic
 			BufferedReader br = new BufferedReader(new FileReader(path));
 			try {
 				StringBuilder sb = new StringBuilder();
@@ -186,7 +189,7 @@ public class XmlRpcContact {
 		return script;
 	}
 	
-	private static List<HashMap<String, String>> CreateTestBlocks(List<String> list) {
+	private static List<HashMap<String, String>> CreateTestBlocks(List<String> list, String projectName) {
 		Script script;
 		String engine;
 		boolean engineFound = false;
@@ -219,6 +222,11 @@ public class XmlRpcContact {
 					maps.add(map);
 				}
 				engineFound = false;
+			}
+			
+			if (maps.size() == 1){
+				System.out.println("testing if we get through");
+				maps.get(0).put("script", getScriptFromFile(maps.get(0).get("scriptNames"), projectName));
 			}
 		}
 		System.out.println(maps);
