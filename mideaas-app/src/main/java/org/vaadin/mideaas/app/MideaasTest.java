@@ -256,12 +256,16 @@ public class MideaasTest extends CustomComponent {
                 new Button.ClickListener() {
                     // inline click-listener
                     public void buttonClick(ClickEvent event) {
-                    	editwindow = testeditor.createTest();
-                    	UI.getCurrent().addWindow(editwindow);
-                    	// Center the window
-                        editwindow.center();
-                        
-                        //updateTable();
+                    	if (!UI.getCurrent().getWindows().contains(editwindow)) {
+                    		editwindow = testeditor.createTest();
+                    		UI.getCurrent().addWindow(editwindow);
+                    		// Center the window
+                    		editwindow.center();
+                    		
+                    		//updateTable();
+                    	} else {
+                    		editwindow.focus();
+                    	}
                     }
                 });
         newScript.setDescription("Add a new test to the list");
@@ -271,8 +275,13 @@ public class MideaasTest extends CustomComponent {
         	new Button.ClickListener() {
             	// inline click-listener
             	public void buttonClick(ClickEvent event) {
-            		conf.updateData(markedRows);
-            		UI.getCurrent().addWindow(confirmTests);
+            		if (!UI.getCurrent().getWindows().contains(confirmTests)) {
+            			conf.updateData(markedRows);
+            			UI.getCurrent().addWindow(confirmTests);
+            		} else {
+            			// the window exists already
+            			confirmTests.focus();
+            		}
             	}
         });
         runScripts.setDescription("Change settings and run marked tests");
@@ -282,7 +291,12 @@ public class MideaasTest extends CustomComponent {
             	new Button.ClickListener() {
                 	// inline click-listener
                 	public void buttonClick(ClickEvent event) {
-                		UI.getCurrent().addWindow(settings);
+                		if (!UI.getCurrent().getWindows().contains(settings)) {
+                			UI.getCurrent().addWindow(settings);
+                		} else{
+                			// the window exists already
+                			settings.focus();
+                		}
                 	}
             });
         serverDetails.setDescription("Add and inspect XMLRPC servers");
