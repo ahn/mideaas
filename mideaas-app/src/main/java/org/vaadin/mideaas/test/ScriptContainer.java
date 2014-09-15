@@ -2,6 +2,7 @@ package org.vaadin.mideaas.test;
 
 import java.io.Serializable;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
 
@@ -26,7 +27,6 @@ public class ScriptContainer extends BeanItemContainer<Script> implements
     }
 
     public static ScriptContainer createWithTestData() {
-        //ScriptContainer c = null;
         Random r = new Random(0);
         try {
             c = new ScriptContainer();
@@ -36,6 +36,7 @@ public class ScriptContainer extends BeanItemContainer<Script> implements
                 p.setLocation(locations[r.nextInt(locations.length)]);
                 p.setDescription(descriptions[r.nextInt(descriptions.length)]);
                 p.setResult("NOT RUN");
+                p.setEngine("robotEngine");
                 p.setCheck(false);
                 p.setNotes("This test has not been executed yet");
                 c.addItem(p);
@@ -49,19 +50,19 @@ public class ScriptContainer extends BeanItemContainer<Script> implements
         return c;
     }
     
-    public static ScriptContainer addTestToContainer(List testData) {
-    	//ScriptContainer c = null;
+    public static ScriptContainer addTestToContainer(List testData, String projectName) {
     	Script p = new Script();
     	
     	p.setName((String)testData.get(0));
         p.setLocation((String)testData.get(1));
         p.setDescription((String)testData.get(2));
+        p.setEngine((String)testData.get(3));
         p.setResult("NOT RUN");
         p.setCheck(false);
         p.setNotes("This test has not been executed yet");
     	c.addItem(p);
     	
-    	XmlTestWriter.WriteTestsToXml();
+    	XmlTestWriter.WriteTestsToXml(projectName);
     
     	return c;
     }
@@ -101,7 +102,6 @@ public class ScriptContainer extends BeanItemContainer<Script> implements
     				}
     			}
     		}
-    		MideaasTest.updateTable();
     	} catch (Exception e) {
     		e.printStackTrace();
     	}
@@ -109,7 +109,7 @@ public class ScriptContainer extends BeanItemContainer<Script> implements
     }
     
     
-    public static synchronized void updateResult(HashMap<String, String> map, String testName) {
+    public static synchronized void updateResult(HashMap<String, String> map, String testName, String projectName) {
     	for (Script p : c.getItemIds()) {
     		if (p.getName().equals(testName)) {
     			//found the correct test
@@ -125,20 +125,38 @@ public class ScriptContainer extends BeanItemContainer<Script> implements
     			break;	//no need to look for more tests
     		}
     	}
-    	XmlTestWriter.WriteTestsToXml();
+    	XmlTestWriter.WriteTestsToXml(projectName);
     }
     
     public static synchronized Script getScriptFromContainer(String scriptName) {
     	Script item = null;
     	for (Script p : (List<Script>) c.getItemIds()) {
-    		//System.out.println("found item " + p.getName() + " from container");
-    		//System.out.println("checking if item '" + p.getName() + "' is '" + scriptName + "'...");
     		if (p.getName().matches(scriptName)) {
-    			//System.out.println("found it!");
     			item = p;
     		}
     	}
     	return item;
+    }
+    
+    public static synchronized void removeScriptFromContainer(String testName, String projectName) {
+    	for (Script item : c.getAllItemIds()) {
+    		if (item.getName().matches(testName)) {
+    			c.removeItem(item);
+    			break;
+    		}
+    	}
+    	XmlTestWriter.WriteTestsToXml(projectName);
+    }
+    
+    public static synchronized void updateScriptCheckValue(HashSet<Object> markedRows, String projectName) {
+    	for (Script item : c.getAllItemIds()) {
+    		if (markedRows.contains(item.getName())) {
+    			item.setCheck(true);
+    		} else {
+    			item.setCheck(false);
+    		}
+    	}
+    	XmlTestWriter.WriteTestsToXml(projectName);
     }
 }
 

@@ -15,14 +15,18 @@ public class XmlRpcRunnable implements Runnable {
 	private final String script;
 	private final Map<String, String> map;
 	private final int i; 
+	private final MideaasTest mideaasTest;
+	private final String projectName;
 	
-	XmlRpcRunnable(String server, String testName, String script, Map<String, String> map, int i) {
+	XmlRpcRunnable(String server, String testName, String script, Map<String, String> map, int i, MideaasTest mideaasTest) {
 		this.server = server;
 		this.testName = testName;
 		this.script = script;
 		this.map = map;
 		this.i = i;
 		System.out.println(this.map.toString());
+		this.mideaasTest = mideaasTest;
+		this.projectName = mideaasTest.getProjectName();
 	}
 	
 	@Override
@@ -38,11 +42,14 @@ public class XmlRpcRunnable implements Runnable {
 			
 			Map<String, String> newmap = this.setupTest(this.map, this.testName);
         	
+			System.out.println(newmap);
 			result = client.execute("executeTestCase", new Object[] {newmap});
 			
-			ScriptContainer.updateResult((HashMap<String, String>) result, this.testName);
+			for(String test : this.testName.split(", ")){
+				ScriptContainer.updateResult((HashMap<String, String>) result, test, this.projectName);
+			}
 			
-			MideaasTest.updateTable();
+			mideaasTest.updateTable();
 		}
 		catch ( Exception ex ) {
 			ex.printStackTrace();
@@ -54,9 +61,8 @@ public class XmlRpcRunnable implements Runnable {
 	}
 	
 	
-	private Map<String, String> setupTest(Map<String, String>map, String testName) {
+	private Map<String, String> setupTest(Map<String, String> map, String testName) {
 		
-		testName = testName + ".txt";
 		String name = map.get("testCaseName");
 		System.out.println("testcasename: " + name);
 		name = name + Integer.toString(i);
@@ -66,7 +72,8 @@ public class XmlRpcRunnable implements Runnable {
 		}
 		newmap.remove("testCaseName");
 		newmap.put("testCaseName", name);
-		newmap.put("scripts", testName);  	// script file names
+		newmap.put("projectName", this.projectName);
+		newmap.put("scriptNames", testName);  	// script file names
 		newmap.put("script", this.script);	// the test script
 		
 		return newmap;

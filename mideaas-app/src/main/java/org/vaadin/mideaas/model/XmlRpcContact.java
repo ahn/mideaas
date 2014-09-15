@@ -15,8 +15,11 @@ import java.util.concurrent.Executors;
 import org.apache.xmlrpc.client.XmlRpcClient;
 import org.apache.xmlrpc.client.XmlRpcClientConfigImpl;
 import org.vaadin.mideaas.app.MideaasConfig;
-import org.vaadin.mideaas.test.Script;
+
+import org.vaadin.mideaas.app.MideaasTest;
 import org.vaadin.mideaas.test.ScriptContainer;
+
+import org.vaadin.mideaas.test.Script;
 
 import com.vaadin.ui.Notification;
 
@@ -24,7 +27,7 @@ public class XmlRpcContact {
 	
 	volatile List<String> scriptList = new ArrayList<String>();
 	
-	public String ping(String server) {
+	public static String ping(String server) {
 		
 		try{
 			XmlRpcClientConfigImpl config = new XmlRpcClientConfigImpl();
@@ -37,13 +40,12 @@ public class XmlRpcContact {
             return (String)result.get("ping");
         }
         catch ( Exception ex ) {
-        	ex.printStackTrace();
         	return "Connection failed";
         }
 	}
 	
 	//executes all tests at once, no threading
-	public Object executeTests(String server, Map<String, String> map) {
+	public static Object executeTests(String server, Map<String, String> map) {
     	Object result = null;
 		
 		try{
@@ -60,15 +62,17 @@ public class XmlRpcContact {
 		return result;
 	}
 	
-	public void executeParallelTests(String server, Map<String, String> map, int NTHREADS) {
+	public static void executeParallelTests(String server, Map<String, String> map, int NTHREADS, final MideaasTest mideaasTest, String projectName) {
 		/*
 		 * the executor runs all the tests in separate threads, making better use of FNTS
 		 * this way the page doesn't have to hang until the tests have been executed, they will be reported the instant
 		 * they are finished
 		 * NTHREADS is the number of possible threads 
 		 */
-		List<String> list = Arrays.asList(map.get("scripts").split("\\s*,\\s*"));
-		map.remove("scripts");
+		List<String> list = Arrays.asList(map.get("scriptNames").split("\\s*,\\s*"));
+		map.remove("scriptNames");
+		
+		List<HashMap<String, String>> blocks = CreateTestBlocks(list, projectName);
 		
 		//commented just in case it's needed for some reason
 		/*if (list.size()/NTHREADS > 1) {
@@ -96,40 +100,54 @@ public class XmlRpcContact {
 			scriptList = list;
 		}*/
 		
-		//List<Thread> threads = new ArrayList<Thread>();
-		
 		ExecutorService executor = Executors.newFixedThreadPool(NTHREADS);
 		ScriptContainer.SetRunnableTests(list);
+		mideaasTest.updateTable();
 		int i = 1;
-		for (String test : list) {
+		for (HashMap<String, String> block : blocks) {
 
 			System.out.println("index is " + i);
-			String script = this.getScriptFromFile(test);
+			//String script = getScriptFromFile(test); TODO
+			String script = " ";
 			
-			Runnable worker = new XmlRpcRunnable(server, test, script, map, i);
+			map.put("testingEngine", block.get("engine"));
+			
+			Runnable worker = new XmlRpcRunnable(server, block.get("scriptNames"), script, map, i, mideaasTest);
 		    executor.execute(worker);
 			i++;
 			
 		}
-		// This will make the executor accept no new threads
+		// This will make the executor to not accept new threads
 	    // and finish all existing threads in the queue
 	    executor.shutdown();
 	}
 	
-	public synchronized Object getServerDetails(String server) {
+	public static synchronized Object getServerDetails(String server, String checkDetail) {
 		Object result = null;
 		Map<String, String> map = new HashMap<String, String>();
-		map.put("key", "value");
+		//map.put("key", "value");
 		try{
 			XmlRpcClientConfigImpl config = new XmlRpcClientConfigImpl();
 			config.setServerURL(new URL(server));
 			XmlRpcClient client = new XmlRpcClient();
 			client.setConfig(config);
-        	
-            result = client.execute("getServerDetails", new Object[] {map});
-        }
-        catch ( Exception ex ) {
-        	ex.printStackTrace();
+			if (checkDetail.matches("engines")) {
+        	    System.out.println("checking engines");
+        	    map.put("getdetails", "false");
+                //result = client.execute("getServerDet", new Object[] {map});
+			} else if (checkDetail.matches("details")) {
+				System.out.println("checking server details");
+				map.put("getdetails", "true");
+                //result = client.execute("getServerDetails", new Object[] {map});
+			} else {
+				System.out.println("This shouldn't have happened...");
+				Map<String, String> resmap = new HashMap<String, String>();
+				resmap.put("error", "something went wrong");
+				result = resmap;
+			}
+			result = client.execute("getServerDetails", new Object[] {map});
+        } catch ( Exception ex ) {
+        	System.out.println((String)result);
         	Map<String, String> resmap = new HashMap<String, String>();
         	resmap.put("error", "Something went wrong: " + ex.toString());
         	result = resmap;
@@ -138,13 +156,14 @@ public class XmlRpcContact {
 		return result; 
 	}
 	
-	public String getScriptFromFile(String scriptName) {
+	
+	public static String getScriptFromFile(String scriptName, String projectName) {
 		System.out.println(scriptName);
 		Script item = ScriptContainer.getScriptFromContainer(scriptName);
 		System.out.println(item.toString());
 		String script = "";
 		try {
-			String path = MideaasConfig.getProjectsDir() + "test/" + item.getLocation() + scriptName + ".txt"; //TODO: project name needs to be dynamic
+			String path = MideaasConfig.getProjectsDir() + "/" + projectName + "/" + item.getLocation() + scriptName + ".txt"; //TODO: project name needs to be dynamic
 			BufferedReader br = new BufferedReader(new FileReader(path));
 			try {
 				StringBuilder sb = new StringBuilder();
@@ -168,6 +187,50 @@ public class XmlRpcContact {
 		}
 		
 		return script;
+	}
+	
+	private static List<HashMap<String, String>> CreateTestBlocks(List<String> list, String projectName) {
+		Script script;
+		String engine;
+		boolean engineFound = false;
+		List<HashMap<String, String>> maps = new ArrayList<HashMap<String, String>>();
+		
+		for(String scriptName : list){
+			script = ScriptContainer.getScriptFromContainer(scriptName);
+			engine = script.getEngine();
+			
+			if(maps.isEmpty()) {
+				HashMap<String, String> map = new HashMap<String, String>();
+				map.put("engine", engine);
+				map.put("scriptNames", script.getName());
+				maps.add(map);
+			} else {
+				for(HashMap<String, String> map: maps){
+					if(map.get("engine").matches(engine)) {
+						String scriptNames = map.get("scriptNames");
+						map.remove("scriptNames");
+						scriptNames = scriptNames + ", " + script.getName();
+						map.put("scriptNames", scriptNames);
+						engineFound = true;
+						break;
+					}
+				}
+				if(engineFound == false){
+					HashMap<String, String> map = new HashMap<String, String>();
+					map.put("engine", engine);
+					map.put("scriptNames", script.getName());
+					maps.add(map);
+				}
+				engineFound = false;
+			}
+			
+			if (maps.size() == 1){
+				System.out.println("testing if we get through");
+				maps.get(0).put("script", getScriptFromFile(maps.get(0).get("scriptNames"), projectName));
+			}
+		}
+		System.out.println(maps);
+		return maps;
 	}
 }
 

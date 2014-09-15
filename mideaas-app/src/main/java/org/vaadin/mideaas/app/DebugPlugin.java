@@ -1,6 +1,7 @@
 package org.vaadin.mideaas.app;
 
 import org.vaadin.mideaas.frontend.MideaasEditorPlugin;
+import org.vaadin.mideaas.model.SharedProject;
 
 import com.vaadin.ui.MenuBar;
 import com.vaadin.ui.MenuBar.Command;
@@ -14,7 +15,7 @@ public class DebugPlugin implements MideaasEditorPlugin {
 	}
 
 	@Override
-	public void extendMenu(MenuBar menuBar) {
+	public void extendMenu(MenuBar menuBar, SharedProject project) {
 		MenuItem root = menuBar.addItem("Debug", null);
 		root.addItem("Close session", createWidgetSetCommand());
 	}

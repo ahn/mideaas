@@ -2,6 +2,7 @@ package org.vaadin.mideaas.app;
 
 import org.vaadin.mideaas.frontend.MideaasEditorPlugin;
 import org.vaadin.mideaas.model.UserSettings;
+import org.vaadin.mideaas.model.SharedProject;
 
 import com.vaadin.ui.MenuBar;
 import com.vaadin.ui.MenuBar.Command;
@@ -17,7 +18,7 @@ public class SettingsPlugin implements MideaasEditorPlugin {
 	}
 
 	@Override
-	public void extendMenu(MenuBar menuBar) {
+	public void extendMenu(MenuBar menuBar, SharedProject project) {
 		MenuItem root = menuBar.addItem("Settings", null);
 		root.addItem("Widgetset", createWidgetSetCommand());
 	}

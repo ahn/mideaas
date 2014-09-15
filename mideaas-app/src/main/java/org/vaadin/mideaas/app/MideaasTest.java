@@ -1,12 +1,5 @@
 package org.vaadin.mideaas.app;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -15,23 +8,26 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.vaadin.mideaas.model.SharedProject;
 import org.vaadin.mideaas.model.ServerContainer;
 import org.vaadin.mideaas.model.XmlRpcContact;
 import org.vaadin.mideaas.model.XmlTestWriter;
 import org.vaadin.mideaas.test.Script;
 import org.vaadin.mideaas.test.ScriptContainer;
+import org.vaadin.mideaas.app.MideaasTestEditor;
 
 import com.vaadin.data.Property;
 import com.vaadin.event.Action;
+import com.vaadin.server.Page;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
-import com.vaadin.ui.CheckBox;
 import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.Table;
+import com.vaadin.ui.Table.Align;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
@@ -39,10 +35,12 @@ import com.vaadin.ui.Window;
 public class MideaasTest extends CustomComponent {
 
     Window editwindow;
-    //Window confirmTests;
+    
+    private final SharedProject project;
 
-    // XXX should not be static?
-    static public Table table = new Table();
+    public Table table = new Table();
+    
+    final MideaasTestEditor testeditor = new MideaasTestEditor();
 
     HashSet<Object> markedRows = new HashSet<Object>();
 
@@ -55,173 +53,71 @@ public class MideaasTest extends CustomComponent {
     static final Action[] ACTIONS_MARKED = new Action[] { ACTION_UNMARK,
             ACTION_EDIT, ACTION_REMOVE };
     
-    private final com.vaadin.ui.TextArea editor;
     private static final String initialText = "Write script here";
     
     private String savemode = "add";
     
-    public MideaasTest(String tabMessage) {
+    public MideaasTest(String tabMessage, final SharedProject project) {
+    	
+    	this.project = project;
     	
     	final com.vaadin.ui.TextArea testNotes = new com.vaadin.ui.TextArea("Notes", "");
     	testNotes.setWidth("100%");
     	testNotes.setRows(15);
     	testNotes.setReadOnly(true);
         
-        // Create the window
-        editwindow = new Window("Edit script");
-        //UI.getCurrent().addWindow(editwindow);
-        // let's give it a size (optional)
-        editwindow.setWidth("640px");
-        editwindow.setHeight("480px");
-        
-        editor = new com.vaadin.ui.TextArea(null, initialText);
-        editor.setRows(15);
-        editor.setColumns(50);
-        editor.setImmediate(true);
-        
-        VerticalLayout editorLayout = new VerticalLayout();
-        editorLayout.setMargin(true);
-        editorLayout.setSpacing(true);
-        
-        //add some content into the editor
-        final com.vaadin.ui.TextField textName = new com.vaadin.ui.TextField("Test name");
-        final com.vaadin.ui.TextField textLocation = new com.vaadin.ui.TextField("Location");
-        final com.vaadin.ui.TextField textDescription = new com.vaadin.ui.TextField("Description");
-        
-        editorLayout.addComponent(textName);
-        editorLayout.addComponent(textLocation);
-        editorLayout.addComponent(textDescription);
-        editorLayout.addComponent(editor);
+        //final Label selected = new Label("No selection");
+        final Label selected = new Label(project.getName());
 
-        Button closeButton = new Button("Close", new Button.ClickListener() {
-            // inline click-listener
-            public void buttonClick(ClickEvent event) {
-                // close the window by removing it from the parent window
-            	UI.getCurrent().removeWindow(editwindow);
-            }
-        });
-        
-        Button saveButton = new Button("Save", new Button.ClickListener() {
-            // inline click-listener
-            public void buttonClick(ClickEvent event) {
-                // should save the script into a file
-            	if (savemode == "add") {
-            		if (textName.getValue() != "") {
-            			if (textLocation.getValue() != "") {
-            				if (textDescription.getValue() != "") {
-            					List testData = new ArrayList();
-            					testData.add(textName.getValue());
-            					testData.add(textLocation.getValue());
-            					testData.add(textDescription.getValue());
-            					testData.add(false);
-            		
-            					//write test into a file
-            					try {
-            						File path = new File(MideaasConfig.getProjectsDir() + "test/" + textLocation.getValue() + textName.getValue() + ".txt"); //TODO: project name needs to be dynamic
-            						BufferedWriter out = new BufferedWriter(new FileWriter(path));
-            						out.write(editor.getValue());
-            						out.close();
-            					} catch (IOException e) {
-            						Notification.show("Whoops", "Writing to a file failed", Notification.Type.ERROR_MESSAGE);
-            						e.printStackTrace();
-            					}
-            		
-            					table.setContainerDataSource(ScriptContainer.addTestToContainer(testData));
-            					UI.getCurrent().removeWindow(editwindow);
-            				} else {
-                    			Notification.show("Whoops", "Description is required", Notification.Type.ERROR_MESSAGE);
-                    		}
-            			} else {
-                			Notification.show("Whoops", "Location is required", Notification.Type.ERROR_MESSAGE);
-                		}
-            		} else {
-            			Notification.show("Whoops", "Test name is required", Notification.Type.ERROR_MESSAGE);
-            		}
-            	} else if (savemode == "edit") {
-            		if (textName.getValue() != "") {
-            			if (textLocation.getValue() != "") {
-            				if (textDescription.getValue() != "") {
-            					//edit the selected item 
-            					Set<?> value = (Set<?>) table.getValue();
-            					Script item = (Script) value.iterator().next();
-            					item.setName(textName.getValue());
-            					item.setDescription(textDescription.getValue());
-            					item.setLocation(textLocation.getValue());
-            		
-            					//write test into a file
-            					try {
-            						String path = MideaasConfig.getProjectsDir() + "test/" + textLocation.getValue() + textName.getValue() + ".txt"; //TODO: project name needs to be dynamic
-            						BufferedWriter out = new BufferedWriter(new FileWriter(path));
-            						out.write(editor.getValue());
-            						out.close();
-            					} catch (IOException e) {
-            						Notification.show("Whoops", "Writing to a file failed", Notification.Type.ERROR_MESSAGE);
-            						e.printStackTrace();
-            					}
-            		
-            					//remove the old item and add a new one
-            					table.removeItem(table.getValue());
-            					table.addItem(item);
-            					table.markAsDirty();
-            					UI.getCurrent().removeWindow(editwindow);
-            				} else {
-                    			Notification.show("Whoops", "Description is required", Notification.Type.ERROR_MESSAGE);
-                    		}
-            			} else {
-                			Notification.show("Whoops", "Location is required", Notification.Type.ERROR_MESSAGE);
-                		}
-            		} else {
-            			Notification.show("Whoops", "Test name is required", Notification.Type.ERROR_MESSAGE);
-            		}
-            	} else {
-            		//only two possible options, so this should not happen
-            		Notification.show("Whoops", "We have a bad coder!", Notification.Type.WARNING_MESSAGE);
-            	}
-            }
-        });
-        
-        HorizontalLayout editorButtonLayout = new HorizontalLayout();
-        editorButtonLayout.addComponent(closeButton);
-        editorButtonLayout.addComponent(saveButton);
-        editorLayout.addComponent(editorButtonLayout);
-        editwindow.setContent(editorLayout);
-        
-        
-        
-        final Label selected = new Label("No selection");        
         // A layout structure used for composition
         Panel mainPanel = new Panel();
         final VerticalLayout mainLayout = new VerticalLayout();       
         mainLayout.addComponent(table);
-
+        
         // size
         table.setWidth("100%");
-        table.setHeight("300px");
+        table.setHeight("50%");
         // selectable
         table.setSelectable(true);
         table.setMultiSelect(true);
         table.setImmediate(true);
-        
+        // turn on column reordering and collapsing
+        table.setColumnReorderingAllowed(true);
+        table.setColumnCollapsingAllowed(true);
 
+        table.addContainerProperty("check", java.lang.Boolean.class, null);
+        table.addContainerProperty("name", String.class, null);
+        table.addContainerProperty("description", String.class, null);
+        table.addContainerProperty("result", String.class, null);
+        
+        table.setColumnWidth("check", 45);
+        table.setColumnAlignment("check, ", Align.CENTER);
+        table.setVisibleColumns(new Object[] { "check", "name", "description", "result" });
+        
         // set column headers
-        table.addContainerProperty("Marked", CheckBox.class,  null);
-        table.addContainerProperty("Script Name", String.class,  null);
-        table.addContainerProperty("Location", String.class,  null);
-        table.addContainerProperty("Description", String.class, null);
-        table.addContainerProperty("Result", String.class, null);
-        //table.setColumnHeaders(new String[] { "Name", "Location", "Description", "Result" });
+        table.setColumnHeader("check", "Marked");
+        table.setColumnHeader("name", "Test Name");
+        table.setColumnHeader("description", "Description");
+        table.setColumnHeader("result", "Result");
+        
+        table.setDescription("Available tests</br></br>" +
+        		"Left click to select a test</br>" +
+        		"Hold ctrl and left click to select multiple tests</br>" +
+        		"Right click to bring up the action menu");
         
         //load and set data if possible
-        String loadResult = XmlTestWriter.SAXloadTestsFromXml();
+        String loadResult = XmlTestWriter.SAXloadTestsFromXml(project.getName());
         if (loadResult.matches("ok")) {
-        	table.setContainerDataSource(ScriptContainer.getContainer());
         	for (Script p : ScriptContainer.getContainer().getItemIds()) {
-        		if (p.getCheck().getValue() == true) {
-        			markedRows.add(p);
+        		table.addItem(new Object[] {p.getCheck(), p.getName(), p.getDescription(), p.getResult()}, p.getName());
+        		if (p.getCheck() == true){
+        			markedRows.add(p.getName());
         		}
         	}
         } else {
-        	table.setContainerDataSource(ScriptContainer.createWithTestData());
+        	for (Script p : ScriptContainer.createWithTestData().getItemIds()) {
+        		table.addItem(new Object[] {p.getCheck(), p.getName(), p.getDescription(), p.getResult()}, p.getName());
+        	}
         	
         	// getting servers from the config file
             List<String> servers = Arrays.asList(MideaasConfig.getFNTSServers().split("\\s*,\\s*"));
@@ -229,10 +125,10 @@ public class MideaasTest extends CustomComponent {
             String errServers = "";
             for (String server : servers) {
             	try {
-            		Map<String, String> result = (HashMap<String, String>)xmlrpc.getServerDetails(server);
-            		ServerContainer.addServer(server, Arrays.asList(result.get("engines").split(" ")));
+            		Map<String, String> result = (HashMap<String, String>)xmlrpc.getServerDetails(server, "details");
+            		ServerContainer.addServer(server, Arrays.asList(result.get("engines").split(" ")), result.get("details"), project.getName());
             	} catch (Exception e) {
-            		if (errServers == "") {
+            		if (errServers.equals("")) {
             			errServers = server;
             		} else {
             			errServers = errServers + "\n" + server;
@@ -243,11 +139,13 @@ public class MideaasTest extends CustomComponent {
             	Notification.show("Whoops", "Unable to reach the following servers:\n" + errServers, Notification.Type.ERROR_MESSAGE);
             }
         }
-
+        
+        testeditor.createEditor("add", (Set<?>) table.getValue(), this, project.getName());
+        
         // Actions (a.k.a context menu)
         table.addActionHandler(new Action.Handler() {
             public Action[] getActions(Object target, Object sender) {
-                if (markedRows.contains(target)) {
+                if (markedRows.contains((String)target)) {
                     return ACTIONS_MARKED;
                 } else {
                     return ACTIONS_UNMARKED;
@@ -258,40 +156,39 @@ public class MideaasTest extends CustomComponent {
                 if (ACTION_MARK == action) {
                 	Set<?> value = (Set<?>) table.getValue();
                 	for (Object object : value) {
-                		if (!markedRows.contains(object)) {
-                			markedRows.add(object);
-                			Script item = (Script)object;
+                		if (!markedRows.contains((String)object)) {
+                			markedRows.add((String)object);
+                			Script item = (Script)ScriptContainer.getScriptFromContainer((String)object);
                 			item.setCheck(true);
                 		}
                 	}
-                    //markedRows.add(target);
+                    markedRows.add((String)target);
                     System.out.println(markedRows);
-                    /*for (Iterator i = value.iterator(); i.hasNext();) {
-                    	Script item = (Script)i.next();
-                    	item.setCheck(true);
-                    }*/
-                    table.markAsDirty();
+                    ScriptContainer.updateScriptCheckValue(markedRows, project.getName());
+                    Set<?> selection = (Set<?>) table.getValue();
+                    updateTable();
+                    table.setValue(selection);
+                    
                     
                 } else if (ACTION_UNMARK == action) {
                     Set<?> value = (Set<?>) table.getValue();
                     for (Object object : value) {
-                		if (markedRows.contains(object)) {
-                			markedRows.remove(object);
-                			Script item = (Script)object;
+                		if (markedRows.contains((String)object)) {
+                			markedRows.remove((String)object);
+                			Script item = (Script)ScriptContainer.getScriptFromContainer((String)object);
                 			item.setCheck(false);
                 		}
                 	}
-                    //markedRows.remove(target);
+                    markedRows.remove((String)target);
                     System.out.println(markedRows);
-                    /*for (Iterator i = value.iterator(); i.hasNext();) {
-                    	Script item = (Script)i.next();
-                    	item.setCheck(false);
-                    }*/
-                    table.markAsDirty();
+                    ScriptContainer.updateScriptCheckValue(markedRows, project.getName());
+                    Set<?> selection = (Set<?>) table.getValue();
+                    updateTable();
+                    table.setValue(selection);
+                    
                     
                 } else if (ACTION_EDIT == action) {
                 	// should open the window for editing
-                	// where is it saved?
                 	savemode = "edit";
                 	Set<?> value = (Set<?>) table.getValue();
                 	if (null == value || value.size() == 0) {
@@ -299,38 +196,8 @@ public class MideaasTest extends CustomComponent {
                 	} else if (value.size() > 1) {
                 		selected.setValue("Please select only one test");
                 	} else {
-                		// Open the subwindow by adding it to the parent
-            			// window
-                		if (editwindow.getParent() == null) {
-                			try {
-                				UI.getCurrent().addWindow(editwindow);
-                				Script item = (Script) value.iterator().next();
-                				textName.setValue(item.getName());
-                				textLocation.setValue(item.getLocation());
-                				textDescription.setValue(item.getDescription());
-                				
-                				String path = MideaasConfig.getProjectsDir() + "test/" + textLocation.getValue() + textName.getValue() + ".txt"; //TODO: project name needs to be dynamic
-                				BufferedReader br = new BufferedReader(new FileReader(path));
-                			    try {
-                			        StringBuilder sb = new StringBuilder();
-                			        String line = br.readLine();
-
-                			        while (line != null) {
-                			            sb.append(line);
-                			            sb.append("\n");
-                			            line = br.readLine();
-                			        }
-                			        editor.setValue(sb.toString());
-                			    } catch (IOException e) {
-                					Notification.show("Whoops", "Reading from a file failed", Notification.Type.ERROR_MESSAGE);
-                    				e.printStackTrace();
-                			    } finally {
-                			        br.close();
-                			    }
-                			} catch (Exception e) {
-                				e.printStackTrace();
-                			}
-                		}
+                		editwindow = testeditor.editTest(savemode, (Set<?>) table.getValue(), project.getName());
+                		UI.getCurrent().addWindow(editwindow);
                 		// Center the window
                 		editwindow.center();
                 	}
@@ -341,16 +208,15 @@ public class MideaasTest extends CustomComponent {
                 	} else {
                 		//should remove the selected item from the table
                 		for (Iterator i = value.iterator(); i.hasNext(); ) {
-                			table.removeItem(i.next());
+                			String strValue = (String)i.next();
+                			removeItemFromTable(strValue);
+                			table.removeItem(strValue);
                 		}
                 	}
                 }
             }
-
         });        
-        // turn on column reordering and collapsing
-        table.setColumnReorderingAllowed(true);
-        table.setColumnCollapsingAllowed(true);
+        
         
         // listen for valueChange, a.k.a 'select' and update the label
         table.addValueChangeListener(new Property.ValueChangeListener() {
@@ -366,7 +232,7 @@ public class MideaasTest extends CustomComponent {
                 } else {
                     selected.setValue("Selected: " + table.getValue());
                     if (value.size() == 1) {
-                    	Script item = (Script) value.iterator().next();
+                    	Script item = (Script) ScriptContainer.getScriptFromContainer((String)value.iterator().next());
                     	testNotes.setReadOnly(false);
                 		testNotes.setValue(item.getNotes());
                 		testNotes.setReadOnly(true);
@@ -380,69 +246,108 @@ public class MideaasTest extends CustomComponent {
         });        
         
         final TestRunConfirmation conf = new TestRunConfirmation();
-        final Window confirmTests = conf.newWindow(markedRows);
-        final Window settings = new XmlRpcServerDetails().newWindow();
+        final Window confirmTests = conf.newWindow(markedRows, this, project.getName());
+        final Window settings = new XmlRpcServerDetails().newWindow(project);
         
         //buttons to the main window
         Panel buttonPanel = new Panel();
         HorizontalLayout buttonLayout = new HorizontalLayout();
-        Button center = new Button("New Script",
+        Button newScript = new Button("New Script",
                 new Button.ClickListener() {
                     // inline click-listener
                     public void buttonClick(ClickEvent event) {
-                        if (editwindow.getParent() == null) {
-                        	savemode = "add";
-                            // Open the subwindow by adding it to the parent
-                            // window
-                        	UI.getCurrent().addWindow(editwindow);
-                        	textName.setValue("");
-            				textLocation.setValue("");
-            				textDescription.setValue("");
-            				editor.setValue("Write your script here");
-                        }
-
-                        // Center the window
-                        editwindow.center();
+                    	if (!UI.getCurrent().getWindows().contains(editwindow)) {
+                    		editwindow = testeditor.createTest();
+                    		UI.getCurrent().addWindow(editwindow);
+                    		// Center the window
+                    		editwindow.center();
+                    		
+                    		//updateTable();
+                    	} else {
+                    		editwindow.focus();
+                    	}
                     }
                 });
-        buttonLayout.addComponent(center);
-        buttonLayout.addComponent(new Button("Run Marked Scripts",
+        newScript.setDescription("Add a new test to the list");
+        buttonLayout.addComponent(newScript);
+        
+        Button runScripts = new Button("Run Marked Scripts",
         	new Button.ClickListener() {
             	// inline click-listener
             	public void buttonClick(ClickEvent event) {
-            		conf.updateData(markedRows);
-            		UI.getCurrent().addWindow(confirmTests);
+            		if (!UI.getCurrent().getWindows().contains(confirmTests)) {
+            			conf.updateData(markedRows);
+            			UI.getCurrent().addWindow(confirmTests);
+            		} else {
+            			// the window exists already
+            			confirmTests.focus();
+            		}
             	}
-        }));
-        buttonLayout.addComponent(new Button("FNTS Server details",
+        });
+        runScripts.setDescription("Change settings and run marked tests");
+        buttonLayout.addComponent(runScripts);
+        
+        Button serverDetails = new Button("FNTS Server details",
             	new Button.ClickListener() {
                 	// inline click-listener
                 	public void buttonClick(ClickEvent event) {
-                		UI.getCurrent().addWindow(settings);
+                		if (!UI.getCurrent().getWindows().contains(settings)) {
+                			UI.getCurrent().addWindow(settings);
+                		} else{
+                			// the window exists already
+                			settings.focus();
+                		}
                 	}
-            }));
+            });
+        serverDetails.setDescription("Add and inspect XMLRPC servers");
+        buttonLayout.addComponent(serverDetails);
+        
         buttonLayout.setMargin(true);
         buttonPanel.setContent(buttonLayout);
         mainLayout.addComponent(buttonPanel);
 
-        mainLayout.addComponent(selected);
-        mainLayout.addComponent(testNotes);
+        Panel labelPanel = new Panel();
+        Panel notePanel = new Panel();
+        labelPanel.setContent(selected);
+        mainLayout.addComponent(labelPanel);
+        notePanel.setContent(testNotes);
+        mainLayout.addComponent(notePanel);
         mainPanel.setContent(mainLayout);
         setCompositionRoot(mainPanel);
         
         
     }
     
-    public static synchronized void updateTable() {
-    	table.setContainerDataSource(ScriptContainer.getContainer());
-    	table.markAsDirty();
+    public synchronized void updateTable() {
+    	table.removeAllItems();
+    	for (Script p : ScriptContainer.getContainer().getItemIds()) {
+    		table.addItem(new Object[] {p.getCheck(), p.getName(), p.getDescription(), p.getResult()}, p.getName());
+    	}
+    }
+    
+    public String getProjectName() {
+    	return project.getName();
     }
     
     public synchronized String[] getServerDetails(String server) {
     	XmlRpcContact xmlrpc = new XmlRpcContact();
-    	Map<String, String> result = (HashMap<String, String>)xmlrpc.getServerDetails(server);
+    	Map<String, String> result = (HashMap<String, String>)xmlrpc.getServerDetails(server, "engines");
     	System.out.println(result.toString());
     	String[] engines = result.get("engines").split(" ");
     	return engines;
+    }
+    
+    public synchronized void updateItemInTable(List testData) {
+    	ScriptContainer.addTestToContainer(testData, project.getName()).getItemIds();
+    	table.addItem(new Object[] {false, (String)testData.get(0), (String)testData.get(2), "NOT RUN"}, (String)testData.get(0));
+    	
+    }
+    
+    public synchronized void removeItemFromTable(String testname) {
+		ScriptContainer.removeScriptFromContainer(testname, project.getName());
+    }
+    
+    public synchronized Set<?> getTableSelection() {
+    	return (Set<?>) table.getValue();
     }
 }

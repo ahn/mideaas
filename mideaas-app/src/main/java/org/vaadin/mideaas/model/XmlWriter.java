@@ -12,9 +12,9 @@ public class XmlWriter {
     static int indentation = 0;
     static BufferedWriter out = null;
 
-    public synchronized void startWriting() {
+    public synchronized void startWriting(String projectName) {
         try {
-        	out = new BufferedWriter(new FileWriter(MideaasConfig.getProjectsDir() + "test/" + "TestDataStorage.xml")); //TODO: replace project name
+        	out = new BufferedWriter(new FileWriter(MideaasConfig.getProjectsDir() + "/" + projectName + "/" + "TestDataStorage.xml")); //TODO: replace project name
 
         	this.childLoop(ScriptContainer.getContainer(), ServerContainer.getServerContainer());
 
@@ -54,12 +54,16 @@ public class XmlWriter {
         	this.endElement("result");
         	
         	this.startElement("check", "", "");
-        	this.characters(String.valueOf(script.getCheck().getValue()));
+        	this.characters(String.valueOf(script.getCheck()));
         	this.endElement("check");
         	
         	this.startElement("notes", "", "");
         	this.characters(script.getNotes());
         	this.endElement("notes");
+        	
+        	this.startElement("testengine", "", "");
+        	this.characters(script.getEngine());
+        	this.endElement("testengine");
         	
         	this.endElement("test");
         }
@@ -79,6 +83,10 @@ public class XmlWriter {
         	}
         	this.characters(engines);
         	this.endElement("engines");
+        	
+        	this.startElement("details", "", "");
+        	this.characters(server.getDetails());
+        	this.endElement("details");
         	
         	this.endElement("server");
         }

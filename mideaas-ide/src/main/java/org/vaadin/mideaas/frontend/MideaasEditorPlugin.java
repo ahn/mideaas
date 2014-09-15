@@ -1,5 +1,7 @@
 package org.vaadin.mideaas.frontend;
 
+import org.vaadin.mideaas.model.SharedProject;
+
 import com.vaadin.ui.MenuBar;
 
 /** A plugin for MideaasEditor.
@@ -8,5 +10,5 @@ import com.vaadin.ui.MenuBar;
  * 
  */
 public interface MideaasEditorPlugin {
-	public void extendMenu(MenuBar menuBar);
+	public void extendMenu(MenuBar menuBar, SharedProject project);
 }

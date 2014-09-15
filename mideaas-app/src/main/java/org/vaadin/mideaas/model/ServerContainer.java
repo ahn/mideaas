@@ -16,7 +16,7 @@ public class ServerContainer extends BeanItemContainer<Server> implements
         super(Server.class);
     }
     
-    public static void addServer(String ip, List<String> engines) {
+    public static void addServer(String ip, List<String> engines, String details, String projectName) {
     	if (sc == null) {
     		try {
     			sc = new ServerContainer();
@@ -29,10 +29,10 @@ public class ServerContainer extends BeanItemContainer<Server> implements
     	Server p = new Server();
     	p.setIP(ip);
     	p.setEngines(engines);
-    	System.out.println(ip + " and " + engines.toString());
+    	p.setDetails(details);
     	sc.addItem(p);
     	
-    	XmlTestWriter.WriteTestsToXml();
+    	XmlTestWriter.WriteTestsToXml(projectName);
     }
     
     public static void addServerObjectToContainer(Server server) {
@@ -62,13 +62,13 @@ public class ServerContainer extends BeanItemContainer<Server> implements
     	return server;
     }
     
-    public static synchronized void removeServer(String serverIP) {
+    public static synchronized void removeServer(String serverIP, String projectName) {
     	for (Server server : sc.getAllItemIds()) {
     		if (server.getIP().matches(serverIP)) {
     			sc.removeItem(server);
     		}
     	}
-    	XmlTestWriter.WriteTestsToXml();
+    	XmlTestWriter.WriteTestsToXml(projectName);
     }
     
     public static ServerContainer getServerContainer() {
@@ -79,7 +79,7 @@ public class ServerContainer extends BeanItemContainer<Server> implements
     	Server server = null;
     	try {
     		server = sc.getIdByIndex(0);
-    	} catch (NullPointerException e) {
+    	} catch (Exception e) {
     		server = null;
     	}
     	return server;
@@ -89,7 +89,6 @@ public class ServerContainer extends BeanItemContainer<Server> implements
     	List<String> engines = new ArrayList<String>();
     	try {
     		for (Server server : sc.getItemIds()) {
-    			//System.out.println(server.getEngines());
     			if (server.getIP().matches(serverIP)) {
     				engines = server.getEngines();
     			}
@@ -98,5 +97,15 @@ public class ServerContainer extends BeanItemContainer<Server> implements
     		engines = null;
     	}
     	return engines;
+    }
+    
+    public static synchronized void updateServerdata(String serverIP, List<String> engines, String details, String projectName) {
+    	for (Server p : sc.getAllItemIds()) {
+    		if (p.getIP().matches(serverIP)) {
+    			p.setEngines(engines);
+    			p.setDetails(details);
+    		}
+    	}
+    	XmlTestWriter.WriteTestsToXml(projectName);
     }
 }

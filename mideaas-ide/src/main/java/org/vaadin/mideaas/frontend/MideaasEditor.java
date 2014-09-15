@@ -160,7 +160,7 @@ public class MideaasEditor extends CustomComponent implements Listener {
 		MenuBarUtil.addAddonMenu(menu, project);
 		MenuBarUtil.addPanicMenu(menu, project, builder, buildDir);
 		for (MideaasEditorPlugin plugin : plugins) {
-			plugin.extendMenu(menu);
+			plugin.extendMenu(menu, this.project);
 		}
 		
 		if (closeHandler!=null) {

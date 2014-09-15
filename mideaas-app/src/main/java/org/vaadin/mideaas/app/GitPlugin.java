@@ -31,7 +31,7 @@ public class GitPlugin implements MideaasEditorPlugin {
 	}
 
 	@Override
-	public void extendMenu(MenuBar menuBar) {
+	public void extendMenu(MenuBar menuBar, SharedProject project) {
 
 		Command commit = createCommitCommand();
 		Command github = createGitHubCommand();
