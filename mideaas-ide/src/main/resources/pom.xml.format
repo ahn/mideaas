@@ -68,12 +68,12 @@
             <version>${vaadin.version}</version>
         </dependency>
             <!--google appengine does not support servler 3.0-->
-<!--        <dependency>
+        <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>servlet-api</artifactId>
             <version>2.4</version>
             <scope>provided</scope>
-        </dependency>-->
+        </dependency>
         <dependency>
             <groupId>org.vaadin.addons</groupId>
             <artifactId>clara</artifactId>
