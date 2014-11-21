@@ -153,7 +153,6 @@ public class SharedDoc implements DiffListener, ResultListener {
 		if (checker == null) {
 			return;
 		}
-		System.out.println(this + " startErrorCheck");
 		// TODO: possible concurrency problems
 		// a brief windows in which changes by somebody else are
 		// overwritten, because of setDoc instead of using diffs...

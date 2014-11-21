@@ -1,17 +1,11 @@
 package org.vaadin.mideaas.editor;
 
 import java.util.Map;
-import java.util.Map.Entry;
 
-import org.vaadin.aceeditor.AceEditor.SelectionChangeListener;
 import org.vaadin.aceeditor.AceEditor;
-import org.vaadin.aceeditor.AceMode;
-import org.vaadin.aceeditor.SuggestionExtension;
 import org.vaadin.aceeditor.TextRange;
-import org.vaadin.aceeditor.client.AceDoc;
 import org.vaadin.mideaas.editor.MultiUserDoc.DifferingChangedListener;
 
-import com.vaadin.event.FieldEvents.TextChangeListener;
 import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.VerticalLayout;
@@ -24,12 +18,6 @@ public class MultiUserEditor extends CustomComponent implements DifferingChanged
 	private MultiUserEditorTopBar topBar;
 	private CollaborativeAceEditor editor;
 	private EditorUser visibleUser;
-
-	private AceMode aceMode;
-	private SuggestionExtension suggestionExtension;
-	private boolean wordWrap;
-	private SelectionChangeListener selectionChangeListener;
-	private TextChangeListener textChangeListener;
 
 	public MultiUserEditor(EditorUser user, MultiUserDoc mud) {
 		this.user = user;
@@ -46,6 +34,14 @@ public class MultiUserEditor extends CustomComponent implements DifferingChanged
 	@Override
 	public void detach() {
 		mud.removeDifferingChangedListener(this);
+		if (editor != null) {
+			SharedDoc doc = mud.getBase();
+			if (doc != null) {
+				// removing the markers here too because the diff at CollaborativeAceEditor.detached
+				// don't go always got through; the Guard may block it..
+				doc.applyDiff(editor.getRemoveCursorMarkersDiff());
+			}
+		}
 		super.detach();
 	}
 
@@ -76,18 +72,7 @@ public class MultiUserEditor extends CustomComponent implements DifferingChanged
 	}
 
 	protected void configureEditor(CollaborativeAceEditor ed) {
-//		ed.setWordWrap(wordWrap);
-//		ed.setMode(aceMode);
-//		if (visibleUser == user && suggestionExtension != null) {
-//			suggestionExtension.extend(ed);
-//		}
-//		if (selectionChangeListener != null) {
-//			ed.addSelectionChangeListener(selectionChangeListener);
-//		}
-//		if (textChangeListener != null) {
-//			ed.addTextChangeListener(null);
-//		}
-//		return ed;
+		// nothing to do?
 	}
 	
 	protected AceEditor getCurrentEditor() {
@@ -116,10 +101,6 @@ public class MultiUserEditor extends CustomComponent implements DifferingChanged
 
 	@Override
 	public void differingChanged(final Map<EditorUser, DocDifference> diffs) {
-		System.out.println(this + " differing changed " + diffs.size());
-		for (Entry<EditorUser, DocDifference> e : diffs.entrySet()) {
-			System.out.println(e.getValue());
-		}
 		getUI().access(new Runnable() {
 			@Override
 			public void run() {
@@ -131,39 +112,4 @@ public class MultiUserEditor extends CustomComponent implements DifferingChanged
 	public void userClicked(EditorUser newUser) {
 		setVisibleUser(newUser);
 	}
-
-	/*
-	public void setMode(AceMode aceMode) {
-		this.aceMode = aceMode;
-	}
-
-	public void setSuggestionExtension(SuggestionExtension suggestionExtension) {
-		this.suggestionExtension = suggestionExtension;
-		
-	}
-
-	public void setWordWrap(boolean wordWrap) {
-		this.wordWrap = wordWrap;
-		
-	}
-
-	public void setSelectionChangeListener(SelectionChangeListener li) {
-		this.selectionChangeListener = li;
-		
-	}
-
-	public void setTextChangeListener(TextChangeListener li) {
-		this.textChangeListener = li;
-	}
-
-	public String getCurrentText() {
-		return editor.getDoc().getText();
-	}
-
-	public TextRange getSelection() {
-		return editor.getSelection();
-	}
-	*/
-
-	
 }

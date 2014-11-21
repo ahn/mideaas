@@ -2,15 +2,11 @@ package org.vaadin.mideaas.editor;
 
 import java.util.Map;
 
-import org.vaadin.mideaas.editor.DocDifference;
-import org.vaadin.mideaas.editor.EditorUser;
-
+import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Button.ClickListener;
 import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.HorizontalLayout;
-import com.vaadin.ui.Label;
 import com.vaadin.ui.NativeButton;
-import com.vaadin.ui.Button.ClickEvent;
 
 @SuppressWarnings("serial")
 public class MultiUserEditorTopBar extends CustomComponent {

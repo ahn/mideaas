@@ -87,12 +87,10 @@ public class DocDiffMediator {
 	}
 
 	private void upstreamChanged() {
-		System.out.println(this + " UP -> DOWN?");
 		tryToApplyFrom(upstream, downstream, downwardsGuard);
 	}
 	
 	private void downstreamChanged() {
-		System.out.println(this + " DOWN -> UP?");
 		tryToApplyFrom(downstream, upstream, upwardsGuard);
 	}
 	
@@ -118,7 +116,6 @@ public class DocDiffMediator {
 		}
 		}
 		if (destDoc!=null) {
-			System.out.println(this + " APPLIED!");
 			toDoc.fireChanged();
 		}
 	}

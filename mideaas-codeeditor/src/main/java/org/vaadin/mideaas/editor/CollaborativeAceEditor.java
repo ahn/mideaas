@@ -11,7 +11,6 @@ import name.fraser.neil.plaintext.diff_match_patch.Patch;
 
 import org.vaadin.aceeditor.AceEditor;
 import org.vaadin.aceeditor.AceEditor.SelectionChangeListener;
-import org.vaadin.aceeditor.AceMode;
 import org.vaadin.aceeditor.ServerSideDocDiff;
 import org.vaadin.aceeditor.client.AceAnnotation.MarkerAnnotation;
 import org.vaadin.aceeditor.client.AceAnnotation.RowAnnotation;
@@ -47,7 +46,6 @@ public class CollaborativeAceEditor extends AceEditor implements SelectionChange
 	
 	public CollaborativeAceEditor(SharedDoc value, EditorUser user) {
 		super();
-		System.out.println("CollaborativeAceEditor(..., " + (user==null?"null":user.getId())+")");
 		this.sharedText = value;
 		this.user = user;
 		setReadOnly(user==null);
@@ -80,14 +78,10 @@ public class CollaborativeAceEditor extends AceEditor implements SelectionChange
 
 	@Override
 	public void detach() {
-		System.out.println("CAE.detach");
 		sharedText.detachEditor(this);
 		if (user!=null) {
 			this.removeSelectionChangeListener(this);
-			for (String markerId : myMarkers) { // TODO: with one diff
-				sharedText.applyDiffNoFire(removeMarkerDiff(markerId));
-			}
-			sharedText.fireChanged();
+			sharedText.applyDiff(removeMarkersDiff(myMarkers));
 		}
 		super.detach();
 	}
@@ -114,11 +108,14 @@ public class CollaborativeAceEditor extends AceEditor implements SelectionChange
 		ServerSideDocDiff diff = ServerSideDocDiff.newMarkersAndAnnotations(msd, mad);
 		return diff;
 	}
+	
+	public ServerSideDocDiff getRemoveCursorMarkersDiff() {
+		return removeMarkersDiff(myMarkers);
+	}
 
-	private static ServerSideDocDiff removeMarkerDiff(String id) {
-		Set<String> removed = Collections.singleton(id);
+	private static ServerSideDocDiff removeMarkersDiff(Set<String> markerIds) {
 		Map<String, MarkerAddition> added = Collections.emptyMap();
-		MarkerSetDiff msd = new MarkerSetDiff(added, removed);
+		MarkerSetDiff msd = new MarkerSetDiff(added, markerIds);
 		return new ServerSideDocDiff(new LinkedList<Patch>(), msd, new SetDiff<RowAnnotation, TransportRowAnnotation>(), new SetDiff<MarkerAnnotation, TransportMarkerAnnotation>());
 	}
 
