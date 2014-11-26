@@ -4,24 +4,28 @@ import java.io.File;
 import java.io.IOException;
 import java.util.TreeSet;
 
+import javax.servlet.annotation.WebServlet;
+
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.vaadin.mideaas.app.MideaasConfig.Prop;
-import org.vaadin.mideaas.frontend.ClaraEditor;
-import org.vaadin.mideaas.frontend.JettyUtil;
-import org.vaadin.mideaas.frontend.MavenUtil;
-import org.vaadin.mideaas.model.GitRepository;
-import org.vaadin.mideaas.model.LobbyBroadcaster;
-import org.vaadin.mideaas.model.ProjectLog;
-import org.vaadin.mideaas.model.SharedProject;
-import org.vaadin.mideaas.model.User;
-import org.vaadin.mideaas.model.UserSettings;
-import org.vaadin.mideaas.model.ZipUtils;
+import org.vaadin.mideaas.app.model.GitRepository;
+import org.vaadin.mideaas.app.model.LobbyBroadcaster;
+import org.vaadin.mideaas.app.model.ZipUtils;
+import org.vaadin.mideaas.ide.ClaraEditor;
+import org.vaadin.mideaas.ide.JettyUtil;
+import org.vaadin.mideaas.ide.MavenUtil;
+import org.vaadin.mideaas.ide.model.ProjectLog;
+import org.vaadin.mideaas.ide.model.SharedProject;
+import org.vaadin.mideaas.ide.model.User;
+import org.vaadin.mideaas.ide.model.UserSettings;
 
 import com.vaadin.annotations.PreserveOnRefresh;
 import com.vaadin.annotations.Push;
 import com.vaadin.annotations.Theme;
+import com.vaadin.annotations.VaadinServletConfiguration;
 import com.vaadin.navigator.Navigator;
 import com.vaadin.server.VaadinRequest;
+import com.vaadin.server.VaadinServlet;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.UI;
 
@@ -31,13 +35,17 @@ import com.vaadin.ui.UI;
 @Theme("mideaas")
 @Push
 public class MideaasUI extends UI {
+	
+	@WebServlet(value = "/*", asyncSupported = true)
+    @VaadinServletConfiguration(productionMode = false, ui = MideaasUI.class, widgetset = "org.vaadin.mideaas.app.AppWidgetSet", heartbeatInterval=5)
+    public static class Servlet extends VaadinServlet {
+    }
 
 	private static TreeSet<User> loggedInUsers = new TreeSet<User>();
 	static void addUser(User user) {
 		synchronized (MideaasUI.class) {
 			loggedInUsers.add(user);
 		}
-		//LobbyView.getLobbyChat().addLine(user.getName()+" logged in");
 		LobbyBroadcaster.broadcastLoggedInUsersChanged(getLoggedInUsers(), user, true);
 	}
 	
@@ -46,7 +54,6 @@ public class MideaasUI extends UI {
 			loggedInUsers.remove(user);
 		}
 		SharedProject.removeFromProjects(user);
-		//LobbyView.getLobbyChat().addLine(user.getName()+" left");
 		LobbyBroadcaster.broadcastLoggedInUsersChanged(getLoggedInUsers(), user, false);
 	}
 	
@@ -97,8 +104,6 @@ public class MideaasUI extends UI {
 	@Override
 	protected void init(VaadinRequest request) {
 		
-		//System.out.println("init of MideeasUI is called");
-		
 		navigator = new Navigator(this, this);
 		
 		navigator.addView("", new LoginView(this, "lobby"));
@@ -134,16 +139,15 @@ public class MideaasUI extends UI {
 
 	@Override
 	public void detach() {
+		System.out.println(this + " MideaasUI.detach");
 		super.detach();
 		logout();
-		//setPushConnection(null);
 	}
+
 	
 	@Override
 	public void attach() {
-		//logout();
 		super.attach();
-		//System.out.println("UI attached");
 	}
 	
 	public void logout() {

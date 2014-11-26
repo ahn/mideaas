@@ -1,35 +1,22 @@
-package org.vaadin.mideaas.editortest;
+package org.vaadin.mideaas.editor;
 
 import javax.servlet.annotation.WebServlet;
-
-import name.fraser.neil.plaintext.diff_match_patch.Diff;
-import name.fraser.neil.plaintext.diff_match_patch.Operation;
-import name.fraser.neil.plaintext.diff_match_patch.Patch;
 
 import org.codehaus.plexus.util.StringUtils;
 import org.vaadin.aceeditor.ServerSideDocDiff;
 import org.vaadin.aceeditor.client.AceDoc;
-import org.vaadin.mideaas.editor.CollaborativeAceEditor;
-import org.vaadin.mideaas.editor.DocDiffMediator;
 import org.vaadin.mideaas.editor.DocDiffMediator.Guard;
-import org.vaadin.mideaas.editor.EditorUser;
-import org.vaadin.mideaas.editor.MultiUserDoc;
-import org.vaadin.mideaas.editor.MultiUserEditor;
-import org.vaadin.mideaas.editor.SharedDoc;
 
 import com.vaadin.annotations.Push;
-import com.vaadin.annotations.StyleSheet;
 import com.vaadin.annotations.Theme;
 import com.vaadin.annotations.VaadinServletConfiguration;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.server.VaadinServlet;
 import com.vaadin.ui.Button;
+import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Button.ClickListener;
-import com.vaadin.ui.Label;
-import com.vaadin.ui.Panel;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
-import com.vaadin.ui.Button.ClickEvent;
 
 
 @Theme("mytheme")
@@ -122,12 +109,9 @@ public class MyVaadinUI extends UI
 	//private final CollaborativeAceEditor editor2 = new CollaborativeAceEditor(downstream2, 2);
 	
 	
-	private static final MultiDoc mud = new MultiDoc(initialDoc, moiGuard, null);
-	
-	
+	private static final MultiUserDoc mud = new MultiUserDoc(initialDoc, null, moiGuard, null, null);
 	
 
-	
 	@Override
 	protected void init(VaadinRequest request) {
 		
@@ -143,7 +127,7 @@ public class MyVaadinUI extends UI
 		
 		mud.createChildDoc(eu);
 
-		final MultiEditor mue = new MultiEditor(eu, mud);
+		final MultiUserEditor mue = new MultiUserEditor(eu, mud);
 		
 		
 		mue.setSizeFull();

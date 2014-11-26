@@ -9,8 +9,8 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Set;
 
-import org.vaadin.mideaas.frontend.Icons;
-import org.vaadin.mideaas.model.SharedProject;
+import org.vaadin.mideaas.ide.Icons;
+import org.vaadin.mideaas.ide.model.SharedProject;
 
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.Panel;

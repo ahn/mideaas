@@ -6,10 +6,10 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.vaadin.mideaas.model.Server;
-import org.vaadin.mideaas.model.ServerContainer;
-import org.vaadin.mideaas.model.XmlRpcContact;
-import org.vaadin.mideaas.model.SharedProject;
+import org.vaadin.mideaas.app.model.Server;
+import org.vaadin.mideaas.app.model.ServerContainer;
+import org.vaadin.mideaas.app.model.XmlRpcContact;
+import org.vaadin.mideaas.ide.model.SharedProject;
 
 import com.vaadin.data.Property;
 import com.vaadin.data.Property.ValueChangeEvent;

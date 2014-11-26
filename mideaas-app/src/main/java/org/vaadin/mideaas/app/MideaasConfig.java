@@ -7,7 +7,7 @@ import java.io.InputStream;
 import java.util.Properties;
 
 import org.apache.commons.io.FileUtils;
-import org.vaadin.mideaas.model.UserSettings;
+import org.vaadin.mideaas.ide.model.UserSettings;
 
 public class MideaasConfig {
 	

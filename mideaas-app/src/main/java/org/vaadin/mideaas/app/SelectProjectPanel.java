@@ -3,10 +3,10 @@ package org.vaadin.mideaas.app;
 import java.util.Collection;
 import java.util.List;
 
-import org.vaadin.mideaas.frontend.Icons;
-import org.vaadin.mideaas.model.ProjectFileUtils;
-import org.vaadin.mideaas.model.SharedProject;
-import org.vaadin.mideaas.model.User;
+import org.vaadin.mideaas.ide.Icons;
+import org.vaadin.mideaas.ide.model.ProjectFileUtils;
+import org.vaadin.mideaas.ide.model.SharedProject;
+import org.vaadin.mideaas.ide.model.User;
 
 import com.vaadin.data.Property.ValueChangeEvent;
 import com.vaadin.data.Property.ValueChangeListener;

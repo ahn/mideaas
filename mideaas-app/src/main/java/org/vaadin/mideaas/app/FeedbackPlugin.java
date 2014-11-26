@@ -4,8 +4,8 @@ import java.io.File;
 import java.io.IOException;
 
 import org.apache.commons.io.FileUtils;
-import org.vaadin.mideaas.frontend.MideaasEditorPlugin;
-import org.vaadin.mideaas.model.SharedProject;
+import org.vaadin.mideaas.ide.MideaasEditorPlugin;
+import org.vaadin.mideaas.ide.model.SharedProject;
 
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;

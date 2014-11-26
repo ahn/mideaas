@@ -1,6 +1,6 @@
 package org.vaadin.mideaas.app;
 
-import org.vaadin.mideaas.model.ExperimentUser;
+import org.vaadin.mideaas.ide.model.ExperimentUser;
 
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;

@@ -8,11 +8,11 @@ import org.vaadin.addon.oauthpopup.buttons.FacebookButton;
 import org.vaadin.addon.oauthpopup.buttons.GitHubButton;
 import org.vaadin.addon.oauthpopup.buttons.TwitterButton;
 import org.vaadin.mideaas.app.MideaasConfig.Prop;
-import org.vaadin.mideaas.model.User;
-import org.vaadin.mideaas.social.OAuthService;
-import org.vaadin.mideaas.social.OAuthService.Service;
-import org.vaadin.mideaas.social.UserProfile;
-import org.vaadin.mideaas.social.UserToken;
+import org.vaadin.mideaas.ide.model.User;
+import org.vaadin.mideaas.ide.social.OAuthService;
+import org.vaadin.mideaas.ide.social.UserProfile;
+import org.vaadin.mideaas.ide.social.UserToken;
+import org.vaadin.mideaas.ide.social.OAuthService.Service;
 
 import com.vaadin.client.ui.layout.Margins;
 import com.vaadin.navigator.View;

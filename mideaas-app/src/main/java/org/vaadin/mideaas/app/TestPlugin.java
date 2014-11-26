@@ -1,7 +1,7 @@
 package org.vaadin.mideaas.app;
 
-import org.vaadin.mideaas.frontend.MideaasEditorPlugin;
-import org.vaadin.mideaas.model.SharedProject;
+import org.vaadin.mideaas.ide.MideaasEditorPlugin;
+import org.vaadin.mideaas.ide.model.SharedProject;
 
 import com.vaadin.ui.MenuBar;
 import com.vaadin.ui.MenuBar.Command;

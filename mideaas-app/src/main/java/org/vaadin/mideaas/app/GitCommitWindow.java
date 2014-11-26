@@ -1,7 +1,7 @@
 package org.vaadin.mideaas.app;
 
 import org.eclipse.jgit.api.errors.GitAPIException;
-import org.vaadin.mideaas.model.GitRepository;
+import org.vaadin.mideaas.app.model.GitRepository;
 
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;

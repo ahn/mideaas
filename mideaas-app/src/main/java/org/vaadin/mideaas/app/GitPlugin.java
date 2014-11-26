@@ -1,10 +1,10 @@
 package org.vaadin.mideaas.app;
 
 import org.vaadin.mideaas.app.MideaasConfig.Prop;
-import org.vaadin.mideaas.frontend.MideaasEditorPlugin;
-import org.vaadin.mideaas.model.GitRepository;
-import org.vaadin.mideaas.model.SharedProject;
-import org.vaadin.mideaas.model.User;
+import org.vaadin.mideaas.app.model.GitRepository;
+import org.vaadin.mideaas.ide.MideaasEditorPlugin;
+import org.vaadin.mideaas.ide.model.SharedProject;
+import org.vaadin.mideaas.ide.model.User;
 
 import com.vaadin.server.ClassResource;
 import com.vaadin.ui.MenuBar;

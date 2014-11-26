@@ -3,7 +3,7 @@ package org.vaadin.mideaas.app;
 import java.util.HashMap;
 import java.util.Map.Entry;
 
-import org.vaadin.mideaas.model.UserSettings;
+import org.vaadin.mideaas.ide.model.UserSettings;
 
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;

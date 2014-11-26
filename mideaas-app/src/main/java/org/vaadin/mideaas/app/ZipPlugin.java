@@ -5,12 +5,12 @@ import java.io.IOException;
 import java.nio.file.Files;
 
 import org.apache.commons.io.FileUtils;
-import org.vaadin.mideaas.frontend.MenuBarUtil;
-import org.vaadin.mideaas.frontend.MideaasEditorPlugin;
-import org.vaadin.mideaas.model.SharedProject;
-import org.vaadin.mideaas.model.User;
-import org.vaadin.mideaas.model.UserSettings;
-import org.vaadin.mideaas.model.ZipUtils;
+import org.vaadin.mideaas.app.model.ZipUtils;
+import org.vaadin.mideaas.ide.MenuBarUtil;
+import org.vaadin.mideaas.ide.MideaasEditorPlugin;
+import org.vaadin.mideaas.ide.model.SharedProject;
+import org.vaadin.mideaas.ide.model.User;
+import org.vaadin.mideaas.ide.model.UserSettings;
 
 import com.vaadin.server.FileDownloader;
 import com.vaadin.server.FileResource;

@@ -8,13 +8,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.vaadin.mideaas.model.SharedProject;
-import org.vaadin.mideaas.model.ServerContainer;
-import org.vaadin.mideaas.model.XmlRpcContact;
-import org.vaadin.mideaas.model.XmlTestWriter;
-import org.vaadin.mideaas.test.Script;
-import org.vaadin.mideaas.test.ScriptContainer;
+import org.vaadin.mideaas.ide.model.SharedProject;
 import org.vaadin.mideaas.app.MideaasTestEditor;
+import org.vaadin.mideaas.app.model.ServerContainer;
+import org.vaadin.mideaas.app.model.XmlRpcContact;
+import org.vaadin.mideaas.app.model.XmlTestWriter;
+import org.vaadin.mideaas.app.test.Script;
+import org.vaadin.mideaas.app.test.ScriptContainer;
 
 import com.vaadin.data.Property;
 import com.vaadin.event.Action;

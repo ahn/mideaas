@@ -20,13 +20,13 @@ import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 import com.vaadin.ui.Button.ClickEvent;
 
-import org.vaadin.mideaas.model.Server;
-import org.vaadin.mideaas.model.ServerContainer;
-import org.vaadin.mideaas.test.Script;
-import org.vaadin.mideaas.test.ScriptContainer;
 
 
 import org.vaadin.mideaas.app.MideaasTest;
+import org.vaadin.mideaas.app.model.Server;
+import org.vaadin.mideaas.app.model.ServerContainer;
+import org.vaadin.mideaas.app.test.Script;
+import org.vaadin.mideaas.app.test.ScriptContainer;
 
 public class MideaasTestEditor extends CustomComponent {
 	

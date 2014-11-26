@@ -5,14 +5,14 @@ import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.vaadin.mideaas.frontend.MideaasEditor;
-import org.vaadin.mideaas.frontend.MideaasEditor.CloseHandler;
-import org.vaadin.mideaas.frontend.MideaasEditorPlugin;
-import org.vaadin.mideaas.model.GitRepository;
-import org.vaadin.mideaas.model.LobbyBroadcaster;
-import org.vaadin.mideaas.model.SharedProject;
-import org.vaadin.mideaas.model.User;
-import org.vaadin.mideaas.model.UserSettings;
+import org.vaadin.mideaas.app.model.GitRepository;
+import org.vaadin.mideaas.app.model.LobbyBroadcaster;
+import org.vaadin.mideaas.ide.MideaasEditor;
+import org.vaadin.mideaas.ide.MideaasEditorPlugin;
+import org.vaadin.mideaas.ide.MideaasEditor.CloseHandler;
+import org.vaadin.mideaas.ide.model.SharedProject;
+import org.vaadin.mideaas.ide.model.User;
+import org.vaadin.mideaas.ide.model.UserSettings;
 
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;

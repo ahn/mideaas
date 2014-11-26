@@ -5,12 +5,12 @@ import java.io.IOException;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.vaadin.addon.oauthpopup.OAuthListener;
 import org.vaadin.addon.oauthpopup.buttons.GitHubButton;
-import org.vaadin.mideaas.model.GitRepository;
-import org.vaadin.mideaas.model.User;
-import org.vaadin.mideaas.social.GitHubService;
-import org.vaadin.mideaas.social.OAuthService.Service;
-import org.vaadin.mideaas.social.UserProfile;
-import org.vaadin.mideaas.social.UserToken;
+import org.vaadin.mideaas.app.model.GitRepository;
+import org.vaadin.mideaas.ide.model.User;
+import org.vaadin.mideaas.ide.social.GitHubService;
+import org.vaadin.mideaas.ide.social.UserProfile;
+import org.vaadin.mideaas.ide.social.UserToken;
+import org.vaadin.mideaas.ide.social.OAuthService.Service;
 
 import com.vaadin.server.ExternalResource;
 import com.vaadin.ui.Button;

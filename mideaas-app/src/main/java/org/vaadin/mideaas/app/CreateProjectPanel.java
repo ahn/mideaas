@@ -3,8 +3,8 @@ package org.vaadin.mideaas.app;
 import java.util.Arrays;
 import java.util.LinkedList;
 
-import org.vaadin.mideaas.model.ProjectFileUtils;
-import org.vaadin.mideaas.model.SharedProject;
+import org.vaadin.mideaas.ide.model.ProjectFileUtils;
+import org.vaadin.mideaas.ide.model.SharedProject;
 
 import com.vaadin.event.FieldEvents.TextChangeEvent;
 import com.vaadin.event.FieldEvents.TextChangeListener;

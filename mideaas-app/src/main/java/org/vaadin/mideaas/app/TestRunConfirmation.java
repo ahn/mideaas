@@ -7,12 +7,12 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import org.vaadin.mideaas.model.Server;
-import org.vaadin.mideaas.model.ServerContainer;
-import org.vaadin.mideaas.model.XmlRpcContact;
-import org.vaadin.mideaas.test.Script;
-import org.vaadin.mideaas.test.ScriptContainer;
 import org.vaadin.mideaas.app.MideaasTest;
+import org.vaadin.mideaas.app.model.Server;
+import org.vaadin.mideaas.app.model.ServerContainer;
+import org.vaadin.mideaas.app.model.XmlRpcContact;
+import org.vaadin.mideaas.app.test.Script;
+import org.vaadin.mideaas.app.test.ScriptContainer;
 
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.Button;

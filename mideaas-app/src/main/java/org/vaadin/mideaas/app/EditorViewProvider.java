@@ -1,6 +1,6 @@
 package org.vaadin.mideaas.app;
 
-import org.vaadin.mideaas.model.UserSettings;
+import org.vaadin.mideaas.ide.model.UserSettings;
 
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewProvider;

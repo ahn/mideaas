@@ -5,10 +5,10 @@
 	<parent>
 		<groupId>org.vaadin.mideaas</groupId>
 		<artifactId>mideaas-parent</artifactId>
-		<version>0.0.2-SNAPSHOT</version>
+		<version>0.0.3-SNAPSHOT</version>
 		<relativePath>..</relativePath>
 	</parent>
-	<artifactId>mideaas-codeeditor</artifactId>
+	<artifactId>mideaas-editor</artifactId>
 	<packaging>jar</packaging>
 
 	<name>MIDEaaS Code Editor</name>

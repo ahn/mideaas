@@ -5,11 +5,11 @@ import java.util.TreeSet;
 import org.vaadin.chatbox.ChatBox;
 import org.vaadin.chatbox.SharedChat;
 import org.vaadin.chatbox.client.ChatUser;
-import org.vaadin.mideaas.frontend.HorizontalUserList;
-import org.vaadin.mideaas.frontend.Icons;
-import org.vaadin.mideaas.model.LobbyBroadcastListener;
-import org.vaadin.mideaas.model.LobbyBroadcaster;
-import org.vaadin.mideaas.model.User;
+import org.vaadin.mideaas.app.model.LobbyBroadcastListener;
+import org.vaadin.mideaas.app.model.LobbyBroadcaster;
+import org.vaadin.mideaas.ide.HorizontalUserList;
+import org.vaadin.mideaas.ide.Icons;
+import org.vaadin.mideaas.ide.model.User;
 
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
