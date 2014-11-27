@@ -54,7 +54,7 @@ public class User implements Comparable<User> {
 
 	protected User(String userId, UserProfile profile) {
 		this.userId = userId;
-		editorUser = new EditorUser(userId, profile.getName());
+		editorUser = new EditorUser(userId, profile.getName(), profile.getEmail());
 		// TODO: editorUser name won't change even if user name changes...
 		
 		profiles.put(profile.getService(), profile);

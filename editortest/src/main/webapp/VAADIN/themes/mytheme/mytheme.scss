@@ -15,7 +15,6 @@
   $bg4: LightSeaGreen;
   $bg5: LightPink;
 
-  
   .collabeditor-layout-0 {
   	background-color: $bg0;
   }
@@ -34,6 +33,63 @@
   .collabeditor-layout-5 {
   	background-color: $bg5;
   }
+  
+  /*
+  .collab-square-image {
+  	opacity: 0.5;
+  }
+  */
+
+  .collab-square-label {
+  	color: black;
+  	background-color: white;
+  	font-size: 9px;
+  }
+  
+  .collab-square {
+  	border-style: solid;
+  	border-width: 1px;
+  }
+  
+  .collab-square-label.collab-user-0 {
+  	background-color: $bg0;
+  }  
+  .collab-square-label.collab-user-1 {
+  	background-color: $bg1;
+  }  
+  .collab-square-label.collab-user-2 {
+  	background-color: $bg2;
+  }  
+  .collab-square-label.collab-user-3 {
+  	background-color: $bg3;
+  }  
+  .collab-square-label.collab-user-4 {
+  	background-color: $bg4;
+  }  
+  .collab-square-label.collab-user-5 {
+  	background-color: $bg5;
+  }
+  
+  
+  .collab-square.collab-user-0 {
+  	background-color: DarkGreen;
+  }
+  .collab-square.collab-user-1 {
+  	background-color: Brown;
+  }
+  .collab-square.collab-user-2 {
+  	background-color: GoldenRod;
+  }
+  .collab-square.collab-user-3 {
+  	background-color: FireBrick;
+  }
+  .collab-square.collab-user-4 {
+  	background-color: Teal;
+  }
+  .collab-square.collab-user-5 {
+  	background-color: MediumVioletRed;
+  }
+  
   
   
   .collab-button {

@@ -2,11 +2,10 @@ package org.vaadin.mideaas.editor;
 
 import java.util.Map;
 
-import com.vaadin.ui.Button.ClickEvent;
-import com.vaadin.ui.Button.ClickListener;
+import com.vaadin.event.MouseEvents.ClickEvent;
+import com.vaadin.event.MouseEvents.ClickListener;
 import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.HorizontalLayout;
-import com.vaadin.ui.NativeButton;
 
 @SuppressWarnings("serial")
 public class MultiUserEditorTopBar extends CustomComponent {
@@ -20,8 +19,9 @@ public class MultiUserEditorTopBar extends CustomComponent {
 		this.user = user;
 		layout = new HorizontalLayout();
 		layout.setSpacing(false);
+		this.addStyleName("collabeditor-layout");
 		if (user != null) {
-			this.addStyleName("collab-user-"+user.getStyleIndex());
+			this.addStyleName("collabeditor-layout-"+user.getStyleIndex());
 		}
 		setCompositionRoot(layout);
 	}
@@ -29,26 +29,26 @@ public class MultiUserEditorTopBar extends CustomComponent {
 	public void setDiffering(Map<EditorUser, DocDifference> diffs) {
 		layout.removeAllComponents();
 		
-		NativeButton base = new NativeButton("Base");
-		base.addStyleName("collab-button");
-		base.setEnabled(user!=null);
+		UserSquare base = new UserSquare(null, 32);
 		base.addClickListener(new ClickListener() {
 			@Override
-			public void buttonClick(ClickEvent event) {
+			public void click(ClickEvent event) {
 				parent.userClicked(null);
 			}
 		});
 		layout.addComponent(base);
 		
 		for (final DocDifference dd : diffs.values()) {
-			NativeButton b = new NativeButton(dd.buttonText());
+			UserSquare b = new UserSquare(dd.getUser(), 32, dd.isChanged());
 			b.addClickListener(new ClickListener() {
 				@Override
-				public void buttonClick(ClickEvent event) {
+				public void click(ClickEvent event) {
 					parent.userClicked(dd.getUser());
 				}
 			});
 			layout.addComponent(b);
+
+			/*
 			b.addStyleName("collab-button");
 			if (dd.isChanged()) {
 				b.addStyleName("different");
@@ -58,6 +58,7 @@ public class MultiUserEditorTopBar extends CustomComponent {
 				b.setEnabled(false);
 			}
 			b.addStyleName("collab-user-" + dd.getUser().getStyleIndex());
+			*/
 		}
 	}
 	

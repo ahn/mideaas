@@ -19,7 +19,7 @@ import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 
 
-@Theme("mytheme")
+//@Theme("mytheme")
 @SuppressWarnings("serial")
 @Push
 public class MyVaadinUI extends UI
@@ -31,7 +31,7 @@ public class MyVaadinUI extends UI
 	}
 
     @WebServlet(value = "/*", asyncSupported = true)
-    @VaadinServletConfiguration(productionMode = false, ui = MyVaadinUI.class, widgetset = "org.vaadin.mideaas.editortest.AppWidgetSet")
+    @VaadinServletConfiguration(productionMode = false, ui = MyVaadinUI.class, widgetset = "org.vaadin.mideaas.editor.AppWidgetSet")
     public static class Servlet extends VaadinServlet {
     }
 
@@ -74,6 +74,7 @@ public class MyVaadinUI extends UI
 	};
 	
 
+	private static Team team = new Team();
 	
 	private static class KGuard implements Guard {
 		private final String X;
@@ -116,14 +117,30 @@ public class MyVaadinUI extends UI
 	protected void init(VaadinRequest request) {
 		
 		
+		final VerticalLayout layout = new VerticalLayout();
+		
+        layout.setMargin(false);
+        layout.setSizeFull();
+        setContent(layout);
+		
+		
+		
+		
 		String fragment = getPage().getUriFragment();
 		String loc = getPage().getLocation().getPath().substring(1);
 		
 		String uid = loc.isEmpty() ? "Default" : loc;
-		final EditorUser eu = new EditorUser(uid, uid);
+		final EditorUser eu = new EditorUser(uid, uid);//, "anttihn@gmail.com");
 		
-		System.out.println("uid");
-		//final EditorUser eu = createUser();
+		
+		
+		team.addUser(eu);
+		
+		
+		/*
+		CollaboratorPanel cp = new CollaboratorPanel(team);
+        layout.addComponent(cp);
+		*/
 		
 		mud.createChildDoc(eu);
 
@@ -132,14 +149,11 @@ public class MyVaadinUI extends UI
 		
 		mue.setSizeFull();
 		
-		final VerticalLayout layout = new VerticalLayout();
 		
-        layout.setMargin(false);
-        layout.setSizeFull();
-        setContent(layout);
         
         
         layout.addComponent(mue);
+        layout.setExpandRatio(mue, 1);
         
         
         Button leave = new Button("Leave");
@@ -150,10 +164,14 @@ public class MyVaadinUI extends UI
 			public void buttonClick(ClickEvent event) {
 				layout.removeAllComponents();
 				mud.removeChildDoc(eu);
+				team.removeUser(eu);
 			}
 		});
         
         layout.addComponent(leave);
+        
+        
+        
         
         /*
         
@@ -186,5 +204,6 @@ public class MyVaadinUI extends UI
         */
         
 	}
+	
 		
 }

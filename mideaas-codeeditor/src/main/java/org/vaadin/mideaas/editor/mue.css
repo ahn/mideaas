@@ -1,0 +1,101 @@
+.mue .collabeditor-layout {
+	border-bottom-width: 4px;
+	border-bottom-style: solid;
+	border-color: transparent;
+}
+
+.mue .collabeditor-layout.collabeditor-layout-0 {
+	border-color: LightGreen;
+}
+
+.mue .collabeditor-layout.collabeditor-layout-1 {
+	border-color: LightSalmon;
+}
+
+.mue .collabeditor-layout.collabeditor-layout-2 {
+	border-color: LightGoldenRodYellow;
+}
+
+.mue .collabeditor-layout.collabeditor-layout-3 {
+	border-color: LightCoral;
+}
+
+.mue .collabeditor-layout.collabeditor-layout-4 {
+	border-color: LightSeaGreen;
+}
+
+.mue .collabeditor-layout.collabeditor-layout-5 {
+	border-color: LightPink;
+}
+
+.mue .collab-square-image-passive {
+	opacity: 0.5;
+}
+
+.mue .collab-square-image-active {
+	opacity: 1;
+}
+
+.mue .collab-square-image:hover {
+	cursor: pointer;
+}
+
+.mue .collab-square-label {
+	color: black;
+	background-color: white;
+	font-size: 9px;
+}
+
+.mue .collab-square.collab-user-0 {
+	border-color: DarkGreen;
+	background-color: LightGreen;
+}
+
+.mue .collab-square.collab-user-1 {
+	border-color: Brown;
+	background-color: LightSalmon;
+}
+
+.mue .collab-square.collab-user-2 {
+	border-color: GoldenRod;
+	background-color: LightGoldenRodYellow;
+}
+
+.mue .collab-square.collab-user-3 {
+	border-color: FireBrick;
+	background-color: LightCoral;
+}
+
+.mue .collab-square.collab-user-4 {
+	border-color: Teal;
+	background-color: LightSeaGreen;
+}
+
+.mue .collab-square.collab-user-5 {
+	border-color: MediumVioletRed;
+	background-color: LightPink;
+}
+
+.mue .collab-user-0 {
+	background-color: LightGreen;
+}
+
+.mue .collab-user-1 {
+	background-color: LightSalmon;
+}
+
+.mue .collab-user-2 {
+	background-color: LightGoldenRodYellow;
+}
+
+.mue .collab-user-3 {
+	background-color: LightCoral;
+}
+
+.mue .collab-user-4 {
+	background-color: LightSeaGreen;
+}
+
+.mue .collab-user-5 {
+	background-color: LightPink;
+}

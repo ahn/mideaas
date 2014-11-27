@@ -6,11 +6,14 @@ import org.vaadin.aceeditor.AceEditor;
 import org.vaadin.aceeditor.TextRange;
 import org.vaadin.mideaas.editor.MultiUserDoc.DifferingChangedListener;
 
+import com.vaadin.annotations.StyleSheet;
 import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.Label;
+import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 
 @SuppressWarnings("serial")
+@StyleSheet("mue.css")
 public class MultiUserEditor extends CustomComponent implements DifferingChangedListener {
 
 	private final EditorUser user;
@@ -22,6 +25,7 @@ public class MultiUserEditor extends CustomComponent implements DifferingChanged
 	public MultiUserEditor(EditorUser user, MultiUserDoc mud) {
 		this.user = user;
 		this.mud = mud;
+		addStyleName("mue");
 	}
 	
 	@Override
@@ -101,10 +105,16 @@ public class MultiUserEditor extends CustomComponent implements DifferingChanged
 
 	@Override
 	public void differingChanged(final Map<EditorUser, DocDifference> diffs) {
-		getUI().access(new Runnable() {
+		UI ui = getUI();
+		if (ui==null) {
+			return;
+		}
+		ui.access(new Runnable() {
 			@Override
 			public void run() {
-				topBar.setDiffering(diffs);
+				if (isAttached()) {
+					topBar.setDiffering(diffs);
+				}
 			}
 		});
 	}

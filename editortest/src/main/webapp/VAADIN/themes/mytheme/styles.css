@@ -7093,6 +7093,65 @@ body .mytheme.v-app .v-app-loading {
 	background-color: LightPink;
 }
 
+.mytheme .collab-square-label {
+	color: black;
+	background-color: white;
+	font-size: 9px;
+}
+
+.mytheme .collab-square {
+	border-style: solid;
+	border-width: 1px;
+}
+
+.mytheme .collab-square-label.collab-user-0 {
+	background-color: LightGreen;
+}
+
+.mytheme .collab-square-label.collab-user-1 {
+	background-color: LightSalmon;
+}
+
+.mytheme .collab-square-label.collab-user-2 {
+	background-color: LightGoldenRodYellow;
+}
+
+.mytheme .collab-square-label.collab-user-3 {
+	background-color: LightCoral;
+}
+
+.mytheme .collab-square-label.collab-user-4 {
+	background-color: LightSeaGreen;
+}
+
+.mytheme .collab-square-label.collab-user-5 {
+	background-color: LightPink;
+}
+
+.mytheme .collab-square.collab-user-0 {
+	background-color: DarkGreen;
+}
+
+.mytheme .collab-square.collab-user-1 {
+	background-color: Brown;
+}
+
+.mytheme .collab-square.collab-user-2 {
+	background-color: GoldenRod;
+}
+
+.mytheme .collab-square.collab-user-3 {
+	background-color: FireBrick;
+}
+
+.mytheme .collab-square.collab-user-4 {
+	background-color: Teal;
+}
+
+.mytheme .collab-square.collab-user-5 {
+	background-color: MediumVioletRed;
+}
+
 .mytheme .collab-button {
 	border: 1px solid black;
 }
