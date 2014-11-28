@@ -23,6 +23,10 @@ public class EditorUser implements Comparable<EditorUser> {
 		return name;
 	}
 	
+	public String getEmail() {
+		return email;
+	}
+	
 	/**
 	 * 
 	 */
@@ -49,7 +53,9 @@ public class EditorUser implements Comparable<EditorUser> {
 	}
 	
 	public String getGravatarUrl(int size) {
-		return "//www.gravatar.com/avatar/" + MD5Util.md5Hex(email!=null?email:name) + "?d=monsterid&s=" + size;
+		return "//www.gravatar.com/avatar/" + MD5Util.md5Hex(email!=null?email:(name!=null?name:id)) + "?d=monsterid&s=" + size;
 	}
+
+	
 	
 }

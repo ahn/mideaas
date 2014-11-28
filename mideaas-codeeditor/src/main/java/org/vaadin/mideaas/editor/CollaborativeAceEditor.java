@@ -38,17 +38,21 @@ public class CollaborativeAceEditor extends AceEditor implements SelectionChange
 	}
 
 	private final SharedDoc sharedText;
-	private final long id = newId();
+	//private final long id = newId();
 	
 	private final EditorUser user;
+	private final String userId;
 	
-	private final Set<String> myMarkers = new HashSet<String>(Arrays.asList(new String[] {"cursorrow-"+id, "cursor-"+id, "cursor-col0-"+id }));
+	private final Set<String> myMarkers;
 	
 	public CollaborativeAceEditor(SharedDoc value, EditorUser user) {
 		super();
 		this.sharedText = value;
 		this.user = user;
+		userId = user==null ? null : user.getId();
+		myMarkers = new HashSet<String>(Arrays.asList(new String[] {"cursorrow-"+userId, "cursor-"+userId, "cursor-col0-"+userId }));
 		setReadOnly(user==null);
+		setUseWorker(false);
 	}
 	
 	public SharedDoc getSharedText() {
@@ -133,20 +137,20 @@ public class CollaborativeAceEditor extends AceEditor implements SelectionChange
 		boolean col0 = col==0;;
 		if (col0) {
 			r = new AceRange(row, col, row, col+1);
-			AceMarker m = new AceMarker("cursor-col0-"+id, r, cursorCssClass(getStyleIndex(),col0), Type.cursor, true, OnTextChange.ADJUST);
-			return newMarkerDiff(m, getValue(), "cursor-"+id);
+			AceMarker m = new AceMarker("cursor-col0-"+userId, r, cursorCssClass(getStyleIndex(),col0), Type.cursor, true, OnTextChange.ADJUST);
+			return newMarkerDiff(m, getValue(), "cursor-"+userId);
 		}
 		else {
 			r = new AceRange(row, col-1, row, col);
-			AceMarker m = new AceMarker("cursor-"+id, r, cursorCssClass(getStyleIndex(),col0), Type.cursor, true, OnTextChange.ADJUST);
-			return newMarkerDiff(m, getValue(), "cursor-col0-"+id);
+			AceMarker m = new AceMarker("cursor-"+userId, r, cursorCssClass(getStyleIndex(),col0), Type.cursor, true, OnTextChange.ADJUST);
+			return newMarkerDiff(m, getValue(), "cursor-col0-"+userId);
 		}
 		
 	}
 
 	private ServerSideDocDiff newRowDiff(AceRange range) {
 		AceRange r = new AceRange(range.getEndRow(), 0, range.getEndRow()+1, 0);
-		AceMarker m = new AceMarker("cursorrow-"+id, r, rowCssClass(getStyleIndex()), Type.cursorRow, false, OnTextChange.ADJUST);
+		AceMarker m = new AceMarker("cursorrow-"+userId, r, rowCssClass(getStyleIndex()), Type.cursorRow, false, OnTextChange.ADJUST);
 			
 		return newMarkerDiff(m, getValue(), null);
 	}

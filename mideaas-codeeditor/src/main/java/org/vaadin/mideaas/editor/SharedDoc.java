@@ -19,6 +19,8 @@ import org.vaadin.aceeditor.client.AceRange;
 import org.vaadin.mideaas.editor.AsyncErrorChecker.ResultListener;
 import org.vaadin.mideaas.editor.ErrorChecker.Error;
 
+import com.vaadin.ui.UI;
+
 /**
  * An {@link AceDoc} to be collaboratively edited by {@link AceEditor}s. 
  *
@@ -97,10 +99,16 @@ public class SharedDoc implements DiffListener, ResultListener {
 			this.doc = doc;
 			
 			for (final AceEditor editor : editors) {
-				editor.getUI().access(new Runnable() {
+				UI ui = editor.getUI();
+				if (ui == null) {
+					continue;
+				}
+				ui.access(new Runnable() {
 					@Override
 					public void run() {
-						editor.setDoc(doc);
+						if (editor.isAttached()) {
+							editor.setDoc(doc);
+						}
 					}
 				});
 			}

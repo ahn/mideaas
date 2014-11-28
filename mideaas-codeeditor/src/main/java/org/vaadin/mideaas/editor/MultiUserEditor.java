@@ -3,6 +3,7 @@ package org.vaadin.mideaas.editor;
 import java.util.Map;
 
 import org.vaadin.aceeditor.AceEditor;
+import org.vaadin.aceeditor.AceMode;
 import org.vaadin.aceeditor.TextRange;
 import org.vaadin.mideaas.editor.MultiUserDoc.DifferingChangedListener;
 
@@ -18,13 +19,16 @@ public class MultiUserEditor extends CustomComponent implements DifferingChanged
 
 	private final EditorUser user;
 	private final MultiUserDoc mud;
+	private final AceMode mode;
 	private MultiUserEditorTopBar topBar;
 	private CollaborativeAceEditor editor;
 	private EditorUser visibleUser;
 
-	public MultiUserEditor(EditorUser user, MultiUserDoc mud) {
+
+	public MultiUserEditor(EditorUser user, MultiUserDoc mud, AceMode mode) {
 		this.user = user;
 		this.mud = mud;
+		this.mode = mode;
 		addStyleName("mue");
 	}
 	
@@ -76,7 +80,7 @@ public class MultiUserEditor extends CustomComponent implements DifferingChanged
 	}
 
 	protected void configureEditor(CollaborativeAceEditor ed) {
-		// nothing to do?
+		editor.setMode(mode);
 	}
 	
 	protected AceEditor getCurrentEditor() {
@@ -122,4 +126,5 @@ public class MultiUserEditor extends CustomComponent implements DifferingChanged
 	public void userClicked(EditorUser newUser) {
 		setVisibleUser(newUser);
 	}
+	
 }

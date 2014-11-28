@@ -3,6 +3,7 @@ package org.vaadin.mideaas.editor;
 import java.util.LinkedList;
 import java.util.List;
 
+import com.vaadin.annotations.StyleSheet;
 import com.vaadin.event.MouseEvents.ClickEvent;
 import com.vaadin.event.MouseEvents.ClickListener;
 import com.vaadin.ui.CustomComponent;
@@ -12,7 +13,8 @@ import com.vaadin.ui.Layout;
 import com.vaadin.ui.UI;
 
 @SuppressWarnings("serial")
-public class CollaboratorPanel extends CustomComponent implements Team.Listener {
+@StyleSheet("mue.css") // ???
+public class TeamLayout extends CustomComponent implements Team.Listener {
 
 	public interface UserClickListener {
 		public void clicked(EditorUser user);
@@ -23,10 +25,11 @@ public class CollaboratorPanel extends CustomComponent implements Team.Listener 
 	private int maxCols;
 	private final LinkedList<UserClickListener> listeners = new LinkedList<UserClickListener>();
 
-	public CollaboratorPanel(Team team) {
+	public TeamLayout(Team team) {
 		this.team = team;
 		this.imageSize = 32;
-		this.maxCols = 0; 
+		this.maxCols = 0;
+		this.setPrimaryStyleName("mue"); // ???
 	}
 	
 	public void setImageSize(int imageSize) {
@@ -64,10 +67,16 @@ public class CollaboratorPanel extends CustomComponent implements Team.Listener 
 
 	@Override
 	public void changed(final List<EditorUser> users) {
-		UI.getCurrent().access(new Runnable() {
+		UI ui = getUI();
+		if (ui == null) {
+			return;
+		}
+		ui.access(new Runnable() {
 			@Override
 			public void run() {
-				update(users);
+				if (isAttached()) {
+					update(users);
+				}
 			}
 		});
 	}
@@ -90,7 +99,7 @@ public class CollaboratorPanel extends CustomComponent implements Team.Listener 
 			la = new HorizontalLayout();
 		}
 		for (final EditorUser user : users) {
-			UserSquare square = new UserSquare(user, imageSize);
+			UserSquare square = new UserSquare(user, imageSize, false);
 			square.addClickListener(new ClickListener() {
 				@Override
 				public void click(ClickEvent event) {

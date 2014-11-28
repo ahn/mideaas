@@ -85,7 +85,36 @@
 		  <artifactId>mideaas-editor</artifactId>
 		  <version>${version}</version>
 		</dependency>
+		
+		<dependency>
+			<groupId>org.vaadin.addons</groupId>
+			<artifactId>chatbox</artifactId>
+			<version>0.7.4</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>org.vaadin.addon</groupId>
+			<artifactId>oauthpopup</artifactId>
+			<version>0.0.3</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>org.kohsuke</groupId>
+			<artifactId>github-api</artifactId>
+			<version>1.59</version>
+		</dependency>
+		
+		<!-- -->
+		
+		<dependency>
+			<groupId>net.sourceforge.cssparser</groupId>
+			<artifactId>cssparser</artifactId>
+			<version>0.9.14</version>
+		</dependency>
+		
 	</dependencies>
+	
+	
 
 	<build>
 		<plugins>
