@@ -74,12 +74,9 @@ public class WelcomeView extends CustomComponent implements View, OAuthListener 
 	
 	@Override
 	public void enter(ViewChangeEvent event) {
-		
-		Object token = getSession().getAttribute("github-access-token");
-		Object secret = getSession().getAttribute("github-access-token-secret");
-		
-		if (token != null && secret != null) {
-			loggedIn((String)token, (String)secret);
+		IdeUser user = ((IdeUI)getUI()).getIdeUser();
+		if (user != null && user.getGithubToken() != null) {
+			loggedIn(user.getGithubToken());
 		}
 		else {
 			showLogin();
@@ -107,7 +104,7 @@ public class WelcomeView extends CustomComponent implements View, OAuthListener 
 				@Override
 				public void buttonClick(ClickEvent event) {
 					IdeUI ui = (IdeUI) getUI();
-					ui.setSessionUser(new EditorUser(UUID.randomUUID().toString(), "Demo user"));
+					ui.setSessionUser(new IdeUser(UUID.randomUUID().toString(), "Demo user", null));
 					ui.startProject(Util.createDemoProject());
 				}
 			});
@@ -120,7 +117,8 @@ public class WelcomeView extends CustomComponent implements View, OAuthListener 
 	public void authSuccessful(String accessToken, String accessTokenSecret) {
 		getSession().setAttribute("github-access-token", accessToken);
 		getSession().setAttribute("github-access-token-secret", accessTokenSecret);
-		loggedIn(accessToken, accessTokenSecret);
+		UserToken token = new UserToken(accessToken, accessTokenSecret);
+		loggedIn(token);
 	}
 	
 	@Override
@@ -128,20 +126,19 @@ public class WelcomeView extends CustomComponent implements View, OAuthListener 
 		// Do nothing?
 	}
 	
-	private void loggedIn(String accessToken, String accessTokenSecret) {
-		UserToken token = new UserToken(accessToken, accessTokenSecret);
+	private void loggedIn(UserToken token) {
 		final GitHubService gh = new GitHubService(API_KEY, API_SECRET, token);
 		final UserProfile profile = gh.getUserProfile();
 		
 		String name = profile.getName()!=null ? profile.getName() : profile.getIdentifier();
-		EditorUser user = new EditorUser(profile.getIdentifier(), name, profile.getEmail());
+		IdeUser user = new IdeUser(profile.getIdentifier(), name, profile.getEmail());
+		user.setGithubToken(token);
 		((IdeUI) getUI()).setSessionUser(user);
 
 		if (project==null) {
 			showGistsOpener(gh, name, profile);
 		}
 		else {
-			project.getTeam().addUser(user);
 			Ide ide = new Ide(project, user);
 			ide.setSizeFull();
 			setSizeFull();
@@ -167,8 +164,6 @@ public class WelcomeView extends CustomComponent implements View, OAuthListener 
 			@Override
 			public void buttonClick(ClickEvent event) {
 				((IdeUI)getUI()).removeSessionUser();
-				getSession().setAttribute("github-access-token", null);
-				getSession().setAttribute("github-access-token-secret", null);
 				showLogin();
 			}
 		});

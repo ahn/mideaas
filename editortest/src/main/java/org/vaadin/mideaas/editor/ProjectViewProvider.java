@@ -29,12 +29,10 @@ public final class ProjectViewProvider implements ViewProvider {
 			return null;
 		}
 		
-		EditorUser user = ui.getSessionUser();
+		IdeUser user = ui.getIdeUser();
 		if (user==null) {
 			return new WelcomeView(project);
 		}
-		
-		project.getTeam().addUser(user);
 		
 		return new IdeView(project, user);
 

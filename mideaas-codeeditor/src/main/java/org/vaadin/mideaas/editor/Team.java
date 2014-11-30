@@ -2,7 +2,7 @@ package org.vaadin.mideaas.editor;
 
 import java.util.LinkedList;
 import java.util.List;
-import java.util.TreeSet;
+import java.util.TreeMap;
 
 public class Team {
 	
@@ -10,31 +10,50 @@ public class Team {
 		public void changed(List<EditorUser> users);
 	}
 
-	private TreeSet<EditorUser> users = new TreeSet<EditorUser>();
+	//private TreeSet<EditorUser> users = new TreeSet<EditorUser>();
+	private TreeMap<EditorUser, Integer> users = new TreeMap<EditorUser, Integer>();
 	private LinkedList<Listener> listeners = new LinkedList<Listener>();
 
 	public synchronized void addUser(EditorUser user) {
-		boolean added;
+		boolean changed = false;
 		synchronized (this) {
-			added = users.add(user);
+			Integer n = users.get(user);
+			if (n == null) {
+				users.put(user, 1);
+				changed = true;
+			}
+			else {
+				users.put(user, n+1);
+			}
+			System.out.println("addUser " + user.getId() + " " + n + " -> " + users.get(user));
 		}
-		if (added) {
+		if (changed) {
 			fireChanged();
 		}
 	}
 	
 	public synchronized void removeUser(EditorUser user) {
-		boolean removed;
+		boolean changed = false;
 		synchronized (this) {
-			removed = users.remove(user);
+			Integer n = users.get(user);
+			if (n != null) {
+				if (n <= 1) {
+					users.remove(user);
+					changed = true;
+				}
+				else {
+					users.put(user, n-1);
+				}
+			}
+			System.out.println("removeUser " + user.getId() + " " + n + " -> " + users.get(user));
 		}
-		if (removed) {
+		if (changed) {
 			fireChanged();
 		}
 	}
 	
 	public synchronized List<EditorUser> getUsers() {
-		return new LinkedList<EditorUser>(users );
+		return new LinkedList<EditorUser>(users.keySet());
 	}
 
 	public synchronized void addListener(Listener li) {
@@ -48,7 +67,7 @@ public class Team {
 	private void fireChanged() {
 		List<EditorUser> usersCopy;
 		synchronized (this) {
-			usersCopy = new LinkedList<EditorUser>(users);
+			usersCopy = getUsers();
 		}
 		for (Listener li : listeners) {
 			li.changed(usersCopy);

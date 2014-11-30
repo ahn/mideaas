@@ -9,7 +9,7 @@ public class IdeView extends CustomComponent implements View {
 
 	private final MultiUserProject project;
 	
-	public IdeView(MultiUserProject project, EditorUser user) {
+	public IdeView(MultiUserProject project, IdeUser user) {
 		this.project = project;
 		Ide ide = new Ide(project, user);
 		ide.setSizeFull();

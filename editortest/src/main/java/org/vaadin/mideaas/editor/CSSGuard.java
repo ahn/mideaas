@@ -19,9 +19,8 @@ public class CSSGuard implements Guard {
 
 	@Override
 	public boolean isAcceptable(AceDoc candidate, ServerSideDocDiff diff) {
-		System.out.println("css isAcceptable?");
 		if (diff.getPatches().isEmpty()) {
-			System.out.println("empty");
+			// optimization
 			return true;
 		}
 		else {

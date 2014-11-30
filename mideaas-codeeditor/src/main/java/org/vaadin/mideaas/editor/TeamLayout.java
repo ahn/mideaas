@@ -9,6 +9,7 @@ import com.vaadin.event.MouseEvents.ClickListener;
 import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.GridLayout;
 import com.vaadin.ui.HorizontalLayout;
+import com.vaadin.ui.Label;
 import com.vaadin.ui.Layout;
 import com.vaadin.ui.UI;
 
@@ -61,8 +62,10 @@ public class TeamLayout extends CustomComponent implements Team.Listener {
 	
 	@Override
 	public void detach() {
+		System.out.println(this + " detach");
 		team.removeListener(this);
 		super.detach();
+		System.out.println(this + " detached");
 	}
 
 	@Override
@@ -74,9 +77,9 @@ public class TeamLayout extends CustomComponent implements Team.Listener {
 		ui.access(new Runnable() {
 			@Override
 			public void run() {
-				if (isAttached()) {
-					update(users);
-				}
+				System.out.println(this + " Updating users " + users);
+				update(users);
+				System.out.println(this + " updated");
 			}
 		});
 	}
@@ -90,6 +93,11 @@ public class TeamLayout extends CustomComponent implements Team.Listener {
 	}
 	
 	private void update(List<EditorUser> users) {
+		if (users.isEmpty()) {
+			setCompositionRoot(new Label());
+			return;
+		}
+
 		Layout la;
 		if (maxCols > 0) {
 			int h = (users.size()-1) / maxCols + 1;

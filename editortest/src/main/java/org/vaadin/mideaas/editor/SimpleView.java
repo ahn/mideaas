@@ -12,6 +12,7 @@ public class SimpleView extends CustomComponent implements View {
 	
 	public SimpleView(IdeDoc doc, EditorUser user, String title) {
 		this.title = title;
+		
 		MultiUserEditor ed = new MultiUserEditor(user, doc.getDoc(), doc.getAceMode());
 		ed.setSizeFull();
 		
@@ -29,7 +30,6 @@ public class SimpleView extends CustomComponent implements View {
 	
 	@Override
 	public void enter(ViewChangeEvent event) {
-		System.out.println("enter SimpleView");
 		getUI().getPage().setTitle(title);
 	}
 

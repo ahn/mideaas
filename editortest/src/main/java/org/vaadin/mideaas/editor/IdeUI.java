@@ -12,7 +12,7 @@ import com.vaadin.server.VaadinSession;
 import com.vaadin.ui.UI;
 
 
-@Theme("runo")
+@Theme("mideaas")
 @SuppressWarnings("serial")
 @Push
 public class IdeUI extends UI
@@ -39,37 +39,51 @@ public class IdeUI extends UI
 		navigator.navigateTo(project.getName());
 	}
 
-	public void setSessionUser(EditorUser user) {
+	public void setSessionUser(IdeUser user) {
 		VaadinSession s = getSession();
-		s.setAttribute("user-id", user.getId());
-		s.setAttribute("user-name", user.getName());
-		s.setAttribute("user-email", user.getEmail());
+		s.setAttribute("user", user);
 	}
 	
-	public EditorUser getSessionUser() {
+	public IdeUser getIdeUser() {
 		VaadinSession s = getSession();
-		Object id = s.getAttribute("user-id");
-		if (id == null) {
-			return null;
-		}
-		return new EditorUser(
-				(String)id,
-				(String)s.getAttribute("user-name"),
-				(String)s.getAttribute("user-email"));
+		return (IdeUser) s.getAttribute("user");
 	}
 
 	public void removeSessionUser() {
 		VaadinSession s = getSession();
-		s.setAttribute("user-id", null);
-		s.setAttribute("user-name", null);
-		s.setAttribute("user-email", null);
+		s.setAttribute("user", null);
 	}
 	
 	@Override
 	public void detach() {
-		System.out.println("IdeUI.detach " + this);
+
+		int n = getSession().getUIs().size();
+		System.out.println("There are " + n + " UIs left...");
+		if (n < 1) {
+			IdeUser user = getIdeUser();
+			if (user != null) {
+				cleanup(user);
+			}
+		}
 		
 		super.detach();
+		System.out.println("IdeUI.detached " + this);
+		
+		
+		for (UI ui : getSession().getUIs()) {
+			System.out.println(ui + " - " + ui.getId() + " - " + ui.getCaption());
+		}
+		
+	}
+
+	private void cleanup(IdeUser user) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public EditorUser getEditorUser() {
+		IdeUser user = getIdeUser();
+		return user==null ? null : user.getEditorUser();
 	}
 		
 }

@@ -13,27 +13,43 @@ public class Ide extends CustomComponent {
 	private final EditorUser user;
 
 	private final HorizontalSplitPanel split = new HorizontalSplitPanel();
+	private IdeDoc activeDoc;
 
-	public Ide(MultiUserProject project, EditorUser user) {
+	public Ide(MultiUserProject project, IdeUser user) {
 
 		this.project = project;
-		this.user = user;
+		this.user = user.getEditorUser();
 
 		split.setSizeFull();
-		split.setFirstComponent(createFirstComponent());
+		split.setFirstComponent(createSidebar());
 		split.setSplitPosition(200, Unit.PIXELS);
+		
 
 		setCompositionRoot(split);
 	}
+	
+	@Override
+	public void attach() {
+		super.attach();
+		project.getTeam().addUser(user);
+	}
+	
+	@Override
+	public void detach() {
+		super.detach();
+		project.getTeam().removeUser(user);
+	}
 
 	public void openDoc(String name) {
-
+		
 		IdeDoc doc = project.getDoc(name);
 		if (doc == null) {
 			return;
 		}
-		MultiUserEditor ed = new MultiUserEditor(user, doc.getDoc(),
-				doc.getAceMode());
+		
+		setActiveDoc(doc);
+		
+		MultiUserEditor ed = new MultiUserEditor(user, doc.getDoc(), doc.getAceMode());
 		ed.setSizeFull();
 
 		VerticalSplitPanel vsplit = new VerticalSplitPanel();
@@ -50,18 +66,29 @@ public class Ide extends CustomComponent {
 		split.setSecondComponent(vsplit);
 
 	}
+	
+	private void setActiveDoc(IdeDoc doc) {
+		if (activeDoc != null) {
+			// TODO activeDoc.getDoc().removeChildDoc(user);
+		}
+		activeDoc = doc;
+	}
 
-	private Component createFirstComponent() {
+	private Component createSidebar() {
+		VerticalLayout la = new VerticalLayout();
+		la.setSpacing(true);
+		
 		FileList fileList = new FileList(project);
 		fileList.addListener(new FileList.Listener() {
 			@Override
 			public void selected(String name) {
 				openDoc(name);
 			}
+			@Override
+			public void selectedNewTab(String name) {
+				getUI().getPage().open("#!"+project.getName()+"/"+name, "_blank");
+			}
 		});
-
-		VerticalLayout la = new VerticalLayout();
-		la.setSpacing(true);
 
 		la.addComponent(fileList);
 

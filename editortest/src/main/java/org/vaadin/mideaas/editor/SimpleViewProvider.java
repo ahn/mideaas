@@ -21,7 +21,6 @@ public final class SimpleViewProvider implements ViewProvider {
 
 	@Override
 	public View getView(String viewName) {
-		System.out.println("SimpleViewProvider getView "+ viewName);
 		String[] ss = viewName.split("/", 2);
 		if (ss.length != 2 ) {
 			return null;
@@ -37,11 +36,11 @@ public final class SimpleViewProvider implements ViewProvider {
 			return null;
 		}
 		
-		EditorUser user = ui.getSessionUser();
+		EditorUser user = ui.getEditorUser();
 		if (user==null) {
 			return new WelcomeView(project, ss[1]);
 		}
 		
-		return new SimpleView(doc, user,  ss[1] + " (" + ss[0] + ")");
+		return new SimpleView(doc, user,  ss[1]);
 	}
 }

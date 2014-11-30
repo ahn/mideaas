@@ -7,7 +7,7 @@ import com.vaadin.ui.CustomComponent;
 @SuppressWarnings("serial")
 public class MainView extends CustomComponent implements View {
 
-	public MainView(MultiUserProject project, EditorUser user) {
+	public MainView(MultiUserProject project, IdeUser user) {
 		Ide ide = new Ide(project, user);
 		ide.setSizeFull();
 		this.setSizeFull();

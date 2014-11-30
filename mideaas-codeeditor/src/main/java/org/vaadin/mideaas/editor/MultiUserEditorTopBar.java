@@ -11,12 +11,10 @@ import com.vaadin.ui.HorizontalLayout;
 public class MultiUserEditorTopBar extends CustomComponent {
 	
 	private final MultiUserEditor parent;
-	private final EditorUser user;
 	private final HorizontalLayout layout;
 	
 	public MultiUserEditorTopBar(MultiUserEditor parent, EditorUser user) {
 		this.parent = parent;
-		this.user = user;
 		layout = new HorizontalLayout();
 		layout.setSpacing(false);
 		this.addStyleName("collabeditor-layout");
@@ -29,7 +27,7 @@ public class MultiUserEditorTopBar extends CustomComponent {
 	public void setDiffering(Map<EditorUser, DocDifference> diffs) {
 		layout.removeAllComponents();
 		
-		UserSquare base = new UserSquare(null, 32);
+		UserSquare base = new UserSquare(null, 16);
 		base.addClickListener(new ClickListener() {
 			@Override
 			public void click(ClickEvent event) {
@@ -39,7 +37,7 @@ public class MultiUserEditorTopBar extends CustomComponent {
 		layout.addComponent(base);
 		
 		for (final DocDifference dd : diffs.values()) {
-			UserSquare b = new UserSquare(dd.getUser(), 32, dd.isChanged());
+			UserSquare b = new UserSquare(dd.getUser(), 16, dd.isChanged());
 			b.addClickListener(new ClickListener() {
 				@Override
 				public void click(ClickEvent event) {
@@ -47,18 +45,6 @@ public class MultiUserEditorTopBar extends CustomComponent {
 				}
 			});
 			layout.addComponent(b);
-
-			/*
-			b.addStyleName("collab-button");
-			if (dd.isChanged()) {
-				b.addStyleName("different");
-			}
-			if (dd.getUser().equals(user)) {
-				b.addStyleName("collab-user-me");
-				b.setEnabled(false);
-			}
-			b.addStyleName("collab-user-" + dd.getUser().getStyleIndex());
-			*/
 		}
 	}
 	
