@@ -20,11 +20,8 @@ public class CSSGuard implements Guard {
 	@Override
 	public boolean isAcceptable(AceDoc candidate, ServerSideDocDiff diff) {
 		if (diff.getPatches().isEmpty()) {
-			// optimization
+			// optimization: always acceptable if text not changed
 			return true;
-		}
-		else {
-			System.out.println(diff);
 		}
 		
 		try {

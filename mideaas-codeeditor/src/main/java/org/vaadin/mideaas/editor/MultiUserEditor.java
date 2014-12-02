@@ -35,6 +35,7 @@ public class MultiUserEditor extends CustomComponent implements DifferingChanged
 	@Override
 	public void attach() {
 		super.attach();
+		mud.registerChildDoc(user);
 		setVisibleUser(user);
 		mud.addDifferingChangedListener(this);
 	}
@@ -50,7 +51,14 @@ public class MultiUserEditor extends CustomComponent implements DifferingChanged
 				doc.applyDiff(editor.getRemoveCursorMarkersDiff());
 			}
 		}
+		unregisterVisibleDoc();
 		super.detach();
+	}
+	
+	private void unregisterVisibleDoc() {
+		if (visibleUser==user) {
+			mud.unregisterChildDoc(user);
+		}
 	}
 
 	private void createLayout() {
@@ -99,9 +107,6 @@ public class MultiUserEditor extends CustomComponent implements DifferingChanged
 		if (visibleUser == null) {
 			return mud.getBase();
 		} 
-		else if (visibleUser == user) {
-			return mud.getChildDocCreateIfNeeded(user);
-		}
 		else {
 			return mud.getChildDoc(visibleUser);
 		}

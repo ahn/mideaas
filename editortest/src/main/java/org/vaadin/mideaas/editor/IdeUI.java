@@ -19,7 +19,7 @@ public class IdeUI extends UI
 {
 
     @WebServlet(value = "/*", asyncSupported = true)
-    @VaadinServletConfiguration(productionMode = false, ui = IdeUI.class, widgetset = "org.vaadin.mideaas.editor.AppWidgetSet", heartbeatInterval=5)
+    @VaadinServletConfiguration(productionMode = false, ui = IdeUI.class, widgetset = "org.vaadin.mideaas.editor.AppWidgetSet", heartbeatInterval=5, closeIdleSessions=true)
     public static class Servlet extends VaadinServlet {}
 
 	private final Navigator navigator = new Navigator(this, this);
@@ -32,6 +32,8 @@ public class IdeUI extends UI
 		navigator.addProvider(new SimpleViewProvider(this, projects));
 		navigator.addProvider(new ProjectViewProvider(this, projects));
 		navigator.setErrorView(new IdeErrorView());
+		
+		getSession().getSession().setMaxInactiveInterval(300);
 	}
 
 	public void startProject(MultiUserProject project) {

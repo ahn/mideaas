@@ -21,8 +21,7 @@ public final class ProjectViewProvider implements ViewProvider {
 
 	@Override
 	public View getView(String viewName) {
-		System.out.println("ProjectViewProvider.getView "+ viewName);
-						
+
 		MultiUserProject project = projects.getProject(viewName);
 		
 		if (project == null) {

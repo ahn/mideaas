@@ -40,6 +40,7 @@ public class MultiUserDoc implements Listener {
 		final EditorUser user;
 		final SharedDoc doc;
 		final DocDiffMediator med;
+		int numRegistered = 1;
 		public ChildDoc(EditorUser user, SharedDoc doc, DocDiffMediator med) {
 			this.user = user;
 			this.doc = doc;
@@ -68,6 +69,7 @@ public class MultiUserDoc implements Listener {
 		return childDocs.get(user).doc;
 	}
 	
+	/*
 	synchronized public SharedDoc getChildDocCreateIfNeeded(EditorUser user) {
 		ChildDoc cd = childDocs.get(user);
 		if (cd == null) {
@@ -75,8 +77,31 @@ public class MultiUserDoc implements Listener {
 		}
 		return cd.doc;
 	}
+	*/
 	
-	synchronized public SharedDoc createChildDoc(EditorUser user) {
+	public SharedDoc registerChildDoc(EditorUser user) {
+		boolean changed = false;
+		ChildDoc child;
+		synchronized (this) {
+			child = childDocs.get(user);
+			if (child == null) {
+				child = createNewChildDoc(user);
+				changed = true;
+			}
+			else {
+				child.numRegistered += 1;
+			}
+			System.out.println(this + "   REGISTER " + user.getId() + " -> " + child.numRegistered+"");
+		}
+		
+		if (changed) {
+			fireDifferingChanged(getDifferences());
+		}
+		
+		return child.doc;
+	}
+	
+	private ChildDoc createNewChildDoc(EditorUser user) {
 		SharedDoc doc = new SharedDoc(base.getDoc(), checker);
 		DocDiffMediator med = new DocDiffMediator(filter, base, doc);
 		setGuards(med);
@@ -85,8 +110,37 @@ public class MultiUserDoc implements Listener {
 		childDocs.put(user, cd);
 		
 		doc.addListener(this);
-		fireDifferingChanged(getDifferences());
-		return cd.doc;
+		
+		return cd;
+	}
+	
+	public void unregisterChildDoc(EditorUser user) {
+		boolean changed = false;
+		synchronized (this) {
+			ChildDoc child = childDocs.get(user);
+			if (child == null) {
+				return;
+			}
+			if (child.numRegistered == 1) {
+				removeChildDoc(child);
+				changed = true;
+			}
+			else {
+				child.numRegistered -= 1;
+			}
+			System.out.println(this + " UNREGISTER " + user.getId() + " -> " + child.numRegistered+"");
+		}
+		
+		if (changed) {
+			fireDifferingChanged(getDifferences());
+		}
+	}
+	
+	private void removeChildDoc(ChildDoc child) {
+
+		childDocs.remove(child.user);
+		child.doc.removeListener(this);
+		child.med.stop();
 	}
 
 	private void setGuards(DocDiffMediator med) {
@@ -104,16 +158,7 @@ public class MultiUserDoc implements Listener {
 //		}
 //	}
 	
-	synchronized public SharedDoc removeChildDoc(EditorUser user) {
-		ChildDoc cd = childDocs.remove(user);
-		if (cd == null) {
-			return null;
-		}
-		cd.doc.removeListener(this);
-		cd.med.stop();
-		fireDifferingChanged(getDifferences());
-		return cd.doc;
-	}
+	
 	
 	public synchronized void addDifferingChangedListener(DifferingChangedListener li) {
 		dcListeners.add(li);

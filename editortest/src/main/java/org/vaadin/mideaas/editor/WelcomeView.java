@@ -74,6 +74,7 @@ public class WelcomeView extends CustomComponent implements View, OAuthListener 
 	
 	@Override
 	public void enter(ViewChangeEvent event) {
+		getUI().getPage().setTitle("Welcome");
 		IdeUser user = ((IdeUI)getUI()).getIdeUser();
 		if (user != null && user.getGithubToken() != null) {
 			loggedIn(user.getGithubToken());
@@ -84,7 +85,6 @@ public class WelcomeView extends CustomComponent implements View, OAuthListener 
 	}
 	
 	private void showLogin() {
-		getUI().getPage().setTitle("Welcome");
 		panel.setCaption("Welcome");
 		
 		layout.removeAllComponents();
@@ -139,6 +139,8 @@ public class WelcomeView extends CustomComponent implements View, OAuthListener 
 			showGistsOpener(gh, name, profile);
 		}
 		else {
+			// TODO: this probably should be somewhere else...
+			getUI().getPage().setTitle(project.getName());
 			Ide ide = new Ide(project, user);
 			ide.setSizeFull();
 			setSizeFull();
