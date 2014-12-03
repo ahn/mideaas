@@ -3,8 +3,8 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.vaadin.mideaas</groupId>
-	<artifactId>mideaas-ide2</artifactId>
-	<packaging>jar</packaging>
+	<artifactId>mideaas-app2</artifactId>
+	<packaging>war</packaging>
 	<version>0.0.3-SNAPSHOT</version>
 	<name>Vaadin Web Application</name>
 
@@ -18,7 +18,6 @@
 			<id>vaadin-addons</id>
 			<url>http://maven.vaadin.com/vaadin-addons</url>
 		</repository>
-		<!--
 		<repository>
 			<id>vaadin-snapshots</id>
 			<url>http://oss.sonatype.org/content/repositories/vaadin-snapshots/</url>
@@ -29,8 +28,19 @@
 				<enabled>true</enabled>
 			</snapshots>
 		</repository>
-		 -->
 	</repositories>
+	<pluginRepositories>
+		<pluginRepository>
+			<id>vaadin-snapshots</id>
+			<url>http://oss.sonatype.org/content/repositories/vaadin-snapshots/</url>
+			<releases>
+				<enabled>false</enabled>
+			</releases>
+			<snapshots>
+				<enabled>true</enabled>
+			</snapshots>
+		</pluginRepository>
+	</pluginRepositories>
 	<dependencies>
 		<dependency>
 			<groupId>com.vaadin</groupId>
@@ -39,7 +49,7 @@
 		</dependency>
 		<dependency>
 			<groupId>com.vaadin</groupId>
-			<artifactId>vaadin-client-compiler</artifactId>
+			<artifactId>vaadin-client-compiled</artifactId>
 			<version>${vaadin.version}</version>
 		</dependency>
 		<!--
@@ -81,42 +91,24 @@
 		</dependency>
 		
 		<dependency>
-		  <groupId>org.vaadin.mideaas</groupId>
-		  <artifactId>mideaas-editor</artifactId>
-		  <version>${project.version}</version>
+			<groupId>org.vaadin.mideaas</groupId>
+			<artifactId>mideaas-ide2</artifactId>
+			<version>${project.version}</version>
 		</dependency>
 		
 		<dependency>
-			<groupId>org.vaadin.addons</groupId>
-			<artifactId>chatbox</artifactId>
-			<version>0.7.4</version>
+			<groupId>net.sourceforge.cssparser</groupId>
+			<artifactId>cssparser</artifactId>
+			<version>0.9.14</version>
 		</dependency>
-		
-		<dependency>
-			<groupId>org.vaadin.addon</groupId>
-			<artifactId>oauthpopup</artifactId>
-			<version>0.0.3</version>
-		</dependency>
-		
-		<dependency>
-			<groupId>org.kohsuke</groupId>
-			<artifactId>github-api</artifactId>
-			<version>1.59</version>
-		</dependency>
-		
-		<!-- -->
-
 		
 	</dependencies>
-	
-	
 
 	<build>
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
-				<version>2.5.1</version>
 				<configuration>
 					<source>1.6</source>
 					<target>1.6</target>
@@ -135,29 +127,12 @@
 					</filesets>
 				</configuration>
 			</plugin>
-<!-- 			<plugin>
+			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-war-plugin</artifactId>
 				<version>2.2</version>
 				<configuration>
 					<failOnMissingWebXml>false</failOnMissingWebXml>
-				</configuration>
-			</plugin> -->
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-jar-plugin</artifactId>
-				<version>2.3.2</version>
-				<configuration>
-					<archive>
-						<index>true</index>
-						<addMavenDescriptor>false</addMavenDescriptor>
-						<manifest>
-							<addDefaultImplementationEntries>true</addDefaultImplementationEntries>
-						</manifest>
-						<manifestEntries>
-							<Vaadin-Package-Version>1</Vaadin-Package-Version>
-						</manifestEntries>
-					</archive>
 				</configuration>
 			</plugin>
 			<plugin>
@@ -173,10 +148,15 @@
 					</webappDirectory>
 					<hostedWebapp>${basedir}/src/main/webapp/VAADIN/widgetsets
 					</hostedWebapp>
+					<!-- Most Vaadin apps don't need this stuff, guide that to target -->
+					<persistentunitcachedir>${project.build.directory}</persistentunitcachedir>
+					<deploy>${project.build.directory}/gwt-deploy</deploy>
+					<!-- Compile report is not typically needed either, saves hunreds of mb disk -->
+					<compileReport>false</compileReport>
 					<noServer>true</noServer>
 					<!-- Remove draftCompile when project is ready -->
 					<draftCompile>false</draftCompile>
-					<compileReport>true</compileReport>
+					
 					<style>OBF</style>
 					<strict>true</strict>
 					<runTarget>http://localhost:8080/</runTarget>
@@ -205,7 +185,7 @@
 				<version>8.1.16.v20140903</version>
 				<configuration>
                     <stopPort>9967</stopPort>
-                    <stopKey>editortest</stopKey>
+                    <stopKey>mideeas-app</stopKey>
                     <scanIntervalSeconds>2</scanIntervalSeconds>
                 </configuration>
 			</plugin>
@@ -227,7 +207,7 @@
 											vaadin-maven-plugin
 										</artifactId>
 										<versionRange>
-											[7.1.8,)
+											[7.3.0,)
 										</versionRange>
 										<goals>
 											<goal>resources</goal>
@@ -243,6 +223,19 @@
 								</pluginExecution>
 							</pluginExecutions>
 						</lifecycleMappingMetadata>
+					</configuration>
+				</plugin>
+				<plugin>
+					<artifactId>maven-eclipse-plugin</artifactId>
+					<configuration>
+						<wtpversion>2.0</wtpversion>
+						<additionalProjectnatures>
+							<projectnature>com.vaadin.integration.eclipse.widgetsetNature</projectnature>
+						</additionalProjectnatures>
+						<additionalBuildcommands>
+							<buildcommand>com.vaadin.integration.eclipse.widgetsetBuilder</buildcommand>
+							<buildcommand>com.vaadin.integration.eclipse.addonStylesBuilder</buildcommand>
+						</additionalBuildcommands>
 					</configuration>
 				</plugin>
 			</plugins>
