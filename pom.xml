@@ -11,7 +11,7 @@
     <modules>
         <module>mideaas-app</module>
         <module>mideaas-ide</module>
-        <module>mideaas-codeeditor</module>
+        <module>mideaas-editor</module>
     </modules>
 
     <properties>
