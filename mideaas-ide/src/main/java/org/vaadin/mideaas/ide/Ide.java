@@ -12,6 +12,7 @@ import com.vaadin.ui.HorizontalSplitPanel;
 import com.vaadin.ui.MenuBar;
 import com.vaadin.ui.MenuBar.Command;
 import com.vaadin.ui.MenuBar.MenuItem;
+import com.vaadin.ui.Panel;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.VerticalSplitPanel;
 
@@ -143,7 +144,9 @@ public class Ide extends CustomComponent {
 			}
 		}
 
-		return la;
+		Panel pa = new Panel(la);
+		pa.setSizeFull();
+		return pa;
 	}
 
 }
