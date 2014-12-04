@@ -15,6 +15,7 @@ public class IdeProject {
 	}
 	private final CopyOnWriteArrayList<Listener> listeners = new CopyOnWriteArrayList<Listener>();
 	
+	private final String id;
 	private final String name;
 	
 	private final HashMap<String, IdeDoc> docs = new HashMap<String, IdeDoc>();
@@ -23,8 +24,13 @@ public class IdeProject {
 	
 	private final SharedChat chat = new SharedChat();
 	
-	public IdeProject(String name) {
+	public IdeProject(String id, String name) {
+		this.id = id;
 		this.name = name;
+	}
+	
+	public String getId() {
+		return id;
 	}
 	
 	public String getName() {
@@ -35,23 +41,23 @@ public class IdeProject {
 		return team;
 	}
 	
-	public synchronized IdeDoc getDoc(String name) {
-		return docs.get(name);
+	public synchronized IdeDoc getDoc(String id) {
+		return docs.get(id);
 	}
 	
-	public IdeDoc putDoc(String name, IdeDoc doc) {
+	public IdeDoc putDoc(String id, IdeDoc doc) {
 		IdeDoc d;
 		synchronized(this) {
-			d = docs.put(name, doc);
+			d = docs.put(id, doc);
 		}
 		fireChanged();
 		return d;
 	}
 	
-	public IdeDoc removeDoc(String name) {
+	public IdeDoc removeDoc(String id) {
 		IdeDoc d;
 		synchronized (this) {
-			d = docs.remove(name);	
+			d = docs.remove(id);	
 		}
 		if (d != null) {
 			fireChanged();
@@ -82,6 +88,10 @@ public class IdeProject {
 
 	public SharedChat getChat() {
 		return chat;
+	}
+
+	public void destroy() {
+		// Nothing for now...
 	}
 
 }

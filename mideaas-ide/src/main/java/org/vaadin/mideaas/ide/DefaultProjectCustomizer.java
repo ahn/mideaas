@@ -8,9 +8,10 @@ import org.vaadin.mideaas.editor.DocDiffMediator.Guard;
 
 public class DefaultProjectCustomizer implements ProjectCustomizer {
 
+	
 	@Override
-	public IdeProject createProject(String name, Map<String, String> files) {
-		return new IdeProject(name);
+	public IdeProject createProject(String id, String name, Map<String, String> files) {
+		return new IdeProject(id, name);
 	}
 	
 	@Override

@@ -102,7 +102,7 @@ public class Ide extends CustomComponent {
 		userMenu.addItem("Log out", new Command() {
 			@Override
 			public void menuSelected(MenuItem selectedItem) {
-				((IdeUI)getUI()).reset();
+				((IdeUI)getUI()).logOut();
 			}
 		});
 		
@@ -123,7 +123,7 @@ public class Ide extends CustomComponent {
 			}
 			@Override
 			public void selectedNewTab(String name) {
-				getUI().getPage().open("#!"+project.getName()+"/"+name, "_blank");
+				getUI().getPage().open("#!"+project.getId()+"/"+name, "_blank");
 			}
 		});
 

@@ -15,8 +15,8 @@ public class VaadinProject extends IdeProject {
 		public void classpathChanged();
 	}
 
-	public VaadinProject(String name) {
-		super(name);
+	public VaadinProject(String id, String name) {
+		super(id, name);
 		this.dir = createDir();
 		System.out.println("new VaadinProject(" + name + ") -- dir: " + this.dir);
 	}

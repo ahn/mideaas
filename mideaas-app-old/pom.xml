@@ -9,7 +9,7 @@
 		<relativePath>..</relativePath>
 	</parent>
 
-	<artifactId>mideaas-app</artifactId>
+	<artifactId>mideaas-app-old</artifactId>
 	<packaging>war</packaging>
 	<name>MIDEaaS Application</name>
 

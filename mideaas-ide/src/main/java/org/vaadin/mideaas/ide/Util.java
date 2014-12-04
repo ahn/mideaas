@@ -1,11 +1,19 @@
 package org.vaadin.mideaas.ide;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.TreeMap;
 import java.util.UUID;
 
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.filefilter.IOFileFilter;
+import org.apache.commons.io.filefilter.TrueFileFilter;
 import org.kohsuke.github.GHGist;
 import org.kohsuke.github.GHGistFile;
 import org.vaadin.aceeditor.AceMode;
@@ -20,7 +28,7 @@ public class Util {
 	
 	public static IdeProject projectFromGist(GHGist gist, ProjectCustomizer cust) {
 		
-		String name = UUID.randomUUID().toString();
+		String id = UUID.randomUUID().toString();
 		
 		Map<String, String> files = new TreeMap<String, String>();
 		for (Entry<String, GHGistFile> e : gist.getFiles().entrySet()) {
@@ -29,7 +37,7 @@ public class Util {
 		
 //		return createProject(files, cust);
 		
-		IdeProject project = cust.createProject(name, files);
+		IdeProject project = cust.createProject(id, gist.getId(), files);
 		
 		for (Entry<String, GHGistFile> e : gist.getFiles().entrySet()) {
 			IdeDoc ideDoc = docFromGistFile(e.getValue(), cust);
@@ -76,23 +84,23 @@ public class Util {
 		return new MultiUserDoc(new AceDoc(content), filter, upGuard, downGuard, checker);
 	}
 	
-	public static IdeProject createDemoProject(ProjectCustomizer cust) {
-		String name = UUID.randomUUID().toString();
-		
-		Map<String,String> noFiles = Collections.emptyMap();
-		IdeProject project = cust.createProject(name, noFiles);
-		
-		MultiUserDoc doc1 = customizedDoc("index.html", INDEX_HTML, cust);
-		project.putDoc("index.html", new IdeDoc(doc1, AceMode.html));
+//	public static IdeProject createDemoProject(ProjectCustomizer cust) {
+//		String id = UUID.randomUUID().toString();
+//		
+//		Map<String,String> noFiles = Collections.emptyMap();
+//		IdeProject project = cust.createProject(id, "Example project", noFiles);
+//		
+//		MultiUserDoc doc1 = customizedDoc("index.html", INDEX_HTML, cust);
+//		project.putDoc("index.html", new IdeDoc(doc1, AceMode.html));
+//
+//		MultiUserDoc doc2 = customizedDoc("style.css", STYLE_CSS, cust);
+//		project.putDoc("style.css", new IdeDoc(doc2, AceMode.css));
+//		
+//		return project;
+//	}
 
-		MultiUserDoc doc2 = customizedDoc("style.css", STYLE_CSS, cust);
-		project.putDoc("style.css", new IdeDoc(doc2, AceMode.css));
-		
-		return project;
-	}
-
-	public static IdeProject createProject(Map<String, String> contents, ProjectCustomizer cust) {
-		IdeProject project = cust.createProject(UUID.randomUUID().toString(), contents);
+	public static IdeProject createProject(String name, Map<String, String> contents, ProjectCustomizer cust) {
+		IdeProject project = cust.createProject(UUID.randomUUID().toString(), name, contents);
 		for (Entry<String, String> e : contents.entrySet()) {
 			MultiUserDoc doc = customizedDoc(e.getKey(), e.getValue(), cust);
 			project.putDoc(e.getKey(), new IdeDoc(doc, aceModeForFilename(e.getKey())));
@@ -102,6 +110,48 @@ public class Util {
 
 	private static AceMode aceModeForFilename(String filename) {
 		return AceMode.forFile(filename);
+	}
+
+	public static Map<String, String> readContentsFromDir(File dir) {
+		int le = dir.getPath().length();
+		Map<String, String> contents = new TreeMap<String, String>();
+		for (File f : readFilesFrom(dir)) {
+			try {
+				String content = readFileContent(f);
+				String path = f.getPath().substring(le).replace("\\", "/");
+				contents.put(path, content);
+			} catch (IOException e) {
+				e.printStackTrace();
+				// XXX ignoring...
+			}
+		}
+		return contents;
+	}
+	
+	private static String readFileContent(File f) throws IOException {
+		return new String(Files.readAllBytes(f.toPath()));
+	}
+
+	private static Collection<File> readFilesFrom(File dir) {
+		IOFileFilter filter = new IOFileFilter() {
+			@Override
+			public boolean accept(File f, String arg1) {
+				return !f.getName().startsWith(".");
+			}
+			
+			@Override
+			public boolean accept(File f) {
+				return !f.getName().startsWith(".");
+			}
+		};
+		return FileUtils.listFiles(dir, filter, filter);
+	}
+
+	public static Map<String, String> getDemoProjectFiles() {
+		TreeMap<String, String> contents = new TreeMap<String, String>();
+		contents.put("index.html", INDEX_HTML);
+		contents.put("style.css", STYLE_CSS);
+		return contents;
 	}
 	
 

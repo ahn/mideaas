@@ -8,14 +8,14 @@ import org.vaadin.mideaas.editor.DocDiffMediator.Guard;
 import org.vaadin.mideaas.ide.DefaultProjectCustomizer;
 import org.vaadin.mideaas.ide.IdeProject;
 
-public class MyCustomizer extends DefaultProjectCustomizer {
+public class MideaasProjectCustomizer extends DefaultProjectCustomizer {
 
 	@Override
-	public IdeProject createProject(String name, Map<String, String> files) {
+	public IdeProject createProject(String id, String name, Map<String, String> files) {
 		if (files.containsKey("pom.xml")) {
-			return new VaadinProject(name);
+			return new VaadinProject(id, name);
 		}
-		return super.createProject(name, files);
+		return super.createProject(id, name, files);
 	}
 	
 	@Override

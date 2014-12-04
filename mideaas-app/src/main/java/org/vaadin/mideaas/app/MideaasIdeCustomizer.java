@@ -11,7 +11,7 @@ import com.vaadin.ui.MenuBar;
 import com.vaadin.ui.MenuBar.Command;
 import com.vaadin.ui.MenuBar.MenuItem;
 
-public class MyIdeCustomizer implements IdeCustomizer {
+public class MideaasIdeCustomizer implements IdeCustomizer {
 
 	@Override
 	public List<Component> getSidebarComponents(IdeProject project) {

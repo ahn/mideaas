@@ -5,7 +5,7 @@ import org.vaadin.mideaas.ide.oauth.UserToken;
 
 public class IdeUser {
 	private final EditorUser editorUser;
-	private UserToken githubToken;
+
 	public IdeUser(String id, String name, String email) {
 		editorUser = new EditorUser(id, name, email);
 	}
@@ -26,17 +26,7 @@ public class IdeUser {
 		return editorUser;
 	}
 	
-	public void setGithubToken(String token, String secret) {
-		setGithubToken(new UserToken(token, secret));
-	}
-	
-	public void setGithubToken(UserToken token) {
-		githubToken = token;
-	}
-	
-	public UserToken getGithubToken() {
-		return githubToken;
-	}
+
 
 	
 }

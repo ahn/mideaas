@@ -8,7 +8,7 @@
 		<version>0.0.3-SNAPSHOT</version>
 		<relativePath>..</relativePath>
 	</parent>
-	<artifactId>mideaas-ide</artifactId>
+	<artifactId>mideaas-ide-old</artifactId>
 	<packaging>jar</packaging>
 
 	<name>MIDEaaS IDE</name>
