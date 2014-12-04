@@ -13,6 +13,7 @@ import org.vaadin.mideaas.ide.DefaultIdeConfiguration;
 import org.vaadin.mideaas.ide.IdeCustomizer;
 import org.vaadin.mideaas.ide.IdeProject;
 import org.vaadin.mideaas.ide.ProjectCustomizer;
+import org.vaadin.mideaas.ide.Util;
 
 public class MideaasIdeConfiguration extends DefaultIdeConfiguration {
 
@@ -49,21 +50,10 @@ public class MideaasIdeConfiguration extends DefaultIdeConfiguration {
 	
 	private static File createProjectDir(Map<String, String> files) throws IOException {
 		Path path = Files.createTempDirectory("mideaas-vaadin");
-		saveFilesToPath(files, path);
+		Util.saveFilesToPath(files, path);
 		return path.toFile();
 	}
 
 
-	private static void saveFilesToPath(Map<String, String> files, Path path) throws IOException {
-		for (Entry<String, String> e : files.entrySet()) {
-			String f = e.getKey();
-			String filename = f.substring(f.lastIndexOf("/")+1);
-			if (f.length() > filename.length()) {
-				Path dir = path.resolve(f.substring(0, f.length() - filename.length() - 1));
-				dir.toFile().mkdirs();
-			}
-			Files.write(path.resolve(f), e.getValue().getBytes(), StandardOpenOption.CREATE_NEW);
-		}
-		
-	}
+	
 }

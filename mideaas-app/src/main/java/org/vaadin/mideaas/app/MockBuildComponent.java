@@ -1,16 +1,14 @@
 package org.vaadin.mideaas.app;
 
-import org.vaadin.mideaas.ide.BuildComponent;
 import org.vaadin.mideaas.ide.IdeProject;
 
 import com.vaadin.ui.Button;
+import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Button.ClickListener;
 import com.vaadin.ui.CustomComponent;
-import com.vaadin.ui.Button.ClickEvent;
 
 @SuppressWarnings("serial")
-public class MockBuildComponent extends CustomComponent implements
-		BuildComponent {
+public class MockBuildComponent extends CustomComponent {
 
 	private final Button button = new Button("naps");
 

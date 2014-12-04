@@ -8,7 +8,7 @@ import com.vaadin.ui.MenuBar;
 public class DefaultIdeCustomizer implements IdeCustomizer {
 
 	@Override
-	public List<Component> getSidebarComponents(IdeProject project) {
+	public List<Component> getSidebarComponents(IdeProject project, IdeUser user) {
 		return null;
 	}
 

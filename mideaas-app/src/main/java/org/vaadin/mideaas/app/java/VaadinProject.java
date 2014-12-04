@@ -2,12 +2,11 @@ package org.vaadin.mideaas.app.java;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
 
 import org.vaadin.mideaas.app.java.util.CompilingService;
 import org.vaadin.mideaas.editor.AsyncErrorChecker;
 import org.vaadin.mideaas.ide.IdeProject;
+import org.vaadin.mideaas.ide.Util;
 
 
 public class VaadinProject extends IdeProject {
@@ -24,14 +23,6 @@ public class VaadinProject extends IdeProject {
 		super(id, name);
 		this.dir = dir;
 		System.out.println("new VaadinProject(" + name + ") -- dir: " + this.dir);
-	}
-
-	private static Path createDir() {
-		try {
-			return Files.createTempDirectory("mideaas");
-		} catch (IOException e) {
-			return null;
-		}
 	}
 
 	public String getClassPath() {
@@ -53,7 +44,18 @@ public class VaadinProject extends IdeProject {
 		System.out.println("pak? " + filename);
 		String s = filename.substring("src/main/java/".length(), filename.length() - ".java".length());
 		return s.replace("/", ".");
-		
+	}
+
+	public void writeToDisk() throws IOException {
+		Util.saveFilesToPath(getSnapshot(), dir.toPath());
+	}
+
+	public File getProjectDir() {
+		return dir;
+	}
+
+	public File getPomXmlFile() {
+		return new File(dir, "pom.xml");
 	}
 
 }

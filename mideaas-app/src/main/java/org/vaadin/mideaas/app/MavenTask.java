@@ -1,4 +1,4 @@
-package org.vaadin.mideaas.ide;
+package org.vaadin.mideaas.app;
 
 import java.io.File;
 import java.util.List;
@@ -12,6 +12,7 @@ import org.apache.maven.shared.invoker.InvocationRequest;
 import org.apache.maven.shared.invoker.InvocationResult;
 import org.apache.maven.shared.invoker.Invoker;
 import org.apache.maven.shared.invoker.MavenInvocationException;
+import org.vaadin.mideaas.app.java.MavenUtil;
 
 /**
  * For running a Maven task in a separate thread.
@@ -37,9 +38,6 @@ public class MavenTask implements Callable<InvocationResult> {
 	}
 
 	private void runMaven() {
-		System.out.println("runMaven pomXml = " + pomXml);
-		System.out.println("runMaven goals =" + goals);
-		
 		InvocationRequest request = new DefaultInvocationRequest();
 		request.setPomFile(pomXml);
 		request.setGoals(goals);
@@ -49,7 +47,7 @@ public class MavenTask implements Callable<InvocationResult> {
 			handler = new InvocationOutputHandler() {
 				@Override
 				public void consumeLine(String li) {
-					System.out.println("Maven log: " + li);
+//					System.out.println("Maven log: " + li);
 					logLine(li);
 				}
 			};
@@ -61,7 +59,6 @@ public class MavenTask implements Callable<InvocationResult> {
 				@Override
 				public void consumeLine(String li) {
 					// Nothing.
-					System.out.println("Maven log: " + li);
 				}
 			};
 		}

@@ -94,11 +94,10 @@ public class MavenUtil {
 		}
 	}
 	
-//	public static String targetDirFor(EditorUser u) {
-//		
-//		//System.out.println( "userID: " + u.getUserId());
-//		
-//		return "target-"+u.getUserId();
-//	}
+	public static String targetDirFor(String userId) {
+		
+		
+		return "target-"+userId;
+	}
 	
 }

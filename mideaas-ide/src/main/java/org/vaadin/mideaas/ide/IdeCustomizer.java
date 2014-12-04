@@ -7,7 +7,7 @@ import com.vaadin.ui.MenuBar;
 
 public interface IdeCustomizer {
 
-	List<Component> getSidebarComponents(IdeProject project);
+	List<Component> getSidebarComponents(IdeProject project, IdeUser user);
 
 	void customizeMenuBar(MenuBar menuBar);
 	

@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
@@ -154,5 +155,16 @@ public class Util {
 		return contents;
 	}
 	
+	public static void saveFilesToPath(Map<String, String> files, Path path) throws IOException {
+		for (Entry<String, String> e : files.entrySet()) {
+			String f = e.getKey();
+			String filename = f.substring(f.lastIndexOf("/")+1);
+			if (f.length() > filename.length()) {
+				Path dir = path.resolve(f.substring(0, f.length() - filename.length() - 1));
+				dir.toFile().mkdirs();
+			}
+			Files.write(path.resolve(f), e.getValue().getBytes(), StandardOpenOption.CREATE);
+		}
+	}
 
 }

@@ -20,6 +20,7 @@ import com.vaadin.ui.VerticalSplitPanel;
 public class Ide extends CustomComponent {
 
 	private final IdeProject project;
+	private final IdeUser ideUser;
 	private final EditorUser user;
 	private final IdeCustomizer customizer;
 
@@ -30,6 +31,7 @@ public class Ide extends CustomComponent {
 	public Ide(IdeProject project, IdeUser user, IdeCustomizer customizer) {
 
 		this.project = project;
+		this.ideUser = user;
 		this.user = user.getEditorUser();
 		this.customizer = customizer;
 
@@ -137,7 +139,7 @@ public class Ide extends CustomComponent {
 		chat.setWidth("100%");
 		la.addComponent(chat);
 		
-		List<Component> additional = customizer.getSidebarComponents(project);
+		List<Component> additional = customizer.getSidebarComponents(project, ideUser);
 		if (additional != null) {
 			for (Component c : additional) {
 				la.addComponent(c);
