@@ -26,44 +26,44 @@ import org.vaadin.mideaas.editor.MultiUserDoc;
 public class Util {
 
 	
-	public static IdeProject projectFromGist(GHGist gist, ProjectCustomizer cust) {
-		
-		String id = UUID.randomUUID().toString();
-		
-		Map<String, String> files = new TreeMap<String, String>();
-		for (Entry<String, GHGistFile> e : gist.getFiles().entrySet()) {
-			files.put(e.getKey(), e.getValue().getContent());
-		}
-		
-//		return createProject(files, cust);
-		
-		IdeProject project = cust.createProject(id, gist.getId(), files);
-		
-		for (Entry<String, GHGistFile> e : gist.getFiles().entrySet()) {
-			IdeDoc ideDoc = docFromGistFile(e.getValue(), cust);
-			project.putDoc(e.getKey(), ideDoc);
-		}
-		
-		return project;
-	}
+//	public static IdeProject projectFromGist(GHGist gist, ProjectCustomizer cust) {
+//		
+//		String id = UUID.randomUUID().toString();
+//		
+//		Map<String, String> files = new TreeMap<String, String>();
+//		for (Entry<String, GHGistFile> e : gist.getFiles().entrySet()) {
+//			files.put(e.getKey(), e.getValue().getContent());
+//		}
+//		
+//
+//		
+//		IdeProject project = cust.createProject(id, gist.getId(), files);
+//		
+//		for (Entry<String, GHGistFile> e : gist.getFiles().entrySet()) {
+//			IdeDoc ideDoc = docFromGistFile(e.getValue(), cust);
+//			project.putDoc(e.getKey(), ideDoc);
+//		}
+//		
+//		return project;
+//	}
 
-	private static IdeDoc docFromGistFile(GHGistFile file, ProjectCustomizer cust) {
-		MultiUserDoc mud = customizedDoc(file.getFileName(), file.getContent(), cust);
-		return new IdeDoc(mud, aceModeForGistFile(file));
-	}
+//	private static IdeDoc docFromGistFile(GHGistFile file, ProjectCustomizer cust) {
+//		MultiUserDoc mud = customizedDoc(file.getFileName(), file.getContent(), cust);
+//		return new IdeDoc(mud, aceModeForGistFile(file));
+//	}
 
-	private static AceMode aceModeForGistFile(GHGistFile file) {
-		String lang = file.getLanguage();
-		if (lang==null) {
-			return AceMode.text;
-		}
-		try {
-			return AceMode.valueOf(aceLangFromGithubLang(lang));
-		}
-		catch (IllegalArgumentException e) {
-			return AceMode.text;
-		}
-	}
+//	private static AceMode aceModeForGistFile(GHGistFile file) {
+//		String lang = file.getLanguage();
+//		if (lang==null) {
+//			return AceMode.text;
+//		}
+//		try {
+//			return AceMode.valueOf(aceLangFromGithubLang(lang));
+//		}
+//		catch (IllegalArgumentException e) {
+//			return AceMode.text;
+//		}
+//	}
 
 	private static String aceLangFromGithubLang(String lang) {
 		System.out.println("lang " + lang);
@@ -76,11 +76,11 @@ public class Util {
 	
 	private static String STYLE_CSS = "body {\n    color: red;\n}\n";
 
-	private static MultiUserDoc customizedDoc(String filename, String content, ProjectCustomizer cust) {
+	private static MultiUserDoc customizedDoc(String filename, String content, ProjectCustomizer cust, IdeProject project) {
 		Guard upGuard = cust.getUpwardsGuardFor(filename);
 		Guard downGuard = cust.getDownwardsGuardFor(filename);
 		Filter filter = cust.getFilterFor(filename);
-		AsyncErrorChecker checker = cust.getErrorCheckerFor(filename);
+		AsyncErrorChecker checker = cust.getErrorCheckerFor(filename, project);
 		return new MultiUserDoc(new AceDoc(content), filter, upGuard, downGuard, checker);
 	}
 	
@@ -99,10 +99,10 @@ public class Util {
 //		return project;
 //	}
 
-	public static IdeProject createProject(String name, Map<String, String> contents, ProjectCustomizer cust) {
-		IdeProject project = cust.createProject(UUID.randomUUID().toString(), name, contents);
+	public static IdeProject createProject(String name, Map<String, String> contents, IdeConfiguration config) {
+		IdeProject project = config.createProject(UUID.randomUUID().toString(), name, contents);
 		for (Entry<String, String> e : contents.entrySet()) {
-			MultiUserDoc doc = customizedDoc(e.getKey(), e.getValue(), cust);
+			MultiUserDoc doc = customizedDoc(e.getKey(), e.getValue(), config.getProjectCustomizer(project), project);
 			project.putDoc(e.getKey(), new IdeDoc(doc, aceModeForFilename(e.getKey())));
 		}
 		return project;
@@ -113,7 +113,7 @@ public class Util {
 	}
 
 	public static Map<String, String> readContentsFromDir(File dir) {
-		int le = dir.getPath().length();
+		int le = dir.getPath().length() + 1; // + 1 for the slash after dir
 		Map<String, String> contents = new TreeMap<String, String>();
 		for (File f : readFilesFrom(dir)) {
 			try {

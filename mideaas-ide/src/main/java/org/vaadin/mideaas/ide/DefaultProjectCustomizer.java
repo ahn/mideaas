@@ -10,11 +10,6 @@ public class DefaultProjectCustomizer implements ProjectCustomizer {
 
 	
 	@Override
-	public IdeProject createProject(String id, String name, Map<String, String> files) {
-		return new IdeProject(id, name);
-	}
-	
-	@Override
 	public Guard getUpwardsGuardFor(String fileName) {
 		return null;
 	}
@@ -30,7 +25,7 @@ public class DefaultProjectCustomizer implements ProjectCustomizer {
 	}
 
 	@Override
-	public AsyncErrorChecker getErrorCheckerFor(String filename) {
+	public AsyncErrorChecker getErrorCheckerFor(String filename, IdeProject project) {
 		return null;
 	}
 

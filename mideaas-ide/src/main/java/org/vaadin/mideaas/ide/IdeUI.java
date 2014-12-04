@@ -34,10 +34,6 @@ public class IdeUI extends UI {
 		getSession().getSession().setMaxInactiveInterval(300);
 		
 	}
-
-	ProjectCustomizer getProjectCustomizer() {
-		return config.getProjectCustomizer();
-	}
 	
 	IdeCustomizer getIdeCustomizer() {
 		return config.getIdeCustomizer();
@@ -50,7 +46,7 @@ public class IdeUI extends UI {
 	 * @param projectFileContents key:filename, 
 	 */
 	public void startProject(String projectName, Map<String, String> projectFileContents) {
-		IdeProject project = Util.createProject(projectName, projectFileContents, config.getProjectCustomizer());
+		IdeProject project = Util.createProject(projectName, projectFileContents, config);
 		projects.putProject(project.getId(), project);
 		navigator.navigateTo(project.getId());
 	}
