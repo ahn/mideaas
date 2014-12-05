@@ -6,7 +6,7 @@ import java.io.IOException;
 import org.vaadin.mideaas.app.java.util.CompilingService;
 import org.vaadin.mideaas.editor.AsyncErrorChecker;
 import org.vaadin.mideaas.ide.IdeProject;
-import org.vaadin.mideaas.ide.Util;
+import org.vaadin.mideaas.ide.IdeUtil;
 
 
 public class VaadinProject extends IdeProject {
@@ -47,7 +47,7 @@ public class VaadinProject extends IdeProject {
 	}
 
 	public void writeToDisk() throws IOException {
-		Util.saveFilesToPath(getSnapshot(), dir.toPath());
+		IdeUtil.saveFilesToPath(getSnapshot(), dir.toPath());
 	}
 
 	public File getProjectDir() {

@@ -46,7 +46,7 @@ public class IdeUI extends UI {
 	 * @param projectFileContents key:filename, 
 	 */
 	public void startProject(String projectName, Map<String, String> projectFileContents) {
-		IdeProject project = Util.createProject(projectName, projectFileContents, config);
+		IdeProject project = IdeUtil.createProject(projectName, projectFileContents, config);
 		projects.putProject(project.getId(), project);
 		navigator.navigateTo(project.getId());
 	}

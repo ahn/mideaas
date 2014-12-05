@@ -1,5 +1,7 @@
 package org.vaadin.mideaas.ide;
 
+import java.util.UUID;
+
 import org.vaadin.mideaas.editor.EditorUser;
 import org.vaadin.mideaas.ide.oauth.UserToken;
 
@@ -24,6 +26,10 @@ public class IdeUser {
 	
 	public EditorUser getEditorUser() {
 		return editorUser;
+	}
+
+	public static String randomId() {
+		return UUID.randomUUID().toString();
 	}
 	
 

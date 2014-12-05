@@ -3,7 +3,7 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.vaadin.mideaas</groupId>
-	<artifactId>mideaas-ide2</artifactId>
+	<artifactId>mideaas-ide</artifactId>
 	<packaging>jar</packaging>
 	<version>0.0.3-SNAPSHOT</version>
 	<name>Mideaas IDE</name>
@@ -95,14 +95,10 @@
 		<dependency>
 			<groupId>org.vaadin.addon</groupId>
 			<artifactId>oauthpopup</artifactId>
-			<version>0.0.3</version>
+			<version>0.0.3</version> <!-- TODO: update version -->
 		</dependency>
 		
-		<dependency>
-			<groupId>org.kohsuke</groupId>
-			<artifactId>github-api</artifactId>
-			<version>1.59</version>
-		</dependency>
+
 		
 		<!-- -->
 

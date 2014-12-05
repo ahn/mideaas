@@ -39,11 +39,6 @@ public class BuildComponent extends CustomComponent implements BuildListener {
 	private static final List<String> GOALS_PACKAGE = Arrays
 			.asList(new String[] { "vaadin:update-widgetset", "vaadin:compile", "package" });
 
-	
-//	private List<String> goals = GOALS_PACKAGE;
-
-//	private boolean firstBuild = true;
-
 	private UI ui;
 
 	public BuildComponent(Builder builder, IdeUser user) {

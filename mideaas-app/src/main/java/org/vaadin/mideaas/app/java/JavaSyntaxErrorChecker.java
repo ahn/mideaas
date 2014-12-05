@@ -25,8 +25,10 @@ public class JavaSyntaxErrorChecker implements ErrorChecker {
 	public JavaSyntaxErrorChecker(String initial) {
 		try {
 			latestValid = getCu(initial);
-		} catch (ParseException e) {
+		} catch (ParseException | TokenMgrError e) {
+			// TokenMgrError is thrown eg. when incomplete string literal (single ")
 			System.err.println("WARNING: initial java code has syntax errors.");
+			throw new IllegalStateException("Initial java code has syntax errors. That shouldn't be!");
 		}
 	}
 	
@@ -36,6 +38,7 @@ public class JavaSyntaxErrorChecker implements ErrorChecker {
 			getCu(s);
 			return Collections.emptyList();
 		} catch (ParseException | TokenMgrError e) {
+			// TokenMgrError is thrown eg. when incomplete string literal (single ")
 			return Collections.singletonList(new Error("error",0,0) /* TODO */);
 		}
 	}

@@ -4,16 +4,21 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.StandardOpenOption;
 import java.util.Map;
-import java.util.Map.Entry;
 
+import org.vaadin.mideaas.app.MideaasConfig.Prop;
+import org.vaadin.mideaas.app.git.GitHubLobbyView;
+import org.vaadin.mideaas.app.git.GitHubLoginView;
 import org.vaadin.mideaas.app.java.VaadinProject;
 import org.vaadin.mideaas.ide.DefaultIdeConfiguration;
+import org.vaadin.mideaas.ide.ExampleProjectLobbyView;
 import org.vaadin.mideaas.ide.IdeCustomizer;
+import org.vaadin.mideaas.ide.IdeLobbyView;
+import org.vaadin.mideaas.ide.IdeLoginView;
 import org.vaadin.mideaas.ide.IdeProject;
+import org.vaadin.mideaas.ide.JustUsernameLoginView;
 import org.vaadin.mideaas.ide.ProjectCustomizer;
-import org.vaadin.mideaas.ide.Util;
+import org.vaadin.mideaas.ide.IdeUtil;
 
 public class MideaasIdeConfiguration extends DefaultIdeConfiguration {
 
@@ -46,12 +51,30 @@ public class MideaasIdeConfiguration extends DefaultIdeConfiguration {
 		return new MideaasIdeCustomizer();
 	}	
 
-	
-	
 	private static File createProjectDir(Map<String, String> files) throws IOException {
 		Path path = Files.createTempDirectory("mideaas-vaadin");
-		Util.saveFilesToPath(files, path);
+		IdeUtil.saveFilesToPath(files, path);
 		return path.toFile();
+	}
+	
+	@Override
+	public IdeLoginView createLoginView() {
+		String key = MideaasConfig.getProperty(Prop.GITHUB_KEY);
+		String secret = MideaasConfig.getProperty(Prop.GITHUB_SECRET);
+		if (key == null || secret == null) {
+			throw new IllegalArgumentException("No " + Prop.GITHUB_KEY + "/" + Prop.GITHUB_SECRET +" in config.");
+		}
+		return new GitHubLoginView(key, secret);
+	}
+
+	@Override
+	public IdeLobbyView createLobbyView() {
+		String key = MideaasConfig.getProperty(Prop.GITHUB_KEY);
+		String secret = MideaasConfig.getProperty(Prop.GITHUB_SECRET);
+		if (key == null || secret == null) {
+			throw new IllegalArgumentException("No " + Prop.GITHUB_KEY + "/" + Prop.GITHUB_SECRET +" in config.");
+		}
+		return new GitHubLobbyView(key, secret);
 	}
 
 

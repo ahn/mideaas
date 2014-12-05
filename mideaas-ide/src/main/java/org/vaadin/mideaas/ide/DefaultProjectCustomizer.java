@@ -1,7 +1,5 @@
 package org.vaadin.mideaas.ide;
 
-import java.util.Map;
-
 import org.vaadin.mideaas.editor.AsyncErrorChecker;
 import org.vaadin.mideaas.editor.DocDiffMediator.Filter;
 import org.vaadin.mideaas.editor.DocDiffMediator.Guard;

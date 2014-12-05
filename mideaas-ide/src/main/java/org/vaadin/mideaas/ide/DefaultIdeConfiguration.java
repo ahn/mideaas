@@ -20,12 +20,14 @@ public class DefaultIdeConfiguration implements IdeConfiguration {
 	
 	@Override
 	public IdeLoginView createLoginView() {
-		return new GitHubLoginView(API_KEY, API_SECRET);
+		return new JustUsernameLoginView();
+		//return new GitHubLoginView(API_KEY, API_SECRET);
 	}
 
 	@Override
 	public IdeLobbyView createLobbyView() {
-		return new GitHubLobbyView(API_KEY, API_SECRET);
+		return new ExampleProjectLobbyView();
+		//return new GitHubLobbyView(API_KEY, API_SECRET);
 	}
 	
 	@Override

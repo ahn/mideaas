@@ -17,20 +17,7 @@ public abstract class OAuthService {
 	private final UserToken token;
 	
 	private boolean connected = false;
-	
-	public static OAuthService createService(Service service, String apiKey, String apiSecret, UserToken token) {
-//		if (service==Service.TWITTER) {
-//			return new TwitterService(apiKey, apiSecret, token);
-//		}
-//		if (service==Service.FACEBOOK) {
-//			return new FacebookService(apiKey, apiSecret, token);
-//		}
-		if (service==Service.GITHUB) {
-			return new GitHubService(apiKey, apiSecret, token);
-		}
-		return null;
-	}
-	
+
 	protected OAuthService(Service service, String apiKey, String apiSecret, UserToken token) {
 		this.service = service;
 		this.apiKey = apiKey;
