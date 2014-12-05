@@ -67,7 +67,7 @@ public class FileList extends CustomComponent implements
 	public void attach() {
 		super.attach();
 
-		updateTable(project.getDocNames());
+		updateTable(project.getDocIds());
 
 		project.addListener(this);
 	}

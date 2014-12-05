@@ -68,7 +68,7 @@ public class IdeProject {
 		return d;
 	}
 	
-	public synchronized Collection<String> getDocNames() {
+	public synchronized Collection<String> getDocIds() {
 		return new TreeSet<String>(docs.keySet());
 	}
 	
@@ -82,7 +82,7 @@ public class IdeProject {
 
 	private void fireChanged() {
 
-		Collection<String> docNames = getDocNames();
+		Collection<String> docNames = getDocIds();
 		
 		for (Listener li : listeners) {
 			li.changed(docNames);

@@ -4,8 +4,10 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.TreeSet;
 
 public class ProjectContainer {
 	
@@ -78,6 +80,15 @@ public class ProjectContainer {
 		for (String r : remove) {
 			projects.remove(r);
 		}
+	}
+
+	public synchronized Set<String> getProjectIds() {
+		return new TreeSet<String>(projects.keySet());
+	}
+	
+	public synchronized Date projectLastTouched(String projectId) {
+		Proj p = projects.get(projectId);
+		return p == null ? null : p.lastTouched;
 	}
 	
 }

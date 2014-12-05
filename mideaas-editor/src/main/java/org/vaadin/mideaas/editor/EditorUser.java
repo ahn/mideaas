@@ -56,6 +56,10 @@ public class EditorUser implements Comparable<EditorUser> {
 		return "//www.gravatar.com/avatar/" + MD5Util.md5Hex(email!=null?email:(name!=null?name:id)) + "?d=monsterid&s=" + size;
 	}
 
+	@Override
+	public String toString() {
+		return "{id=\""+id+"\", name=\""+name+"\", email=\""+email+"\"}";
+	}
 	
 	
 }

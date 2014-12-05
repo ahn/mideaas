@@ -30,7 +30,7 @@ public class IdeUI extends UI {
 	protected void init(VaadinRequest request) {
 		navigator.addProvider(new IdeViewProvider(this, projects, config));
 		navigator.setErrorView(new IdeErrorView());
-		
+		navigator.addView("stats", new StatsView(projects));
 		getSession().getSession().setMaxInactiveInterval(300);
 		
 	}
