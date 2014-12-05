@@ -1,10 +1,11 @@
-package org.vaadin.mideaas.app;
+package org.vaadin.mideaas.app.maven;
 
 import java.util.Arrays;
 import java.util.List;
 
-import org.vaadin.mideaas.app.Builder.BuildListener;
+import org.vaadin.mideaas.app.Icons;
 import org.vaadin.mideaas.app.java.MavenUtil;
+import org.vaadin.mideaas.app.maven.Builder.BuildListener;
 import org.vaadin.mideaas.ide.IdeUser;
 
 import com.vaadin.server.ThemeResource;

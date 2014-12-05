@@ -1,6 +1,6 @@
-package org.vaadin.mideaas.ide.oauth;
+package org.vaadin.mideaas.ide;
 
-import org.vaadin.mideaas.ide.oauth.OAuthService.Service;
+import org.vaadin.mideaas.ide.OAuthService.Service;
 
 
 public class UserProfile {

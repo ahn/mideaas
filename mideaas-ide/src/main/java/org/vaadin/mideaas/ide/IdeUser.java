@@ -3,7 +3,6 @@ package org.vaadin.mideaas.ide;
 import java.util.UUID;
 
 import org.vaadin.mideaas.editor.EditorUser;
-import org.vaadin.mideaas.ide.oauth.UserToken;
 
 public class IdeUser {
 	private final EditorUser editorUser;

@@ -4,6 +4,8 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.vaadin.mideaas.app.java.VaadinProject;
+import org.vaadin.mideaas.app.maven.BuildComponent;
+import org.vaadin.mideaas.app.maven.Builder;
 import org.vaadin.mideaas.ide.IdeCustomizer;
 import org.vaadin.mideaas.ide.IdeProject;
 import org.vaadin.mideaas.ide.IdeUser;

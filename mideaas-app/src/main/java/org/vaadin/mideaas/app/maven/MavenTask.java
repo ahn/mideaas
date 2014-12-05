@@ -1,4 +1,4 @@
-package org.vaadin.mideaas.app;
+package org.vaadin.mideaas.app.maven;
 
 import java.io.File;
 import java.util.List;

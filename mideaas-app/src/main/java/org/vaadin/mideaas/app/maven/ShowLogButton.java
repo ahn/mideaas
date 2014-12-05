@@ -1,4 +1,4 @@
-package org.vaadin.mideaas.app;
+package org.vaadin.mideaas.app.maven;
 
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickListener;

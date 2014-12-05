@@ -1,4 +1,4 @@
-package org.vaadin.mideaas.app;
+package org.vaadin.mideaas.app.maven;
 
 import java.io.IOException;
 import java.util.List;
@@ -8,8 +8,9 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import org.apache.maven.shared.invoker.InvocationResult;
-import org.vaadin.mideaas.app.MavenTask.LogListener;
+import org.vaadin.mideaas.app.UserSettings;
 import org.vaadin.mideaas.app.java.VaadinProject;
+import org.vaadin.mideaas.app.maven.MavenTask.LogListener;
 
 public class Builder {
 
@@ -69,7 +70,7 @@ public class Builder {
 		Properties props = new Properties();
 		props.setProperty("projectDirectory", project.getProjectDir().getAbsolutePath());
 		//compiles google appengine war
-		if ( false ) { // TODO settings.compileGae){
+		if (settings.compileGae){
 			
 			//Downloads all the maven dependencies
 			//mvn dependency:copy-dependencies			

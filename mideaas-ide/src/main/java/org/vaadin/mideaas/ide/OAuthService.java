@@ -1,4 +1,4 @@
-package org.vaadin.mideaas.ide.oauth;
+package org.vaadin.mideaas.ide;
 
 
 public abstract class OAuthService {

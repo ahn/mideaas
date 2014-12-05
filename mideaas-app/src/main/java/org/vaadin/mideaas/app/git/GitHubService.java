@@ -11,9 +11,9 @@ import org.kohsuke.github.GHMyself;
 import org.kohsuke.github.GHRepository;
 import org.kohsuke.github.GHUser;
 import org.kohsuke.github.GitHub;
-import org.vaadin.mideaas.ide.oauth.OAuthService;
-import org.vaadin.mideaas.ide.oauth.UserProfile;
-import org.vaadin.mideaas.ide.oauth.UserToken;
+import org.vaadin.mideaas.ide.OAuthService;
+import org.vaadin.mideaas.ide.UserProfile;
+import org.vaadin.mideaas.ide.UserToken;
 
 public class GitHubService extends OAuthService {
 

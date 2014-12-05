@@ -1,8 +1,8 @@
-package org.vaadin.mideaas.app;
+package org.vaadin.mideaas.app.maven;
 
 import java.util.LinkedList;
 
-import org.vaadin.mideaas.app.MavenTask.LogListener;
+import org.vaadin.mideaas.app.maven.MavenTask.LogListener;
 
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.Button;
