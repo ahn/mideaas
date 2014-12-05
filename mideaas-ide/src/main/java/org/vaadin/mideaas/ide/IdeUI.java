@@ -16,23 +16,23 @@ import com.vaadin.ui.UI;
 public class IdeUI extends UI {
 
 	private final Navigator navigator = new Navigator(this, this);
-	private final IdeConfiguration config;
+	private IdeConfiguration config;
 	private String afterLoginNavigateTo = "lobby";
 
 	private static final ProjectContainer projects = new ProjectContainer();
 
-	public IdeUI(IdeConfiguration config) {
-		super();
-		this.config = config == null ? new DefaultIdeConfiguration() : config;
-	}
 	
-	@Override
-	protected void init(VaadinRequest request) {
+	public void init(VaadinRequest request, IdeConfiguration config) {
+		this.config = config == null ? new DefaultIdeConfiguration() : config;
 		navigator.addProvider(new IdeViewProvider(this, projects, config));
 		navigator.setErrorView(new IdeErrorView());
 		navigator.addView("stats", new StatsView(projects));
 		getSession().getSession().setMaxInactiveInterval(300);
-		
+	}
+	
+	@Override
+	protected void init(VaadinRequest request) {
+		throw new IllegalStateException("Call IdeUI.init(VaadinRequest,IdeConfiguration). Not IdeUI.init(VaadinRequest).");
 	}
 	
 	IdeCustomizer getIdeCustomizer() {
@@ -102,6 +102,8 @@ public class IdeUI extends UI {
 	void setNextNavigation(String where) {
 		afterLoginNavigateTo = where;
 	}
+
+	
 
 	
 

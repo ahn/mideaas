@@ -15,11 +15,17 @@ import com.vaadin.ui.MenuBar.MenuItem;
 
 public class MideaasIdeCustomizer implements IdeCustomizer {
 
+	private final UserSettings userSettings;
+	
+	public MideaasIdeCustomizer(UserSettings userSettings) {
+		this.userSettings = userSettings;
+	}
+	
 	@Override
 	public List<Component> getSidebarComponents(IdeProject project, IdeUser user) {
 		List<Component> components = new LinkedList<Component>();
-		components.add(new MockBuildComponent(project));
-		components.add(new BuildComponent(new Builder((VaadinProject) project, null), user));
+		Builder builder = new Builder((VaadinProject) project, userSettings);
+		components.add(new BuildComponent(builder, user));
 		return components;
 	}
 

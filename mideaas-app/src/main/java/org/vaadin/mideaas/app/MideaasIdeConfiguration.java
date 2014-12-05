@@ -11,17 +11,20 @@ import org.vaadin.mideaas.app.git.GitHubLobbyView;
 import org.vaadin.mideaas.app.git.GitHubLoginView;
 import org.vaadin.mideaas.app.java.VaadinProject;
 import org.vaadin.mideaas.ide.DefaultIdeConfiguration;
-import org.vaadin.mideaas.ide.ExampleProjectLobbyView;
 import org.vaadin.mideaas.ide.IdeCustomizer;
 import org.vaadin.mideaas.ide.IdeLobbyView;
 import org.vaadin.mideaas.ide.IdeLoginView;
 import org.vaadin.mideaas.ide.IdeProject;
-import org.vaadin.mideaas.ide.JustUsernameLoginView;
-import org.vaadin.mideaas.ide.ProjectCustomizer;
 import org.vaadin.mideaas.ide.IdeUtil;
+import org.vaadin.mideaas.ide.ProjectCustomizer;
 
 public class MideaasIdeConfiguration extends DefaultIdeConfiguration {
 
+	private final UserSettings userSettings;
+	
+	public MideaasIdeConfiguration(UserSettings userSettings) {
+		this.userSettings = userSettings;
+	}
 
 	@Override
 	public IdeProject createProject(String id, String name, Map<String, String> files) {
@@ -48,7 +51,7 @@ public class MideaasIdeConfiguration extends DefaultIdeConfiguration {
 
 	@Override
 	public IdeCustomizer getIdeCustomizer() {
-		return new MideaasIdeCustomizer();
+		return new MideaasIdeCustomizer(userSettings);
 	}	
 
 	private static File createProjectDir(Map<String, String> files) throws IOException {

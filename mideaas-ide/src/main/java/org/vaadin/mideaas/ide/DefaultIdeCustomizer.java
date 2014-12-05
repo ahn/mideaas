@@ -14,7 +14,7 @@ public class DefaultIdeCustomizer implements IdeCustomizer {
 
 	@Override
 	public void customizeMenuBar(MenuBar menuBar) {
-		
+		// Nothing...
 	}
 
 }

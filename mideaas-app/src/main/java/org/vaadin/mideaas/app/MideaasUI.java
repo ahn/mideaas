@@ -7,6 +7,7 @@ import org.vaadin.mideaas.ide.IdeUI;
 
 import com.vaadin.annotations.Theme;
 import com.vaadin.annotations.VaadinServletConfiguration;
+import com.vaadin.server.VaadinRequest;
 import com.vaadin.server.VaadinServlet;
 
 @Theme("mideaas")
@@ -20,15 +21,15 @@ public class MideaasUI extends IdeUI
 	
 	private final UserSettings userSettings = MideaasConfig.getDefaultUserSettings();
 	
-	public MideaasUI() {
-		super(createConfig());
-//		super(new DefaultIdeConfiguration());
+	@Override
+	public void init(VaadinRequest request) {
 		
-		System.out.println("ccc " + 	MideaasConfig.getFeedbackFile());
+		IdeConfiguration config = createConfig();
+		super.init(request, config);
 	}
 	
-	private static IdeConfiguration createConfig() {
-		return new MideaasIdeConfiguration();
+	private IdeConfiguration createConfig() {
+		return new MideaasIdeConfiguration(userSettings);
 	}
 	
 	public UserSettings getUserSettings() {

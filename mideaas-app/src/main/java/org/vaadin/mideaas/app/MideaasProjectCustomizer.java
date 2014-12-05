@@ -20,7 +20,7 @@ public class MideaasProjectCustomizer extends DefaultProjectCustomizer {
 		if (filename.endsWith(".java")) {
 			return new JavaGuard();
 		}
-		if (filename.endsWith(".java")) {
+		if (filename.endsWith(".xml")) {
 			return new XmlGuard();
 		}
 		return super.getUpwardsGuardFor(filename);

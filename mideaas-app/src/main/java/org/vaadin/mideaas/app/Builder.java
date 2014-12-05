@@ -23,12 +23,12 @@ public class Builder {
 	private MavenTask task;
 
 	private final VaadinProject project;
-// TODO	private final UserSettings settings;
+	private final UserSettings settings;
 	private CopyOnWriteArrayList<BuildListener> listeners = new CopyOnWriteArrayList<>();
 
 	public Builder(VaadinProject project, UserSettings settings) {
 		this.project = project;
-// TODO		this.settings = settings;
+		this.settings = settings;
 	}
 	
 	public synchronized void addBuildListener(BuildListener li) {
