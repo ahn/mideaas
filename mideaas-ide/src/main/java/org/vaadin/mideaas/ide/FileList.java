@@ -21,8 +21,6 @@ import com.vaadin.ui.VerticalLayout;
 public class FileList extends CustomComponent implements
 		IdeProject.Listener, ValueChangeListener, ItemClickListener {
 
-	private static final String LIST_HEADER = "Files";
-
 	public interface Listener {
 		public void selected(String name);
 		public void selectedNewTab(String name);
@@ -37,8 +35,6 @@ public class FileList extends CustomComponent implements
 		this.project = project;
 		tree = new Tree();
 		tree.setSizeFull();
-		//table.setPageLength(10);
-		//table.addContainerProperty(LIST_HEADER, String.class, null);
 		tree.setSelectable(true);
 		tree.addItemClickListener(this);
 		tree.addValueChangeListener(this);
@@ -47,10 +43,9 @@ public class FileList extends CustomComponent implements
 		la.addComponent(tree);
 		la.setSizeFull();
 		
-		Panel pa = new Panel(LIST_HEADER);
+		Panel pa = new Panel(project.getName());
 		pa.setContent(la);
-		pa.setHeight("200px");
-		pa.setWidth("100%");
+		pa.setSizeFull();
 
 		setCompositionRoot(pa);
 	}
@@ -74,11 +69,8 @@ public class FileList extends CustomComponent implements
 
 	@Override
 	public void detach() {
-
 		project.removeListener(this);
-
 		super.detach();
-
 	}
 
 	private void updateTable(Collection<String> names) {

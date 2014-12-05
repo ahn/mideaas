@@ -3,6 +3,7 @@ package org.vaadin.mideaas.ide;
 import java.util.List;
 
 import com.vaadin.ui.Component;
+import com.vaadin.ui.Label;
 import com.vaadin.ui.MenuBar;
 
 public class DefaultIdeCustomizer implements IdeCustomizer {
@@ -11,10 +12,17 @@ public class DefaultIdeCustomizer implements IdeCustomizer {
 	public List<Component> getSidebarComponents(IdeProject project, IdeUser user) {
 		return null;
 	}
+	
+	@Override
+	public Component getBelowEditorComponent(IdeProject project, IdeUser user) {
+		return null;
+	}
 
 	@Override
 	public void customizeMenuBar(MenuBar menuBar) {
 		// Nothing...
 	}
+
+	
 
 }

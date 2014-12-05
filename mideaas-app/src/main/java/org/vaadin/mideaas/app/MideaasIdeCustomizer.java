@@ -11,6 +11,7 @@ import org.vaadin.mideaas.ide.IdeProject;
 import org.vaadin.mideaas.ide.IdeUser;
 
 import com.vaadin.ui.Component;
+import com.vaadin.ui.Label;
 import com.vaadin.ui.MenuBar;
 import com.vaadin.ui.MenuBar.Command;
 import com.vaadin.ui.MenuBar.MenuItem;
@@ -30,6 +31,11 @@ public class MideaasIdeCustomizer implements IdeCustomizer {
 		components.add(new BuildComponent(builder, user));
 		return components;
 	}
+	
+	@Override
+	public Component getBelowEditorComponent(IdeProject project, IdeUser user) {
+		return new Label("moi");
+	}
 
 	@Override
 	public void customizeMenuBar(MenuBar menuBar) {
@@ -41,5 +47,7 @@ public class MideaasIdeCustomizer implements IdeCustomizer {
 			}
 		});
 	}
+
+	
 
 }

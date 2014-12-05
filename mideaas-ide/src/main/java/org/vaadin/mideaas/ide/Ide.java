@@ -3,7 +3,6 @@ package org.vaadin.mideaas.ide;
 import java.util.List;
 
 import org.vaadin.mideaas.editor.EditorUser;
-import org.vaadin.mideaas.editor.MultiUserEditor;
 import org.vaadin.mideaas.editor.TeamLayout;
 
 import com.vaadin.ui.Component;
@@ -25,7 +24,6 @@ public class Ide extends CustomComponent {
 	private final IdeCustomizer customizer;
 
 	private final HorizontalSplitPanel split = new HorizontalSplitPanel();
-//	private final MenuBar menuBar = new MenuBar();
 	private IdeDoc activeDoc;
 
 	public Ide(IdeProject project, IdeUser user, IdeCustomizer customizer) {
@@ -72,21 +70,9 @@ public class Ide extends CustomComponent {
 		
 		setActiveDoc(doc);
 		
-		MultiUserEditor ed = new MultiUserEditor(user, doc.getDoc(), doc.getAceMode());
-		ed.setSizeFull();
+		IdeEditorComponent ed = new IdeEditorComponent(customizer, project, doc, ideUser);
 
-		VerticalSplitPanel vsplit = new VerticalSplitPanel();
-		vsplit.setSizeFull();
-		vsplit.setFirstComponent(ed);
-
-		IdeChatBox chat = new IdeChatBox(doc.getChat(), user);
-		chat.setSizeFull();
-
-		vsplit.setSecondComponent(chat);
-
-		vsplit.setSplitPosition(200, Unit.PIXELS, true);
-
-		split.setSecondComponent(vsplit);
+		split.setSecondComponent(ed);
 
 	}
 	
@@ -114,10 +100,13 @@ public class Ide extends CustomComponent {
 	}
 
 	private Component createSidebar() {
-		VerticalLayout la = new VerticalLayout();
-		la.setSpacing(true);
+		
+		VerticalSplitPanel split = new VerticalSplitPanel();
+		split.setSizeFull();
+		split.setSplitPosition(250, Unit.PIXELS);
 		
 		FileList fileList = new FileList(project);
+		fileList.setSizeFull();
 		fileList.addListener(new FileList.Listener() {
 			@Override
 			public void selected(String name) {
@@ -129,7 +118,10 @@ public class Ide extends CustomComponent {
 			}
 		});
 
-		la.addComponent(fileList);
+		split.setFirstComponent(fileList);
+		
+		VerticalLayout la = new VerticalLayout();
+		la.setSpacing(true);
 
 		TeamLayout tela = new TeamLayout(project.getTeam());
 		tela.setMaxCols(4);
@@ -148,7 +140,9 @@ public class Ide extends CustomComponent {
 
 		Panel pa = new Panel(la);
 		pa.setSizeFull();
-		return pa;
+		split.setSecondComponent(pa);
+
+		return split;
 	}
 
 }

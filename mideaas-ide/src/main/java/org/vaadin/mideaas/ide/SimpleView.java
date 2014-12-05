@@ -27,7 +27,7 @@ public class SimpleView extends CustomComponent implements View {
 		this.setSizeFull();
 		split.setFirstComponent(ed);
 		split.setSecondComponent(chat);
-		split.setSplitPosition(200, Unit.PIXELS, true);
+		split.setSplitPosition(125, Unit.PIXELS, true);
 		setCompositionRoot(split);
 	}
 	
