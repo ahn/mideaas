@@ -22,53 +22,6 @@ import org.vaadin.mideaas.editor.MultiUserDoc;
 
 public class IdeUtil {
 
-	
-//	public static IdeProject projectFromGist(GHGist gist, ProjectCustomizer cust) {
-//		
-//		String id = UUID.randomUUID().toString();
-//		
-//		Map<String, String> files = new TreeMap<String, String>();
-//		for (Entry<String, GHGistFile> e : gist.getFiles().entrySet()) {
-//			files.put(e.getKey(), e.getValue().getContent());
-//		}
-//		
-//
-//		
-//		IdeProject project = cust.createProject(id, gist.getId(), files);
-//		
-//		for (Entry<String, GHGistFile> e : gist.getFiles().entrySet()) {
-//			IdeDoc ideDoc = docFromGistFile(e.getValue(), cust);
-//			project.putDoc(e.getKey(), ideDoc);
-//		}
-//		
-//		return project;
-//	}
-
-//	private static IdeDoc docFromGistFile(GHGistFile file, ProjectCustomizer cust) {
-//		MultiUserDoc mud = customizedDoc(file.getFileName(), file.getContent(), cust);
-//		return new IdeDoc(mud, aceModeForGistFile(file));
-//	}
-
-//	private static AceMode aceModeForGistFile(GHGistFile file) {
-//		String lang = file.getLanguage();
-//		if (lang==null) {
-//			return AceMode.text;
-//		}
-//		try {
-//			return AceMode.valueOf(aceLangFromGithubLang(lang));
-//		}
-//		catch (IllegalArgumentException e) {
-//			return AceMode.text;
-//		}
-//	}
-
-	private static String aceLangFromGithubLang(String lang) {
-		System.out.println("lang " + lang);
-		return lang.toLowerCase();
-	}
-	
-
-
 	private static MultiUserDoc customizedDoc(String filename, String content, ProjectCustomizer cust, IdeProject project) {
 		Guard upGuard = cust.getUpwardsGuardFor(filename);
 		Guard downGuard = cust.getDownwardsGuardFor(filename);
@@ -76,28 +29,11 @@ public class IdeUtil {
 		AsyncErrorChecker checker = cust.getErrorCheckerFor(filename, project);
 		return new MultiUserDoc(new AceDoc(content), filter, upGuard, downGuard, checker);
 	}
-	
-
 
 	public static IdeDoc createDoc(String filename, String content, IdeConfiguration config, IdeProject project) {
 		MultiUserDoc doc = customizedDoc(filename, content, config.getProjectCustomizer(project), project);
 		return new IdeDoc(doc, aceModeForFilename(filename));
 	}
-	
-//	public static IdeProject createDemoProject(ProjectCustomizer cust) {
-//		String id = UUID.randomUUID().toString();
-//		
-//		Map<String,String> noFiles = Collections.emptyMap();
-//		IdeProject project = cust.createProject(id, "Example project", noFiles);
-//		
-//		MultiUserDoc doc1 = customizedDoc("index.html", INDEX_HTML, cust);
-//		project.putDoc("index.html", new IdeDoc(doc1, AceMode.html));
-//
-//		MultiUserDoc doc2 = customizedDoc("style.css", STYLE_CSS, cust);
-//		project.putDoc("style.css", new IdeDoc(doc2, AceMode.css));
-//		
-//		return project;
-//	}
 
 	public static IdeProject createProject(String name, Map<String, String> contents, IdeConfiguration config) {
 		IdeProject project = config.createProject(UUID.randomUUID().toString(), name, contents);
