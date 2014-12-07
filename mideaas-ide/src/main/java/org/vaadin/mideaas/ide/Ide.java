@@ -19,19 +19,24 @@ import com.vaadin.ui.VerticalSplitPanel;
 public class Ide extends CustomComponent {
 
 	private final IdeProject project;
-	private final IdeUser ideUser;
-	private final EditorUser user;
-	private final IdeCustomizer customizer;
+	private final IdeUser user;
+	private final EditorUser editorUser;
+	private final IdeConfiguration config;
 
 	private final HorizontalSplitPanel split = new HorizontalSplitPanel();
 	private IdeDoc activeDoc;
+	private MenuBar menuBar;
+	private VerticalLayout sidebarLayout;
+	private IdeEditorComponent editorComponent;
+	private Component belowEditorComponent = null;
+	private int belowEditorComponentHeight = 0;
 
-	public Ide(IdeProject project, IdeUser user, IdeCustomizer customizer) {
+	public Ide(IdeProject project, IdeUser user, IdeConfiguration config) {
 
 		this.project = project;
-		this.ideUser = user;
-		this.user = user.getEditorUser();
-		this.customizer = customizer;
+		this.user = user;
+		this.editorUser = user.getEditorUser();
+		this.config = config;
 
 		VerticalLayout la = new VerticalLayout();
 		la.setSizeFull();
@@ -47,18 +52,34 @@ public class Ide extends CustomComponent {
 		setCompositionRoot(la);
 	}
 	
+	public IdeProject getProject() {
+		return project;
+	}
 	
-
+	public IdeUser getUser() {
+		return user;
+	}
+	
+	public MenuBar getMenuBar() {
+		return menuBar;
+	}
+	
+	public void addSideBarComponents(List<Component> components) {
+		for (Component c : components) {
+			sidebarLayout.addComponent(c);
+		}
+	}
+	
 	@Override
 	public void attach() {
 		super.attach();
-		project.getTeam().addUser(user);
+		project.getTeam().addUser(editorUser);
 	}
 	
 	@Override
 	public void detach() {
 		super.detach();
-		project.getTeam().removeUser(user);
+		project.getTeam().removeUser(editorUser);
 	}
 
 	public void openDoc(String name) {
@@ -70,9 +91,9 @@ public class Ide extends CustomComponent {
 		
 		setActiveDoc(doc);
 		
-		IdeEditorComponent ed = new IdeEditorComponent(customizer, project, doc, ideUser);
-
-		split.setSecondComponent(ed);
+		editorComponent = new IdeEditorComponent(project, doc, user);
+		editorComponent.draw(belowEditorComponent, belowEditorComponentHeight);
+		split.setSecondComponent(editorComponent);
 
 	}
 	
@@ -84,17 +105,15 @@ public class Ide extends CustomComponent {
 	}
 	
 	private MenuBar createMenuBar() {
-		MenuBar menuBar = new MenuBar();
+		menuBar = new MenuBar();
 		menuBar.setWidth("100%");
-		MenuItem userMenu = menuBar.addItem(user.getName(), null, null);
+		MenuItem userMenu = menuBar.addItem(editorUser.getName(), null, null);
 		userMenu.addItem("Log out", new Command() {
 			@Override
 			public void menuSelected(MenuItem selectedItem) {
 				((IdeUI)getUI()).logOut();
 			}
 		});
-		
-		customizer.customizeMenuBar(menuBar);
 		
 		return menuBar;
 	}
@@ -105,7 +124,7 @@ public class Ide extends CustomComponent {
 		split.setSizeFull();
 		split.setSplitPosition(250, Unit.PIXELS);
 		
-		FileList fileList = new FileList(project);
+		FileList fileList = new FileList(project, config);
 		fileList.setSizeFull();
 		fileList.addListener(new FileList.Listener() {
 			@Override
@@ -120,29 +139,28 @@ public class Ide extends CustomComponent {
 
 		split.setFirstComponent(fileList);
 		
-		VerticalLayout la = new VerticalLayout();
-		la.setSpacing(true);
+		sidebarLayout = new VerticalLayout();
+		sidebarLayout.setSpacing(true);
 
 		TeamLayout tela = new TeamLayout(project.getTeam());
 		tela.setMaxCols(4);
-		la.addComponent(tela);
+		sidebarLayout.addComponent(tela);
 
-		IdeChatBox chat = new IdeChatBox(project.getChat(), user);
+		IdeChatBox chat = new IdeChatBox(project.getChat(), editorUser);
 		chat.setWidth("100%");
-		la.addComponent(chat);
+		sidebarLayout.addComponent(chat);
 		
-		List<Component> additional = customizer.getSidebarComponents(project, ideUser);
-		if (additional != null) {
-			for (Component c : additional) {
-				la.addComponent(c);
-			}
-		}
+		
 
-		Panel pa = new Panel(la);
+		Panel pa = new Panel(sidebarLayout);
 		pa.setSizeFull();
 		split.setSecondComponent(pa);
 
 		return split;
 	}
+
+	
+
+	
 
 }

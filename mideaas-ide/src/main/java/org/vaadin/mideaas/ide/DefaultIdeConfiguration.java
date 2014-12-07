@@ -11,8 +11,8 @@ public class DefaultIdeConfiguration implements IdeConfiguration {
 	}
 
 	@Override
-	public IdeCustomizer getIdeCustomizer() {
-		return new DefaultIdeCustomizer();
+	public void ideCreated(Ide ide) {
+		// Nothing
 	}
 	
 	@Override
@@ -28,6 +28,11 @@ public class DefaultIdeConfiguration implements IdeConfiguration {
 	@Override
 	public IdeProject createProject(String id, String name, Map<String, String> files) {
 		return new IdeProject(id, name);
+	}
+
+	@Override
+	public DocAdderComponent createDocAdderComponent() {
+		return new SimpleDocAdderComponent();
 	}
 
 }

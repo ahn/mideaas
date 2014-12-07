@@ -9,12 +9,13 @@ public class IdeView extends CustomComponent implements View {
 
 	private final IdeProject project;
 	
-	public IdeView(IdeProject project, IdeUser user, IdeCustomizer cust) {
+	public IdeView(IdeProject project, IdeUser user, IdeConfiguration config) {
 		this.project = project;
-		Ide ide = new Ide(project, user, cust);
+		Ide ide = new Ide(project, user, config);
 		ide.setSizeFull();
 		setSizeFull();
 		setCompositionRoot(ide);
+		config.ideCreated(ide);
 	}
 	
 	@Override

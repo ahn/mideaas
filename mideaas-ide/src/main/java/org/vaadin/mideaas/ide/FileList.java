@@ -7,19 +7,25 @@ import java.util.Map.Entry;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
+import org.vaadin.dialogs.ConfirmDialog;
+
 import com.vaadin.data.Property.ValueChangeEvent;
 import com.vaadin.data.Property.ValueChangeListener;
+import com.vaadin.event.Action;
+import com.vaadin.event.Action.Handler;
 import com.vaadin.event.ItemClickEvent;
 import com.vaadin.event.ItemClickEvent.ItemClickListener;
+import com.vaadin.event.ShortcutAction;
 import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.Tree;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
+import com.vaadin.ui.Window;
 
 @SuppressWarnings("serial")
 public class FileList extends CustomComponent implements
-		IdeProject.Listener, ValueChangeListener, ItemClickListener {
+		IdeProject.Listener, ValueChangeListener, ItemClickListener, Handler {
 
 	public interface Listener {
 		public void selected(String name);
@@ -29,14 +35,20 @@ public class FileList extends CustomComponent implements
 	private LinkedList<Listener> listeners = new LinkedList<Listener>();
 
 	private final IdeProject project;
+	private final IdeConfiguration config;
 	private final Tree tree;
 
-	public FileList(IdeProject project) {
+	private final Action ACTION_DELETE = new ShortcutAction("Delete file", ShortcutAction.KeyCode.DELETE, null);
+	private final Action ACTION_INSERT = new ShortcutAction("Add new...");
+
+	public FileList(IdeProject project, IdeConfiguration config) {
 		this.project = project;
+		this.config = config;
 		tree = new Tree();
 		tree.setSizeFull();
 		tree.setSelectable(true);
 		tree.addItemClickListener(this);
+		tree.addActionHandler(this);
 		tree.addValueChangeListener(this);
 
 		VerticalLayout la = new VerticalLayout();
@@ -46,6 +58,7 @@ public class FileList extends CustomComponent implements
 		Panel pa = new Panel(project.getName());
 		pa.setContent(la);
 		pa.setSizeFull();
+		pa.addActionHandler(this);
 
 		setCompositionRoot(pa);
 	}
@@ -160,6 +173,44 @@ public class FileList extends CustomComponent implements
 		for (Listener li : listeners) {
 			li.selectedNewTab(name);
 		}
+	}
+
+	@Override
+	public Action[] getActions(Object target, Object sender) {
+		return new Action[] { ACTION_INSERT, ACTION_DELETE };
+	}
+
+	@Override
+	public void handleAction(Action action, Object sender, Object target) {
+		if (action == ACTION_DELETE) {
+			final String filename = (String) tree.getValue();
+			if (filename == null || project.getDoc(filename) == null) {
+				return;
+			}
+			final String msg = "Delete "+filename+"?";
+			ConfirmDialog.show(getUI(), msg, msg, "Yes", "No",  new ConfirmDialog.Listener() {
+				@Override
+				public void onClose(ConfirmDialog d) {
+					if (d.isConfirmed()) {
+						project.removeDoc(filename);
+					}
+				}
+			});
+		}
+		else if (action == ACTION_INSERT) {
+			final Window win = new Window("Add file");
+			DocAdderComponent dac = config.createDocAdderComponent();
+			dac.setDocAdder(new DocAdderImpl(project, config) {
+				@Override
+				public void done() {
+					win.close();
+				}
+			});
+			win.setContent(dac);
+			win.center();
+			getUI().addWindow(win);
+		}
+		
 	}
 
 }

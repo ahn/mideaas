@@ -77,6 +77,13 @@ public class IdeUtil {
 		return new MultiUserDoc(new AceDoc(content), filter, upGuard, downGuard, checker);
 	}
 	
+
+
+	public static IdeDoc createDoc(String filename, String content, IdeConfiguration config, IdeProject project) {
+		MultiUserDoc doc = customizedDoc(filename, content, config.getProjectCustomizer(project), project);
+		return new IdeDoc(doc, aceModeForFilename(filename));
+	}
+	
 //	public static IdeProject createDemoProject(ProjectCustomizer cust) {
 //		String id = UUID.randomUUID().toString();
 //		
@@ -153,5 +160,7 @@ public class IdeUtil {
 			Files.write(path.resolve(f), e.getValue().getBytes(), StandardOpenOption.CREATE);
 		}
 	}
+
+
 
 }

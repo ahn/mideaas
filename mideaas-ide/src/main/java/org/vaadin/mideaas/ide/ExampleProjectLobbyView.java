@@ -40,8 +40,10 @@ public class ExampleProjectLobbyView extends CustomComponent implements IdeLobby
 	
 	@Override
 	public void enter(ViewChangeEvent event) {
-		drawLayout();
-		drawSelect();
+		Map<String, String> files = getExampleProjectFiles();
+		((IdeUI)getUI()).startProject("Example project", files);
+		//drawLayout();
+		//drawSelect();
 	}
 
 	private void drawSelect() {

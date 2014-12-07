@@ -10,31 +10,31 @@ import com.vaadin.ui.VerticalSplitPanel;
 public class IdeEditorComponent extends CustomComponent {
 
 	private final MultiUserEditor editor;
-	private final Component below;
+	private Component below = null;
 	
-	public IdeEditorComponent(IdeCustomizer customizer, IdeProject project, IdeDoc doc, IdeUser user) {
-
+	public IdeEditorComponent(IdeProject project, IdeDoc doc, IdeUser user) {
 		setSizeFull();
-		
 		editor = new MultiUserEditor(user.getEditorUser(), doc.getDoc(), doc.getAceMode());
 		editor.setSizeFull();
-		
-		below = customizer.getBelowEditorComponent(project, user);
-
+		draw(null, 0);
+	}
+	
+	public void draw(Component belowEditorComponent, int initialHeightPixels) {
+		below = belowEditorComponent;
 		if (below == null) {
 			setCompositionRoot(editor);
 		}
 		else {
-			setCompositionRoot(createSplit());
+			setCompositionRoot(createSplit(initialHeightPixels));
 		}
 	}
 	
-	private Component createSplit() {
+	private Component createSplit(int initialHeightPixels) {
 		VerticalSplitPanel split = new VerticalSplitPanel();
 		split.setSizeFull();
 		split.setFirstComponent(editor);
 		split.setSecondComponent(below);
-		split.setSplitPosition(125, Unit.PIXELS, true);
+		split.setSplitPosition(initialHeightPixels, Unit.PIXELS, true);
 		return split;
 	}
 

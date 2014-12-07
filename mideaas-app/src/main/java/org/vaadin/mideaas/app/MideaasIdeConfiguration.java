@@ -4,19 +4,28 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 import org.vaadin.mideaas.app.MideaasConfig.Prop;
 import org.vaadin.mideaas.app.git.GitHubLobbyView;
 import org.vaadin.mideaas.app.git.GitHubLoginView;
 import org.vaadin.mideaas.app.java.VaadinProject;
+import org.vaadin.mideaas.app.maven.BuildComponent;
+import org.vaadin.mideaas.app.maven.Builder;
 import org.vaadin.mideaas.ide.DefaultIdeConfiguration;
-import org.vaadin.mideaas.ide.IdeCustomizer;
+import org.vaadin.mideaas.ide.Ide;
 import org.vaadin.mideaas.ide.IdeLobbyView;
 import org.vaadin.mideaas.ide.IdeLoginView;
 import org.vaadin.mideaas.ide.IdeProject;
 import org.vaadin.mideaas.ide.IdeUtil;
 import org.vaadin.mideaas.ide.ProjectCustomizer;
+
+import com.vaadin.ui.Component;
+import com.vaadin.ui.MenuBar;
+import com.vaadin.ui.MenuBar.Command;
+import com.vaadin.ui.MenuBar.MenuItem;
 
 public class MideaasIdeConfiguration extends DefaultIdeConfiguration {
 
@@ -24,6 +33,31 @@ public class MideaasIdeConfiguration extends DefaultIdeConfiguration {
 	
 	public MideaasIdeConfiguration(UserSettings userSettings) {
 		this.userSettings = userSettings;
+	}
+	
+	@Override
+	public void ideCreated(Ide ide) {
+		addSideBarComponents(ide);
+		addMenuBarComponents(ide);
+	}
+	
+	private void addSideBarComponents(Ide ide) {
+		List<Component> components = new LinkedList<Component>();
+		Builder builder = new Builder((VaadinProject) ide.getProject(), userSettings);
+		components.add(new BuildComponent(builder, ide.getUser()));
+		ide.addSideBarComponents(components);
+	}
+	
+	@SuppressWarnings("serial")
+	private void addMenuBarComponents(Ide ide) {
+		MenuBar menuBar = ide.getMenuBar();
+		MenuItem menu = menuBar.addItem("Moi", null);
+		menu.addItem("foo", new Command() {
+			@Override
+			public void menuSelected(MenuItem selectedItem) {
+				System.out.println("foofoofoo");
+			}
+		});
 	}
 
 	@Override
@@ -39,8 +73,6 @@ public class MideaasIdeConfiguration extends DefaultIdeConfiguration {
 		return super.createProject(id, name, files);
 	}
 
-
-
 	@Override
 	public ProjectCustomizer getProjectCustomizer(IdeProject project) {
 		if (project instanceof VaadinProject) {
@@ -48,11 +80,6 @@ public class MideaasIdeConfiguration extends DefaultIdeConfiguration {
 		}
 		return new MideaasProjectCustomizer();
 	}
-
-	@Override
-	public IdeCustomizer getIdeCustomizer() {
-		return new MideaasIdeCustomizer(userSettings);
-	}	
 
 	private static File createProjectDir(Map<String, String> files) throws IOException {
 		Path path = Files.createTempDirectory("mideaas-vaadin");
@@ -79,7 +106,6 @@ public class MideaasIdeConfiguration extends DefaultIdeConfiguration {
 		}
 		return new GitHubLobbyView(key, secret);
 	}
-
 
 	
 }

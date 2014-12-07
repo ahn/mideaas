@@ -4,10 +4,22 @@ import java.util.Map;
 
 
 public interface IdeConfiguration {
-	ProjectCustomizer getProjectCustomizer(IdeProject project);
-	IdeCustomizer getIdeCustomizer();
-	IdeLoginView createLoginView();
-	IdeLobbyView createLobbyView();
+	public ProjectCustomizer getProjectCustomizer(IdeProject project);
+	
+	public void ideCreated(Ide ide);
+	
+	/**
+	 * The view that's shown when the user hasn't logged in.
+	 * See {@link IdeLoginView}.
+	 */
+	public IdeLoginView createLoginView();
+	
+	/**
+	 * The view that's shown when the user has logged in.
+	 * In the {@link IdeLobbyView} the user selects a project to edit.
+	 * See {@link IdeLobbyView}.
+	 */
+	public IdeLobbyView createLobbyView();
 
 	/**
 	 * All the projects are created by calling this method.
@@ -19,5 +31,7 @@ public interface IdeConfiguration {
 	 * @param files
 	 * @return
 	 */
-	IdeProject createProject(String id, String name, Map<String, String> files);
+	public IdeProject createProject(String id, String name, Map<String, String> files);
+
+	public DocAdderComponent createDocAdderComponent();
 }

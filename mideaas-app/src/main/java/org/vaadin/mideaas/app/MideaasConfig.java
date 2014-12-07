@@ -110,7 +110,7 @@ public class MideaasConfig {
 
     private static void readConfigFrom(File f) throws IOException {
         readConfigFrom(new FileInputStream(f));
-        checkProperties(f);
+        // checkProperties(f);
     }
     
     private static void readConfigFrom(InputStream inputStream) throws IOException {
@@ -134,7 +134,7 @@ public class MideaasConfig {
         else {
             try {
                 readConfigFrom(inputStream);
-                checkProperties(null);
+                // checkProperties(null);
             } catch (IOException e) {
             	throw new ConfigError(new File(MIDEAAS_CONFIG_FILE_IN_CLASSPATH), "Could not read", e);
             }
@@ -214,9 +214,11 @@ public class MideaasConfig {
 	
 	public static void checkProperties(File f) {
 		
+		
 		if (!getProjectsDir().isDirectory()) {
 			throw new ConfigError(f, Prop.PROJECTS_DIR + " does not exist: " + getProjectsDir());
 		}
+		
 		
 		File logDir = getLogDir();
 		if (logDir!=null && !logDir.isDirectory()) {

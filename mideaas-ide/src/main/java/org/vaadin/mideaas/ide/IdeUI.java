@@ -34,10 +34,6 @@ public class IdeUI extends UI {
 	protected void init(VaadinRequest request) {
 		throw new IllegalStateException("Call IdeUI.init(VaadinRequest,IdeConfiguration). Not IdeUI.init(VaadinRequest).");
 	}
-	
-	IdeCustomizer getIdeCustomizer() {
-		return config.getIdeCustomizer();
-	}
 
 	/**
 	 * Starts a project.

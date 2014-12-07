@@ -2,6 +2,7 @@ package org.vaadin.mideaas.app;
 
 import javax.servlet.annotation.WebServlet;
 
+import org.vaadin.mideaas.ide.DefaultIdeConfiguration;
 import org.vaadin.mideaas.ide.IdeConfiguration;
 import org.vaadin.mideaas.ide.IdeUI;
 
@@ -29,6 +30,7 @@ public class MideaasUI extends IdeUI
 	}
 	
 	private IdeConfiguration createConfig() {
+//		return new DefaultIdeConfiguration();
 		return new MideaasIdeConfiguration(userSettings);
 	}
 	

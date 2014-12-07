@@ -74,7 +74,7 @@ public final class IdeViewProvider implements ViewProvider {
 			String projectId = m.group(1);
 			IdeProject project = projects.getProject(projectId);
 			if (project != null) {
-				return new IdeView(project, ui.getIdeUser(), config.getIdeCustomizer());
+				return new IdeView(project, ui.getIdeUser(), config);
 			}
 		}
 		return null;
