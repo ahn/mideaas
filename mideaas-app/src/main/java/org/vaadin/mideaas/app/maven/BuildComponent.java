@@ -4,7 +4,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.vaadin.mideaas.app.Icons;
-import org.vaadin.mideaas.app.java.MavenUtil;
 import org.vaadin.mideaas.app.maven.Builder.BuildListener;
 import org.vaadin.mideaas.ide.IdeUser;
 
@@ -112,7 +111,7 @@ public class BuildComponent extends CustomComponent implements BuildListener {
 	}
 
 	private void build(List<String> goals) {
-		builder.build(goals, MavenUtil.targetDirFor(user.getId()), logView);
+		builder.build(goals, MavenUtil.targetDirFor(user), logView);
 	}
 
 

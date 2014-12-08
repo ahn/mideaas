@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 
 import org.vaadin.mideaas.app.java.util.CompilingService;
+import org.vaadin.mideaas.app.maven.MavenUtil;
 import org.vaadin.mideaas.editor.AsyncErrorChecker;
 import org.vaadin.mideaas.ide.IdeProject;
 import org.vaadin.mideaas.ide.IdeUtil;

@@ -2,6 +2,8 @@ package org.vaadin.mideaas.app;
 
 import javax.servlet.annotation.WebServlet;
 
+import org.vaadin.mideaas.app.MideaasConfig.Prop;
+import org.vaadin.mideaas.app.maven.JettyUtil;
 import org.vaadin.mideaas.ide.IdeConfiguration;
 import org.vaadin.mideaas.ide.IdeUI;
 
@@ -20,6 +22,9 @@ public class MideaasUI extends IdeUI
     public static class Servlet extends VaadinServlet {}
 	
 	private final UserSettings userSettings = MideaasConfig.getDefaultUserSettings();
+	static {
+		processConfig();
+	}
 	
 	@Override
 	public void init(VaadinRequest request) {
@@ -28,6 +33,8 @@ public class MideaasUI extends IdeUI
 		super.init(request, config);
 	}
 	
+	
+
 	private IdeConfiguration createConfig() {
 //		return new DefaultIdeConfiguration();
 		return new MideaasIdeConfiguration(userSettings);
@@ -35,6 +42,17 @@ public class MideaasUI extends IdeUI
 	
 	public UserSettings getUserSettings() {
 		return userSettings;
+	}
+	
+	
+	private static void processConfig() {
+		JettyUtil.setPortRange(
+				MideaasConfig.getPropertyInt(Prop.JETTY_PORT_MIN),
+				MideaasConfig.getPropertyInt(Prop.JETTY_PORT_MAX));
+
+		JettyUtil.setStopPortRange(
+				MideaasConfig.getPropertyInt(Prop.JETTY_STOP_PORT_MIN),
+				MideaasConfig.getPropertyInt(Prop.JETTY_STOP_PORT_MAX));
 	}
 
 }

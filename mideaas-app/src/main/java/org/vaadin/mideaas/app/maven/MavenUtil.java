@@ -1,4 +1,4 @@
-package org.vaadin.mideaas.app.java;
+package org.vaadin.mideaas.app.maven;
 
 import java.io.File;
 import java.util.Collections;
@@ -12,6 +12,7 @@ import org.apache.maven.shared.invoker.InvocationRequest;
 import org.apache.maven.shared.invoker.Invoker;
 import org.apache.maven.shared.invoker.MavenInvocationException;
 import org.vaadin.mideaas.editor.EditorUser;
+import org.vaadin.mideaas.ide.IdeUser;
 
 // TODO: is this class needed anywhere?
 
@@ -94,10 +95,8 @@ public class MavenUtil {
 		}
 	}
 	
-	public static String targetDirFor(String userId) {
-		
-		
-		return "target-"+userId;
+	public static String targetDirFor(IdeUser user) {
+		return "target-"+user.getId();
 	}
 	
 }

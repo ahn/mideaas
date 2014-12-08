@@ -12,7 +12,6 @@ import org.apache.maven.shared.invoker.InvocationRequest;
 import org.apache.maven.shared.invoker.InvocationResult;
 import org.apache.maven.shared.invoker.Invoker;
 import org.apache.maven.shared.invoker.MavenInvocationException;
-import org.vaadin.mideaas.app.java.MavenUtil;
 
 /**
  * For running a Maven task in a separate thread.
@@ -47,7 +46,6 @@ public class MavenTask implements Callable<InvocationResult> {
 			handler = new InvocationOutputHandler() {
 				@Override
 				public void consumeLine(String li) {
-//					System.out.println("Maven log: " + li);
 					logLine(li);
 				}
 			};

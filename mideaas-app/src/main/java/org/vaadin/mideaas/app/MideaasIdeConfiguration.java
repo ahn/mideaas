@@ -14,6 +14,7 @@ import org.vaadin.mideaas.app.git.GitHubLoginView;
 import org.vaadin.mideaas.app.java.VaadinProject;
 import org.vaadin.mideaas.app.maven.BuildComponent;
 import org.vaadin.mideaas.app.maven.Builder;
+import org.vaadin.mideaas.app.maven.JettyComponent;
 import org.vaadin.mideaas.ide.DefaultIdeConfiguration;
 import org.vaadin.mideaas.ide.Ide;
 import org.vaadin.mideaas.ide.IdeLobbyView;
@@ -49,6 +50,9 @@ public class MideaasIdeConfiguration extends DefaultIdeConfiguration {
 		List<Component> components = new LinkedList<Component>();
 		Builder builder = new Builder((VaadinProject) ide.getProject(), userSettings);
 		components.add(new BuildComponent(builder, ide.getUser()));
+		
+		components.add(new JettyComponent((VaadinProject) ide.getProject(), ide.getUser()));
+		
 		ide.addSideBarComponents(components);
 	}
 	
