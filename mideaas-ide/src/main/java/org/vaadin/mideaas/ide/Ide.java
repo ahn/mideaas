@@ -27,9 +27,7 @@ public class Ide extends CustomComponent {
 	private IdeDoc activeDoc;
 	private MenuBar menuBar;
 	private VerticalLayout sidebarLayout;
-	private IdeEditorComponent editorComponent;
-	private Component belowEditorComponent = null;
-	private int belowEditorComponentHeight = 0;
+	private final IdeEditorComponent editorComponent;
 
 	public Ide(IdeProject project, IdeUser user, IdeConfiguration config) {
 
@@ -37,6 +35,7 @@ public class Ide extends CustomComponent {
 		this.user = user;
 		this.editorUser = user.getEditorUser();
 		this.config = config;
+		this.editorComponent = new IdeEditorComponent();
 
 		VerticalLayout la = new VerticalLayout();
 		la.setSizeFull();
@@ -44,12 +43,15 @@ public class Ide extends CustomComponent {
 		
 		split.setSizeFull();
 		split.setFirstComponent(createSidebar());
+		split.setSecondComponent(editorComponent);
 		split.setSplitPosition(200, Unit.PIXELS);
 		la.addComponent(split);
 		
 		la.setExpandRatio(split, 1);
 
 		setCompositionRoot(la);
+		
+		closeDoc();
 	}
 	
 	public IdeProject getProject() {
@@ -81,9 +83,13 @@ public class Ide extends CustomComponent {
 		super.detach();
 		project.getTeam().removeUser(editorUser);
 	}
+	
+	public void closeDoc() {
+		setActiveDoc(null);
+		editorComponent.removeEditor();
+	}
 
 	public void openDoc(String name) {
-		
 		IdeDoc doc = project.getDoc(name);
 		if (doc == null) {
 			return;
@@ -91,15 +97,12 @@ public class Ide extends CustomComponent {
 		
 		setActiveDoc(doc);
 		
-		editorComponent = new IdeEditorComponent(project, doc, user);
-		editorComponent.draw(belowEditorComponent, belowEditorComponentHeight);
-		split.setSecondComponent(editorComponent);
-
+		editorComponent.setEditor(doc, user);
 	}
 	
 	private void setActiveDoc(IdeDoc doc) {
 		if (activeDoc != null) {
-			// TODO activeDoc.getDoc().removeChildDoc(user);
+			// TODO??? activeDoc.getDoc().removeChildDoc(user);
 		}
 		activeDoc = doc;
 	}
@@ -149,8 +152,6 @@ public class Ide extends CustomComponent {
 		IdeChatBox chat = new IdeChatBox(project.getChat(), editorUser);
 		chat.setWidth("100%");
 		sidebarLayout.addComponent(chat);
-		
-		
 
 		Panel pa = new Panel(sidebarLayout);
 		pa.setSizeFull();
@@ -159,8 +160,12 @@ public class Ide extends CustomComponent {
 		return split;
 	}
 
-	
+	public void setBelowEditorComponent(Component component, int initialHeightPixels) {
+		editorComponent.setBelowEditorComponent(component, initialHeightPixels);
+	}
 
-	
+	public void setBelowEditorComponent(Component component) {
+		editorComponent.setBelowEditorComponent(component);
+	}	
 
 }

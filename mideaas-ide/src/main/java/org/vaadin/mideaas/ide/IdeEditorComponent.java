@@ -4,38 +4,78 @@ import org.vaadin.mideaas.editor.MultiUserEditor;
 
 import com.vaadin.ui.Component;
 import com.vaadin.ui.CustomComponent;
+import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.VerticalSplitPanel;
 
 @SuppressWarnings("serial")
 public class IdeEditorComponent extends CustomComponent {
 
-	private final MultiUserEditor editor;
+	private MultiUserEditor editor;
 	private Component below = null;
+	private VerticalSplitPanel split;
+	private int belowHeight = 150;
 	
-	public IdeEditorComponent(IdeProject project, IdeDoc doc, IdeUser user) {
+	public IdeEditorComponent() {
 		setSizeFull();
+		removeEditor();
+	}
+	
+	public IdeEditorComponent(IdeDoc doc, IdeUser user) {
+		setSizeFull();
+		setEditor(doc, user);
+		
+	}
+	
+	public void setEditor(IdeDoc doc, IdeUser user) {
 		editor = new MultiUserEditor(user.getEditorUser(), doc.getDoc(), doc.getAceMode());
 		editor.setSizeFull();
-		draw(null, 0);
+		draw();
 	}
 	
-	public void draw(Component belowEditorComponent, int initialHeightPixels) {
+	public void removeEditor() {
+		editor = null;
+		draw();
+	}
+	
+	public void setBelowEditorComponent(Component belowEditorComponent, int initialHeightPixels) {
 		below = belowEditorComponent;
+		belowHeight = initialHeightPixels;
+		if (split != null) {
+			split.setSplitPosition(belowHeight, Unit.PIXELS, true);
+		}
+		draw();
+	}
+	
+	public void setBelowEditorComponent(Component belowEditorComponent) {
+		below = belowEditorComponent;
+		draw();
+	}
+	
+	private void draw() {
 		if (below == null) {
-			setCompositionRoot(editor);
+			setCompositionRoot(getFirstComponent());
 		}
 		else {
-			setCompositionRoot(createSplit(initialHeightPixels));
+			drawSplit();
 		}
 	}
 	
-	private Component createSplit(int initialHeightPixels) {
-		VerticalSplitPanel split = new VerticalSplitPanel();
-		split.setSizeFull();
-		split.setFirstComponent(editor);
-		split.setSecondComponent(below);
-		split.setSplitPosition(initialHeightPixels, Unit.PIXELS, true);
-		return split;
+	private Component getFirstComponent() {
+		return editor != null ? editor : new VerticalLayout(); // ?
 	}
+	
+	private void drawSplit() {
+		setCompositionRoot(null); // to avoid adding the editorView twice
+		if (split == null) {
+			split = new VerticalSplitPanel();
+			split.setSizeFull();
+			split.setSplitPosition(belowHeight, Unit.PIXELS, true);
+		}
+		split.setFirstComponent(getFirstComponent());
+		split.setSecondComponent(below);
+		setCompositionRoot(split);
+	}
+
+	
 
 }

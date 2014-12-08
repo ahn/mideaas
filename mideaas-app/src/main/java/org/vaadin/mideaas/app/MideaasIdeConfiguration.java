@@ -22,8 +22,12 @@ import org.vaadin.mideaas.ide.IdeProject;
 import org.vaadin.mideaas.ide.IdeUtil;
 import org.vaadin.mideaas.ide.ProjectCustomizer;
 
+import com.vaadin.ui.Button;
+import com.vaadin.ui.Button.ClickListener;
 import com.vaadin.ui.Component;
+import com.vaadin.ui.Label;
 import com.vaadin.ui.MenuBar;
+import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.MenuBar.Command;
 import com.vaadin.ui.MenuBar.MenuItem;
 
@@ -48,16 +52,32 @@ public class MideaasIdeConfiguration extends DefaultIdeConfiguration {
 		ide.addSideBarComponents(components);
 	}
 	
-	@SuppressWarnings("serial")
-	private void addMenuBarComponents(Ide ide) {
+	private void addMenuBarComponents(final Ide ide) {
 		MenuBar menuBar = ide.getMenuBar();
 		MenuItem menu = menuBar.addItem("Moi", null);
-		menu.addItem("foo", new Command() {
+		menu.addItem("Show some component", new Command() {
 			@Override
 			public void menuSelected(MenuItem selectedItem) {
-				System.out.println("foofoofoo");
+				ide.setBelowEditorComponent(createBelowEditorComponent("comp1", ide), 100);
 			}
 		});
+		menu.addItem("Show another component", new Command() {
+			@Override
+			public void menuSelected(MenuItem selectedItem) {
+				ide.setBelowEditorComponent(createBelowEditorComponent("comp2", ide), 100);
+			}
+		});
+	}
+
+	private Component createBelowEditorComponent(String text, final Ide ide) {
+		Button b = new Button("Close " + text);
+		b.addClickListener(new ClickListener() {
+			@Override
+			public void buttonClick(ClickEvent event) {
+				ide.setBelowEditorComponent(null);
+			}
+		});
+		return b;
 	}
 
 	@Override

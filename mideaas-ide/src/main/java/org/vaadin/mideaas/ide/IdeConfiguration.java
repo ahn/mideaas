@@ -6,6 +6,13 @@ import java.util.Map;
 public interface IdeConfiguration {
 	public ProjectCustomizer getProjectCustomizer(IdeProject project);
 	
+	/**
+	 * Called when the {@link Ide} has been created.
+	 * 
+	 * This method can customize the Ide. See e.g
+	 * {@link Ide#addSideBarComponents(java.util.List)},
+	 * {@link Ide#getMenuBar()}
+	 */
 	public void ideCreated(Ide ide);
 	
 	/**

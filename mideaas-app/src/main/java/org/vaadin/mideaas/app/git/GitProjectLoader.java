@@ -6,10 +6,11 @@ import java.nio.file.Files;
 import java.util.Map;
 
 import org.eclipse.jgit.api.errors.GitAPIException;
+import org.vaadin.mideaas.app.Icons;
 import org.vaadin.mideaas.ide.IdeUtil;
 
 import com.vaadin.ui.CustomComponent;
-import com.vaadin.ui.Label;
+import com.vaadin.ui.Image;
 import com.vaadin.ui.VerticalLayout;
 
 @SuppressWarnings("serial")
@@ -23,9 +24,7 @@ public class GitProjectLoader extends CustomComponent {
 	private VerticalLayout layout = new VerticalLayout();
 	
 	public GitProjectLoader() {
-		
-		layout.addComponent(new Label("Loading..."));
-		
+		layout.addComponent(new Image(null, Icons.LOADING_INDICATOR));
 		setCompositionRoot(layout);
 	}
 	
