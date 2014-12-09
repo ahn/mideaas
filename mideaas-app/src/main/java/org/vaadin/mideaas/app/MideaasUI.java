@@ -55,7 +55,11 @@ public class MideaasUI extends IdeUI
 				MideaasConfig.getPropertyInt(Prop.JETTY_STOP_PORT_MIN),
 				MideaasConfig.getPropertyInt(Prop.JETTY_STOP_PORT_MAX));
 		
+		JettyUtil.stopAllJettys();
+		
 		MavenUtil.setMavenHome(MideaasConfig.getMavenHome());
+		
+		
 	}
 
 }

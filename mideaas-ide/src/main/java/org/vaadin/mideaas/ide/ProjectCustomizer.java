@@ -2,6 +2,7 @@ package org.vaadin.mideaas.ide;
 
 import java.util.Map;
 
+import org.vaadin.aceeditor.Suggester;
 import org.vaadin.mideaas.editor.AsyncErrorChecker;
 import org.vaadin.mideaas.editor.DocDiffMediator.Filter;
 import org.vaadin.mideaas.editor.DocDiffMediator.Guard;
@@ -43,5 +44,13 @@ public interface ProjectCustomizer {
 	 * @return
 	 */
 	AsyncErrorChecker getErrorCheckerFor(String filename, IdeProject project);
+	
+	/**
+	 * 
+	 * @param filename
+	 * @param project
+	 * @return
+	 */
+	Suggester getSuggesterFor(String filename, IdeProject project);
 
 }

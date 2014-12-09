@@ -1,5 +1,10 @@
 package org.vaadin.mideaas.ide;
 
+import java.util.Collections;
+import java.util.List;
+
+import org.vaadin.aceeditor.Suggester;
+import org.vaadin.aceeditor.Suggestion;
 import org.vaadin.mideaas.editor.MultiUserEditor;
 
 import com.vaadin.ui.Component;
@@ -20,14 +25,14 @@ public class IdeEditorComponent extends CustomComponent {
 		removeEditor();
 	}
 	
-	public IdeEditorComponent(IdeDoc doc, IdeUser user) {
+	public IdeEditorComponent(IdeDoc doc, IdeUser user, Suggester suggester) {
 		setSizeFull();
-		setEditor(doc, user);
+		setEditor(doc, user, suggester);
 		
 	}
 	
-	public void setEditor(IdeDoc doc, IdeUser user) {
-		editor = new MultiUserEditor(user.getEditorUser(), doc.getDoc(), doc.getAceMode());
+	public void setEditor(IdeDoc doc, IdeUser user, Suggester suggester) {
+		editor = new MultiUserEditor(user.getEditorUser(), doc.getDoc(), doc.getAceMode(), suggester);
 		editor.setSizeFull();
 		draw();
 	}

@@ -2,6 +2,7 @@ package org.vaadin.mideaas.ide;
 
 import java.util.List;
 
+import org.vaadin.aceeditor.Suggester;
 import org.vaadin.mideaas.editor.EditorUser;
 import org.vaadin.mideaas.editor.TeamLayout;
 
@@ -97,7 +98,10 @@ public class Ide extends CustomComponent {
 		
 		setActiveDoc(doc);
 		
-		editorComponent.setEditor(doc, user);
+		// XXX
+		Suggester suggester = config.getProjectCustomizer(project).getSuggesterFor(name, project);
+		
+		editorComponent.setEditor(doc, user, suggester);
 	}
 	
 	private void setActiveDoc(IdeDoc doc) {

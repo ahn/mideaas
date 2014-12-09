@@ -3,6 +3,7 @@ package org.vaadin.mideaas.app.java;
 import java.io.File;
 import java.io.IOException;
 
+import org.vaadin.aceeditor.Suggester;
 import org.vaadin.mideaas.app.java.util.CompilingService;
 import org.vaadin.mideaas.app.maven.MavenUtil;
 import org.vaadin.mideaas.editor.AsyncErrorChecker;
@@ -42,11 +43,18 @@ public class VaadinProject extends IdeProject {
 	}
 
 	public synchronized AsyncErrorChecker createErrorChecker(String filename) {
-		String pkg = javaPackageFromFilename(filename);
+		String pkg = javaFullClassNameFromFilename(filename);
 		return new JavaErrorChecker(pkg, compiler);
 	}
 	
-	private static String javaPackageFromFilename(String filename) {
+	public Suggester createSuggester(String filename) {
+		String pkg = javaFullClassNameFromFilename(filename);
+		return new JavaSuggester(compiler.getInMemoryCompiler(), pkg);
+	}
+	
+
+	
+	private static String javaFullClassNameFromFilename(String filename) {
 		String s = filename.substring("src/main/java/".length(), filename.length() - ".java".length());
 		return s.replace("/", ".");
 	}
@@ -78,5 +86,7 @@ public class VaadinProject extends IdeProject {
 	public File getPomXmlFile() {
 		return new File(dir, "pom.xml");
 	}
+
+	
 
 }

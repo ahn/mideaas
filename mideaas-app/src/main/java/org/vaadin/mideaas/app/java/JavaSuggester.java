@@ -31,7 +31,12 @@ public class JavaSuggester implements Suggester {
 	
 	@Override
 	public List<Suggestion> getSuggestions(String text, int cursor) {
-		return compSugger.getSuggestions(text, cursor);
+		List<Suggestion> suggs = compSugger.getSuggestions(text, cursor);
+		System.out.println("SUGGESTIONS: " + suggs.size());
+		for (Suggestion s : suggs) {
+			System.out.println(s.getSuggestionText());
+		}
+		return suggs;
 	}
 
 	@Override
