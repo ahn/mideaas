@@ -97,14 +97,14 @@ public class IdeProject {
 		// Nothing for now...
 	}
 	
-	public synchronized Map<String, String> getSnapshot() {
+	public synchronized IdeProjectSnapshot getSnapshot() {
 		Map<String, String> snap = new TreeMap<String, String>();
 		for (Entry<String, IdeDoc> e : docs.entrySet()) {
 							 // That's a lot of dots...
 			String content = e.getValue().getDoc().getBase().getDoc().getText();
 			snap.put(e.getKey(), content);
 		}
-		return snap;
+		return new IdeProjectSnapshot(snap);
 	}
 
 }

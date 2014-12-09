@@ -7,6 +7,7 @@ import org.vaadin.mideaas.app.java.util.CompilingService;
 import org.vaadin.mideaas.app.maven.MavenUtil;
 import org.vaadin.mideaas.editor.AsyncErrorChecker;
 import org.vaadin.mideaas.ide.IdeProject;
+import org.vaadin.mideaas.ide.IdeProjectSnapshot;
 import org.vaadin.mideaas.ide.IdeUtil;
 
 
@@ -15,6 +16,11 @@ public class VaadinProject extends IdeProject {
 	private final File dir;
 	
 	private final CompilingService compiler = new CompilingService(this);
+
+	/**
+	 * Storing written files so we can avoid writing files that have not been changed.
+	 */
+	private IdeProjectSnapshot writtenSnapshot;
 
 	public interface ClasspathListener {
 		public void classpathChanged();
@@ -37,18 +43,32 @@ public class VaadinProject extends IdeProject {
 
 	public synchronized AsyncErrorChecker createErrorChecker(String filename) {
 		String pkg = javaPackageFromFilename(filename);
-		System.out.println("pak! " + pkg);
 		return new JavaErrorChecker(pkg, compiler);
 	}
 	
 	private static String javaPackageFromFilename(String filename) {
-		System.out.println("pak? " + filename);
 		String s = filename.substring("src/main/java/".length(), filename.length() - ".java".length());
 		return s.replace("/", ".");
 	}
 
 	public void writeToDisk() throws IOException {
-		IdeUtil.saveFilesToPath(getSnapshot(), dir.toPath());
+		IdeProjectSnapshot written = getWrittenSnapshot();
+		IdeProjectSnapshot snapshot = getSnapshot();
+		if (written==null) {
+			snapshot.writeToDisk(dir.toPath());
+		}
+		else {
+			snapshot.writeChangedToDisk(dir.toPath(), written);
+		}
+		setWrittenSnapshot(snapshot);
+	}
+	
+	private synchronized IdeProjectSnapshot getWrittenSnapshot() {
+		return writtenSnapshot;
+	}
+	
+	private synchronized void setWrittenSnapshot(IdeProjectSnapshot snapshot) {
+		writtenSnapshot = snapshot;
 	}
 
 	public File getProjectDir() {

@@ -6,6 +6,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.TreeMap;
@@ -86,7 +87,17 @@ public class IdeUtil {
 
 	
 	public static void saveFilesToPath(Map<String, String> files, Path path) throws IOException {
+		Map<String,String> empty = Collections.emptyMap();
+		saveChangedFilesToPath(files, path, empty); 
+	}
+
+	public static void saveChangedFilesToPath(Map<String, String> files,
+			Path path, Map<String, String> written) throws IOException {
 		for (Entry<String, String> e : files.entrySet()) {
+			if (e.getValue().equals(written.get(e.getKey()))) {
+				System.out.println("Skipping " + e.getKey());
+				continue;
+			}
 			String f = e.getKey();
 			String filename = f.substring(f.lastIndexOf("/")+1);
 			if (f.length() > filename.length()) {
