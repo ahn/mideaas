@@ -7,10 +7,14 @@ import org.vaadin.aceeditor.Suggester;
 import org.vaadin.mideaas.app.java.JavaErrorChecker;
 import org.vaadin.mideaas.app.java.JavaSuggester;
 import org.vaadin.mideaas.app.java.util.CompilingService;
+import org.vaadin.mideaas.app.java.util.InMemoryCompiler;
 import org.vaadin.mideaas.app.maven.MavenUtil;
 import org.vaadin.mideaas.editor.AsyncErrorChecker;
+import org.vaadin.mideaas.editor.SharedDoc;
+import org.vaadin.mideaas.ide.IdeDoc;
 import org.vaadin.mideaas.ide.IdeProject;
 import org.vaadin.mideaas.ide.IdeProjectSnapshot;
+import org.vaadin.mideaas.ide.IdeUser;
 
 
 public class VaadinProject extends IdeProject {
@@ -40,7 +44,7 @@ public class VaadinProject extends IdeProject {
 	}
 
 	public void addClasspathListener(ClasspathListener li) {
-		// TODO Auto-generated method stub
+		// TODO!
 		
 	}
 
@@ -48,12 +52,7 @@ public class VaadinProject extends IdeProject {
 		String pkg = javaFullClassNameFromFilename(filename);
 		return new JavaErrorChecker(pkg, compiler);
 	}
-	
-	public Suggester createSuggester(String filename) {
-		String pkg = javaFullClassNameFromFilename(filename);
-		return new JavaSuggester(compiler.getInMemoryCompiler(), pkg);
-	}
-	
+
 	private static String javaFullClassNameFromFilename(String filename) {
 		String s = filename.substring("src/main/java/".length(), filename.length() - ".java".length());
 		return s.replace("/", ".");
@@ -87,6 +86,18 @@ public class VaadinProject extends IdeProject {
 		return new File(dir, "pom.xml");
 	}
 
-	
+	@Override
+	public Suggester createSuggesterFor(String filename, IdeUser user) {
+		if (!VaadinProjectCustomizer.isJavaFile(filename)) {
+			return super.createSuggesterFor(filename, user);
+		}
+		String pkg = javaFullClassNameFromFilename(filename);
+		IdeDoc doc = getDoc(filename);
+		if (doc == null) {
+			return null;
+		}
+		
+		return new JavaSuggester(pkg, compiler.getInMemoryCompiler(), doc, user.getEditorUser());
+	}
 
 }

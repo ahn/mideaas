@@ -70,7 +70,8 @@ public class MultiUserDoc implements Listener {
 	}
 	
 	synchronized public SharedDoc getChildDoc(EditorUser user) {
-		return childDocs.get(user).doc;
+		ChildDoc d = childDocs.get(user);
+		return d == null ? null : d.doc;
 	}
 	
 	/*

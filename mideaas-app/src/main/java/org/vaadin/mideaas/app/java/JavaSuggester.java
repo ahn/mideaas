@@ -1,13 +1,23 @@
 package org.vaadin.mideaas.app.java;
 
+import japa.parser.ParseException;
+
 import java.util.List;
 
+import org.vaadin.aceeditor.ServerSideDocDiff;
 import org.vaadin.aceeditor.Suggester;
 import org.vaadin.aceeditor.Suggestion;
+import org.vaadin.aceeditor.client.AceDoc;
+import org.vaadin.mideaas.app.VaadinProject;
 import org.vaadin.mideaas.app.java.util.CompilerSuggester;
 import org.vaadin.mideaas.app.java.util.CustomMethodSuggestionGenerator;
 import org.vaadin.mideaas.app.java.util.InMemoryCompiler;
 import org.vaadin.mideaas.app.java.util.StdJavaSuggestionGenerator;
+import org.vaadin.mideaas.editor.EditorUser;
+import org.vaadin.mideaas.editor.MultiUserDoc;
+import org.vaadin.mideaas.editor.SharedDoc;
+import org.vaadin.mideaas.ide.IdeDoc;
+import org.vaadin.mideaas.ide.IdeUser;
 
 public class JavaSuggester implements Suggester {
 	
@@ -20,8 +30,15 @@ public class JavaSuggester implements Suggester {
 			// TODO: more?
 	
 	private final CompilerSuggester compSugger;
+	private final InMemoryCompiler compiler;
+	private final IdeDoc doc;
+	private final EditorUser user;
 
-	public JavaSuggester(InMemoryCompiler compiler, String className) {
+	public JavaSuggester(String className, InMemoryCompiler compiler, IdeDoc doc, EditorUser user) {
+		this.compiler = compiler;
+		this.doc = doc;
+		this.user = user;
+
 		compSugger = new CompilerSuggester(compiler, className);
 		CustomMethodSuggestionGenerator vaadinSG = new CustomMethodSuggestionGenerator(compiler);
 		vaadinSG.setSuggestions(vaadinSuggestions);
@@ -47,16 +64,21 @@ public class JavaSuggester implements Suggester {
 	// TODO
 	
 	private void ensureImport(String cls) {
-//		try {
-//			ControllerCode c = new ControllerCode(codeMud.getBase().getText());
-//			String code1 = c.getCode();
-//			c.ensureImport(cls);
-//			ServerSideDocDiff d = ServerSideDocDiff.diff(new AceDoc(code1), new AceDoc(c.getCode()));
-//			codeMud.tryToApply(d, null);
-//		} catch (ParseException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		}
+
+		SharedDoc childDoc = doc.getDoc().getChildDoc(user);
+		if (childDoc == null) {
+			System.err.println("WARNING: could not ensureImport");
+		}
+		try {
+			ControllerCode c = new ControllerCode(doc.getDoc().getBaseText());
+			String code1 = c.getCode();
+			c.ensureImport(cls);
+			ServerSideDocDiff d = ServerSideDocDiff.diff(new AceDoc(code1), new AceDoc(c.getCode()));
+			childDoc.applyDiff(d);
+		} catch (ParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 }

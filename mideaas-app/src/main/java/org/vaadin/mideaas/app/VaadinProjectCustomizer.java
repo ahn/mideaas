@@ -1,6 +1,5 @@
 package org.vaadin.mideaas.app;
 
-import org.vaadin.aceeditor.Suggester;
 import org.vaadin.mideaas.app.guards.CSSGuard;
 import org.vaadin.mideaas.app.guards.JavaGuard;
 import org.vaadin.mideaas.app.guards.XmlGuard;
@@ -34,17 +33,8 @@ public class VaadinProjectCustomizer extends DefaultProjectCustomizer {
 		return null;
 	}
 
-	private static boolean isJavaFile(String filename) {
+	public static boolean isJavaFile(String filename) {
 		return filename.startsWith("src/main/java/") && filename.endsWith(".java");
 	}
-	
-	@Override
-	public Suggester getSuggesterFor(String filename, IdeProject project) {
-		if (project instanceof VaadinProject && isJavaFile(filename)) {
-			return ((VaadinProject)project).createSuggester(filename);
-		}
-		return null;
-	}
-	
 
 }

@@ -1,10 +1,6 @@
 package org.vaadin.mideaas.ide;
 
-import java.util.Collections;
-import java.util.List;
-
 import org.vaadin.aceeditor.Suggester;
-import org.vaadin.aceeditor.Suggestion;
 import org.vaadin.mideaas.editor.MultiUserEditor;
 
 import com.vaadin.ui.Component;

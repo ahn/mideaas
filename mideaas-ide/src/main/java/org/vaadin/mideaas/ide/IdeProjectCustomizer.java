@@ -43,12 +43,5 @@ public interface IdeProjectCustomizer {
 	 */
 	AsyncErrorChecker getErrorCheckerFor(String filename, IdeProject project);
 	
-	/**
-	 * 
-	 * @param filename
-	 * @param project
-	 * @return
-	 */
-	Suggester getSuggesterFor(String filename, IdeProject project);
 
 }

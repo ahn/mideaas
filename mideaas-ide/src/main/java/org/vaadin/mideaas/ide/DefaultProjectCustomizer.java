@@ -28,11 +28,6 @@ public class DefaultProjectCustomizer implements IdeProjectCustomizer {
 		return null;
 	}
 
-	@Override
-	public Suggester getSuggesterFor(String filename, IdeProject project) {
-		return null;
-	}
-
 
 
 }

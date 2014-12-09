@@ -13,10 +13,10 @@ import org.vaadin.aceeditor.Suggester;
 import org.vaadin.aceeditor.client.AceDoc;
 import org.vaadin.chatbox.SharedChat;
 import org.vaadin.mideaas.editor.AsyncErrorChecker;
-import org.vaadin.mideaas.editor.MultiUserDoc;
-import org.vaadin.mideaas.editor.Team;
 import org.vaadin.mideaas.editor.DocDiffMediator.Filter;
 import org.vaadin.mideaas.editor.DocDiffMediator.Guard;
+import org.vaadin.mideaas.editor.MultiUserDoc;
+import org.vaadin.mideaas.editor.Team;
 
 public class IdeProject {
 	
@@ -147,11 +147,19 @@ public class IdeProject {
 //		return customizer;
 //	}
 
-	public Suggester createSuggesterFor(String id) {
-		if (customizer != null) {
-			return customizer.getSuggesterFor(id, this);
-		}
+	
+	/**
+	 * can be overridden
+	 * 
+	 * @param id
+	 * @param user
+	 * @return
+	 */
+	public Suggester createSuggesterFor(String id, IdeUser user) {
 		return null;
 	}
+
+	
+
 
 }
