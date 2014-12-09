@@ -11,7 +11,6 @@ import java.util.Map;
 import org.vaadin.mideaas.app.MideaasConfig.Prop;
 import org.vaadin.mideaas.app.git.GitHubLobbyView;
 import org.vaadin.mideaas.app.git.GitHubLoginView;
-import org.vaadin.mideaas.app.java.VaadinProject;
 import org.vaadin.mideaas.app.maven.BuildComponent;
 import org.vaadin.mideaas.app.maven.Builder;
 import org.vaadin.mideaas.app.maven.JettyComponent;
@@ -21,7 +20,6 @@ import org.vaadin.mideaas.ide.IdeLobbyView;
 import org.vaadin.mideaas.ide.IdeLoginView;
 import org.vaadin.mideaas.ide.IdeProject;
 import org.vaadin.mideaas.ide.IdeUtil;
-import org.vaadin.mideaas.ide.ProjectCustomizer;
 
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
@@ -47,10 +45,13 @@ public class MideaasIdeConfiguration extends DefaultIdeConfiguration {
 	
 	private void addSideBarComponents(Ide ide) {
 		List<Component> components = new LinkedList<Component>();
-		Builder builder = new Builder((VaadinProject) ide.getProject(), userSettings);
-		components.add(new BuildComponent(builder, ide.getUser()));
 		
-		components.add(new JettyComponent((VaadinProject) ide.getProject(), ide.getUser()));
+		if (ide.getProject() instanceof VaadinProject) {
+			VaadinProject vp = (VaadinProject) ide.getProject();
+			Builder builder = new Builder(vp, userSettings);
+			components.add(new BuildComponent(builder, ide.getUser()));
+			components.add(new JettyComponent(vp, ide.getUser()));
+		}
 		
 		ide.addSideBarComponents(components);
 	}
@@ -94,14 +95,6 @@ public class MideaasIdeConfiguration extends DefaultIdeConfiguration {
 			}
 		}
 		return super.createProject(id, name, files);
-	}
-
-	@Override
-	public ProjectCustomizer getProjectCustomizer(IdeProject project) {
-		if (project instanceof VaadinProject) {
-			// ???
-		}
-		return new MideaasProjectCustomizer();
 	}
 
 	private static File createProjectDir(Map<String, String> files) throws IOException {

@@ -7,8 +7,8 @@ import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import org.vaadin.mideaas.app.java.VaadinProject;
-import org.vaadin.mideaas.app.java.VaadinProject.ClasspathListener;
+import org.vaadin.mideaas.app.VaadinProject;
+import org.vaadin.mideaas.app.VaadinProject.ClasspathListener;
 
 public class CompilingService implements ClasspathListener {
 

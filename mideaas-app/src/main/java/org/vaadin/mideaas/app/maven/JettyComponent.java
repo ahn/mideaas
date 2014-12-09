@@ -4,7 +4,7 @@ import java.io.File;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.vaadin.mideaas.app.java.VaadinProject;
+import org.vaadin.mideaas.app.VaadinProject;
 import org.vaadin.mideaas.ide.IdeUser;
 
 import com.vaadin.server.ExternalResource;

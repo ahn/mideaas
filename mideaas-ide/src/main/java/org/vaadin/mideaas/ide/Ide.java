@@ -99,7 +99,7 @@ public class Ide extends CustomComponent {
 		setActiveDoc(doc);
 		
 		// XXX
-		Suggester suggester = config.getProjectCustomizer(project).getSuggesterFor(name, project);
+		Suggester suggester = project.createSuggesterFor(name);
 		
 		editorComponent.setEditor(doc, user, suggester);
 	}

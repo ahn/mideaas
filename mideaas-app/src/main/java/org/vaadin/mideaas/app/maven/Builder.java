@@ -9,7 +9,7 @@ import java.util.concurrent.Executors;
 
 import org.apache.maven.shared.invoker.InvocationResult;
 import org.vaadin.mideaas.app.UserSettings;
-import org.vaadin.mideaas.app.java.VaadinProject;
+import org.vaadin.mideaas.app.VaadinProject;
 import org.vaadin.mideaas.app.maven.MavenTask.LogListener;
 
 public class Builder {

@@ -1,9 +1,11 @@
-package org.vaadin.mideaas.app.java;
+package org.vaadin.mideaas.app;
 
 import java.io.File;
 import java.io.IOException;
 
 import org.vaadin.aceeditor.Suggester;
+import org.vaadin.mideaas.app.java.JavaErrorChecker;
+import org.vaadin.mideaas.app.java.JavaSuggester;
 import org.vaadin.mideaas.app.java.util.CompilingService;
 import org.vaadin.mideaas.app.maven.MavenUtil;
 import org.vaadin.mideaas.editor.AsyncErrorChecker;
@@ -27,7 +29,7 @@ public class VaadinProject extends IdeProject {
 	}
 
 	public VaadinProject(String id, String name, File dir) {
-		super(id, name);
+		super(id, name, new VaadinProjectCustomizer());
 		this.dir = dir;
 		System.out.println("new VaadinProject(" + name + ") -- dir: " + this.dir);
 		compiler = new CompilingService(this);
@@ -51,8 +53,6 @@ public class VaadinProject extends IdeProject {
 		String pkg = javaFullClassNameFromFilename(filename);
 		return new JavaSuggester(compiler.getInMemoryCompiler(), pkg);
 	}
-	
-
 	
 	private static String javaFullClassNameFromFilename(String filename) {
 		String s = filename.substring("src/main/java/".length(), filename.length() - ".java".length());

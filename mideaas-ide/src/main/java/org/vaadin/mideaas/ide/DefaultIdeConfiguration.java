@@ -6,11 +6,6 @@ import java.util.Map;
 public class DefaultIdeConfiguration implements IdeConfiguration {
 	
 	@Override
-	public ProjectCustomizer getProjectCustomizer(IdeProject project) {
-		return new DefaultProjectCustomizer();
-	}
-
-	@Override
 	public void ideCreated(Ide ide) {
 		// Nothing
 	}

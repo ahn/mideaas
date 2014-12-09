@@ -5,7 +5,7 @@ import org.vaadin.mideaas.editor.AsyncErrorChecker;
 import org.vaadin.mideaas.editor.DocDiffMediator.Filter;
 import org.vaadin.mideaas.editor.DocDiffMediator.Guard;
 
-public class DefaultProjectCustomizer implements ProjectCustomizer {
+public class DefaultProjectCustomizer implements IdeProjectCustomizer {
 
 	
 	@Override

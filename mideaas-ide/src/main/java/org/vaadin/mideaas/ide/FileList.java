@@ -200,7 +200,7 @@ public class FileList extends CustomComponent implements
 		else if (action == ACTION_INSERT) {
 			final Window win = new Window("Add file");
 			DocAdderComponent dac = config.createDocAdderComponent();
-			dac.setDocAdder(new DocAdderImpl(project, config) {
+			dac.setDocAdder(new DocAdderImpl(project) {
 				@Override
 				public void done() {
 					win.close();

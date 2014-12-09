@@ -4,14 +4,12 @@ import org.vaadin.aceeditor.Suggester;
 import org.vaadin.mideaas.app.guards.CSSGuard;
 import org.vaadin.mideaas.app.guards.JavaGuard;
 import org.vaadin.mideaas.app.guards.XmlGuard;
-import org.vaadin.mideaas.app.java.JavaSuggester;
-import org.vaadin.mideaas.app.java.VaadinProject;
 import org.vaadin.mideaas.editor.AsyncErrorChecker;
 import org.vaadin.mideaas.editor.DocDiffMediator.Guard;
 import org.vaadin.mideaas.ide.DefaultProjectCustomizer;
 import org.vaadin.mideaas.ide.IdeProject;
 
-public class MideaasProjectCustomizer extends DefaultProjectCustomizer {
+public class VaadinProjectCustomizer extends DefaultProjectCustomizer {
 
 	
 	@Override

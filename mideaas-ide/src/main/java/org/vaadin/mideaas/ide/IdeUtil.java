@@ -14,40 +14,33 @@ import java.util.UUID;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.filefilter.IOFileFilter;
-import org.vaadin.aceeditor.AceMode;
-import org.vaadin.aceeditor.client.AceDoc;
-import org.vaadin.mideaas.editor.AsyncErrorChecker;
-import org.vaadin.mideaas.editor.DocDiffMediator.Filter;
-import org.vaadin.mideaas.editor.DocDiffMediator.Guard;
-import org.vaadin.mideaas.editor.MultiUserDoc;
 
 public class IdeUtil {
 
-	private static MultiUserDoc customizedDoc(String filename, String content, ProjectCustomizer cust, IdeProject project) {
-		Guard upGuard = cust.getUpwardsGuardFor(filename);
-		Guard downGuard = cust.getDownwardsGuardFor(filename);
-		Filter filter = cust.getFilterFor(filename);
-		AsyncErrorChecker checker = cust.getErrorCheckerFor(filename, project);
-		return new MultiUserDoc(new AceDoc(content), filter, upGuard, downGuard, checker);
-	}
-
-	public static IdeDoc createDoc(String filename, String content, IdeConfiguration config, IdeProject project) {
-		MultiUserDoc doc = customizedDoc(filename, content, config.getProjectCustomizer(project), project);
-		return new IdeDoc(doc, aceModeForFilename(filename));
-	}
+//	private static MultiUserDoc customizedDoc(String filename, String content, ProjectCustomizer cust, IdeProject project) {
+//		Guard upGuard = cust.getUpwardsGuardFor(filename);
+//		Guard downGuard = cust.getDownwardsGuardFor(filename);
+//		Filter filter = cust.getFilterFor(filename);
+//		AsyncErrorChecker checker = cust.getErrorCheckerFor(filename, project);
+//		return new MultiUserDoc(new AceDoc(content), filter, upGuard, downGuard, checker);
+//	}
+//
+//	public static IdeDoc createDoc(String filename, String content, ProjectCustomizer customizer, IdeProject project) {
+//		MultiUserDoc doc = customizedDoc(filename, content, customizer, project);
+//		return new IdeDoc(doc, aceModeForFilename(filename));
+//	}
 
 	public static IdeProject createProject(String name, Map<String, String> contents, IdeConfiguration config) {
 		IdeProject project = config.createProject(UUID.randomUUID().toString(), name, contents);
 		for (Entry<String, String> e : contents.entrySet()) {
-			MultiUserDoc doc = customizedDoc(e.getKey(), e.getValue(), config.getProjectCustomizer(project), project);
-			project.putDoc(e.getKey(), new IdeDoc(doc, aceModeForFilename(e.getKey())));
+			project.putDoc(e.getKey(), e.getValue());
 		}
 		return project;
 	}
-
-	private static AceMode aceModeForFilename(String filename) {
-		return AceMode.forFile(filename);
-	}
+//
+//	private static AceMode aceModeForFilename(String filename) {
+//		return AceMode.forFile(filename);
+//	}
 
 	public static Map<String, String> readContentsFromDir(File dir) {
 		int le = dir.getPath().length() + 1; // + 1 for the slash after dir

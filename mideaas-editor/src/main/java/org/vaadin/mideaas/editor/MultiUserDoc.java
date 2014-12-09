@@ -57,6 +57,10 @@ public class MultiUserDoc implements Listener {
 		base.addListener(this);
 	}
 	
+	public MultiUserDoc(AceDoc initial) {
+		this(initial, null, null, null, null);
+	}
+
 	public SharedDoc getBase() {
 		return base;
 	}

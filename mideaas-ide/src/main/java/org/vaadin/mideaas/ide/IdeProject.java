@@ -8,8 +8,15 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import org.vaadin.aceeditor.AceMode;
+import org.vaadin.aceeditor.Suggester;
+import org.vaadin.aceeditor.client.AceDoc;
 import org.vaadin.chatbox.SharedChat;
+import org.vaadin.mideaas.editor.AsyncErrorChecker;
+import org.vaadin.mideaas.editor.MultiUserDoc;
 import org.vaadin.mideaas.editor.Team;
+import org.vaadin.mideaas.editor.DocDiffMediator.Filter;
+import org.vaadin.mideaas.editor.DocDiffMediator.Guard;
 
 public class IdeProject {
 	
@@ -20,16 +27,22 @@ public class IdeProject {
 	
 	private final String id;
 	private final String name;
+	private final IdeProjectCustomizer customizer;
 	
 	private final HashMap<String, IdeDoc> docs = new HashMap<String, IdeDoc>();
 
 	private final Team team = new Team();
 	
 	private final SharedChat chat = new SharedChat();
-	
-	public IdeProject(String id, String name) {
+
+	public IdeProject(String id, String name, IdeProjectCustomizer customizer) {
 		this.id = id;
 		this.name = name;
+		this.customizer = customizer;
+	}
+	
+	public IdeProject(String id, String name) {
+		this(id, name, null);
 	}
 	
 	public String getId() {
@@ -47,14 +60,39 @@ public class IdeProject {
 	public synchronized IdeDoc getDoc(String id) {
 		return docs.get(id);
 	}
+//	
+//	public IdeDoc putDoc(String id, IdeDoc doc) {
+//		IdeDoc d;
+//		synchronized(this) {
+//			d = docs.put(id, doc);
+//		}
+//		fireChanged();
+//		return d;
+//	}
 	
-	public IdeDoc putDoc(String id, IdeDoc doc) {
-		IdeDoc d;
+	public IdeDoc putDoc(String id, String content) {
+		MultiUserDoc doc;
+		if (customizer != null) {
+			doc = customizedDoc(id, content);
+		}
+		else {
+			doc = new MultiUserDoc(new AceDoc(content));
+		}
+		IdeDoc ideDoc = new IdeDoc(doc, AceMode.forFile(id));
+		IdeDoc prev;
 		synchronized(this) {
-			d = docs.put(id, doc);
+			prev = docs.put(id, ideDoc);
 		}
 		fireChanged();
-		return d;
+		return prev;
+	}
+	
+	private MultiUserDoc customizedDoc(String filename, String content) {
+		Guard upGuard = customizer.getUpwardsGuardFor(filename);
+		Guard downGuard = customizer.getDownwardsGuardFor(filename);
+		Filter filter = customizer.getFilterFor(filename);
+		AsyncErrorChecker checker = customizer.getErrorCheckerFor(filename, this);
+		return new MultiUserDoc(new AceDoc(content), filter, upGuard, downGuard, checker);
 	}
 	
 	public IdeDoc removeDoc(String id) {
@@ -81,9 +119,7 @@ public class IdeProject {
 	}
 
 	private void fireChanged() {
-
 		Collection<String> docNames = getDocIds();
-		
 		for (Listener li : listeners) {
 			li.changed(docNames);
 		}
@@ -105,6 +141,17 @@ public class IdeProject {
 			snap.put(e.getKey(), content);
 		}
 		return new IdeProjectSnapshot(snap);
+	}
+
+//	public ProjectCustomizer getCustomizer() {
+//		return customizer;
+//	}
+
+	public Suggester createSuggesterFor(String id) {
+		if (customizer != null) {
+			return customizer.getSuggesterFor(id, this);
+		}
+		return null;
 	}
 
 }
