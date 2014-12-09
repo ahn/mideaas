@@ -34,7 +34,8 @@ public class IdeErrorView extends CustomComponent implements View {
 
 		layout.addComponent(new Label("The link leads nowhere. Maybe the project doesn't exist or has expired."));
 		
-		layout.addComponent(new Link("Back to frontpage", new ExternalResource("/")));
+		String path = getUI().getPage().getLocation().getPath();
+		layout.addComponent(new Link("Back to frontpage", new ExternalResource(path)));
 		
 		setCompositionRoot(la);
 	}
