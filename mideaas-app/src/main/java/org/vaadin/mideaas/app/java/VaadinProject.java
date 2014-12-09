@@ -8,14 +8,13 @@ import org.vaadin.mideaas.app.maven.MavenUtil;
 import org.vaadin.mideaas.editor.AsyncErrorChecker;
 import org.vaadin.mideaas.ide.IdeProject;
 import org.vaadin.mideaas.ide.IdeProjectSnapshot;
-import org.vaadin.mideaas.ide.IdeUtil;
 
 
 public class VaadinProject extends IdeProject {
 	
 	private final File dir;
 	
-	private final CompilingService compiler = new CompilingService(this);
+	private final CompilingService compiler;
 
 	/**
 	 * Storing written files so we can avoid writing files that have not been changed.
@@ -30,6 +29,7 @@ public class VaadinProject extends IdeProject {
 		super(id, name);
 		this.dir = dir;
 		System.out.println("new VaadinProject(" + name + ") -- dir: " + this.dir);
+		compiler = new CompilingService(this);
 	}
 
 	public String getClassPath() {

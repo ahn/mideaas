@@ -35,9 +35,10 @@ public class CompilingService implements ClasspathListener {
 	}
 	
 	private void refreshClasspath() {
-		if (project.getClassPath()!=null) {
-			List<String> cp = Arrays.asList(project.getClassPath().split(File.pathSeparator));
-			compiler.setClasspath(cp);
+		String cp = project.getClassPath();
+		if (cp!=null) {
+			List<String> cpa = Arrays.asList(cp.split(File.pathSeparator));
+			compiler.setClasspath(cpa);
 		}
 		else {
 			System.err.println("WARNING: could not set project classpath");

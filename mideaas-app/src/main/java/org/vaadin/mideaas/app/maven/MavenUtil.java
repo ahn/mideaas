@@ -11,7 +11,6 @@ import org.apache.maven.shared.invoker.InvocationOutputHandler;
 import org.apache.maven.shared.invoker.InvocationRequest;
 import org.apache.maven.shared.invoker.Invoker;
 import org.apache.maven.shared.invoker.MavenInvocationException;
-import org.vaadin.mideaas.editor.EditorUser;
 import org.vaadin.mideaas.ide.IdeUser;
 
 // TODO: is this class needed anywhere?

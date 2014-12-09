@@ -95,7 +95,6 @@ public class IdeUtil {
 			Path path, Map<String, String> written) throws IOException {
 		for (Entry<String, String> e : files.entrySet()) {
 			if (e.getValue().equals(written.get(e.getKey()))) {
-				System.out.println("Skipping " + e.getKey());
 				continue;
 			}
 			String f = e.getKey();

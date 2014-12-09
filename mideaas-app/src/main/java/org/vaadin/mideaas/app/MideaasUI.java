@@ -4,6 +4,7 @@ import javax.servlet.annotation.WebServlet;
 
 import org.vaadin.mideaas.app.MideaasConfig.Prop;
 import org.vaadin.mideaas.app.maven.JettyUtil;
+import org.vaadin.mideaas.app.maven.MavenUtil;
 import org.vaadin.mideaas.ide.IdeConfiguration;
 import org.vaadin.mideaas.ide.IdeUI;
 
@@ -53,6 +54,8 @@ public class MideaasUI extends IdeUI
 		JettyUtil.setStopPortRange(
 				MideaasConfig.getPropertyInt(Prop.JETTY_STOP_PORT_MIN),
 				MideaasConfig.getPropertyInt(Prop.JETTY_STOP_PORT_MAX));
+		
+		MavenUtil.setMavenHome(MideaasConfig.getMavenHome());
 	}
 
 }

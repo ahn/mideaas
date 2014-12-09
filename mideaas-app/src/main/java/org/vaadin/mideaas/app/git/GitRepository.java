@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.codehaus.plexus.util.FileUtils;
 import org.eclipse.jgit.api.CloneCommand;
 import org.eclipse.jgit.api.CommitCommand;
 import org.eclipse.jgit.api.Git;
@@ -67,26 +66,6 @@ public class GitRepository {
 		command.setCredentialsProvider(auth);
 		return new GitRepository(command.call());
 	}
-	
-	
-	/**
-	 * Delete content.
-	 *
-	 * @param dir the dir
-	 */
-	private static void deleteContent(File dir) {
-		File[] files;
-		try {
-			files = dir.listFiles();
-			while(files.length>0){
-				FileUtils.deleteDirectory(files[0]);
-				files = dir.listFiles();
-			}
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
 
 	/**
 	 * Default project name from git url.
@@ -101,28 +80,11 @@ public class GitRepository {
         }
         return matcher.group(1);
     }
-	
-	/**
-	 * Instantiates a new git repository.
-	 *
-	 * @param git the git
-	 */
+
 	private GitRepository(Git git) {
 		this.git = git;
 	}
 
-	/**
-	 * Adds all the source files to git.
-	 *
-	 * @throws GitAPIException the git api exception
-	 */
-	public void addSourceFilesToGit() throws GitAPIException {
-		git.add().addFilepattern("src/main/java").call();
-		git.add().addFilepattern("src/main/resources").call();
-		git.add().addFilepattern("src/main/webapp/WEB-INF").call();
-		git.add().addFilepattern("src/main/webapp/META-INF").call();
-		git.add().addFilepattern("pom.xml").call();
-	}
 
 	/**
 	 * Commit all.
