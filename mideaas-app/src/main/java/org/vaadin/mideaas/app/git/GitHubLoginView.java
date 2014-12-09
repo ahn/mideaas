@@ -61,7 +61,7 @@ public class GitHubLoginView extends CustomComponent implements IdeLoginView, OA
 		GitHubButton b = new GitHubButton(apiKey, apiSecret);
 		b.setCaption("Log in");
 		b.addOAuthListener(this);
-		b.setScope("user:email,gist");
+		b.setScope("user:email");
 		layout.addComponent(b);
 	}
 
