@@ -89,7 +89,8 @@ public final class IdeViewProvider implements ViewProvider {
 			if (project != null) {
 				IdeDoc doc = project.getDoc(filename);
 				if (doc != null) {
-					return new SimpleView(doc, ui.getIdeUser().getEditorUser(),  filename);
+					String title = filename.substring(filename.lastIndexOf("/")+1);
+					return new SimpleView(doc, ui.getIdeUser().getEditorUser(),  title);
 				}
 			}
 		}
