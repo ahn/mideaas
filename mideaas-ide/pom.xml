@@ -5,7 +5,7 @@
 	<groupId>org.vaadin.mideaas</groupId>
 	<artifactId>mideaas-ide</artifactId>
 	<packaging>jar</packaging>
-	<version>0.0.3-SNAPSHOT</version>
+	<version>0.1.0-SNAPSHOT</version>
 	<name>Mideaas IDE</name>
 
 	<properties>
