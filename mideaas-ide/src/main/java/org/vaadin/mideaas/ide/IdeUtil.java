@@ -96,7 +96,7 @@ public class IdeUtil {
 				Path dir = path.resolve(f.substring(0, f.length() - filename.length() - 1));
 				dir.toFile().mkdirs();
 			}
-			Files.write(path.resolve(f), e.getValue().getBytes(), StandardOpenOption.CREATE, StandardOpenOption.WRITE);
+			Files.write(path.resolve(f), e.getValue().getBytes());
 		}
 	}
 
