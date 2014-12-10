@@ -2,8 +2,9 @@ package org.vaadin.mideaas.app;
 
 import java.io.File;
 import java.io.IOException;
-
-import javax.servlet.http.HttpServletRequest;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import org.vaadin.aceeditor.Suggester;
 import org.vaadin.mideaas.app.java.JavaErrorChecker;
@@ -18,9 +19,6 @@ import org.vaadin.mideaas.ide.IdeDoc;
 import org.vaadin.mideaas.ide.IdeProject;
 import org.vaadin.mideaas.ide.IdeProjectSnapshot;
 import org.vaadin.mideaas.ide.IdeUser;
-
-import com.vaadin.server.VaadinServletService;
-import com.vaadin.ui.Component;
 
 
 public class VaadinProject extends IdeProject {
@@ -115,7 +113,7 @@ public class VaadinProject extends IdeProject {
 
 	@Override
 	public Suggester createSuggesterFor(String filename, IdeUser user) {
-		if (!VaadinProjectCustomizer.isJavaFile(filename)) {
+		if (!isJavaFile(filename)) {
 			return super.createSuggesterFor(filename, user);
 		}
 		String pkg = javaFullClassNameFromFilename(filename);
@@ -143,5 +141,21 @@ public class VaadinProject extends IdeProject {
 		compiler.setClassPath(cp);
 	}
 
+	public void compileAll() {
+		IdeProjectSnapshot snapshot = getSnapshot();
+		Map<String, String> classContents = new HashMap<String, String>();
 
+		for (Entry<String, String> e : snapshot.getFiles().entrySet()) {
+			if (isJavaFile(e.getKey())) {
+				classContents.put(javaFullClassNameFromFilename(e.getKey()), e.getValue());
+			}
+		}
+
+		compiler.compileAll(classContents);
+	}
+
+	
+	public static boolean isJavaFile(String filename) {
+		return filename.startsWith("src/main/java/") && filename.endsWith(".java");
+	}
 }

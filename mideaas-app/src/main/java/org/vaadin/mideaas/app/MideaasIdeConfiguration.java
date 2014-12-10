@@ -57,6 +57,10 @@ public class MideaasIdeConfiguration extends DefaultIdeConfiguration {
 			if (vp.getJettyServer() != null) {
 				components.add(new JettyComponent(vp.getJettyServer()));
 			}
+			
+			// Compiling all at the beginning
+			vp.refreshClasspath();
+			vp.compileAll();
 		}
 		
 		ide.addSideBarComponents(components);
@@ -124,6 +128,13 @@ public class MideaasIdeConfiguration extends DefaultIdeConfiguration {
 			@Override
 			public void menuSelected(MenuItem selectedItem) {
 				project.refreshClasspath();
+			}
+		});
+		
+		menu.addItem("Compile all", new Command() {
+			@Override
+			public void menuSelected(MenuItem selectedItem) {
+				project.compileAll();
 			}
 		});
 	}

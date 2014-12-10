@@ -27,14 +27,12 @@ public class VaadinProjectCustomizer extends DefaultProjectCustomizer {
 	
 	@Override
 	public AsyncErrorChecker getErrorCheckerFor(String filename, IdeProject project) {
-		if (project instanceof VaadinProject && isJavaFile(filename)) {
+		if (project instanceof VaadinProject && VaadinProject.isJavaFile(filename)) {
 			return ((VaadinProject)project).createErrorChecker(filename);
 		}
 		return null;
 	}
 
-	public static boolean isJavaFile(String filename) {
-		return filename.startsWith("src/main/java/") && filename.endsWith(".java");
-	}
+	
 
 }
