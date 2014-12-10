@@ -8,6 +8,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import org.apache.maven.shared.invoker.InvocationResult;
+import org.vaadin.mideaas.app.MideaasConfig;
 import org.vaadin.mideaas.app.UserSettings;
 import org.vaadin.mideaas.app.VaadinProject;
 import org.vaadin.mideaas.app.maven.MavenTask.LogListener;
@@ -60,6 +61,11 @@ public class Builder {
 	public synchronized BuildStatus getStatus() {
 		return status;
 	}
+	
+	public void build(List<String> goals) {
+		build(goals, "target", MideaasConfig.getDefaultUserSettings(), null);
+	}
+	
 
 	public void build(List<String> goals, String buildDir, UserSettings settings, LogListener listener) {
 		synchronized (this) {

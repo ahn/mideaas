@@ -115,6 +115,13 @@ public class Ide extends CustomComponent {
 		menuBar = new MenuBar();
 		menuBar.setWidth("100%");
 		MenuItem userMenu = menuBar.addItem(editorUser.getName(), null, null);
+		userMenu.addItem("Leave project", new Command() {
+			@Override
+			public void menuSelected(MenuItem selectedItem) {
+				String path = getUI().getPage().getLocation().getPath();
+				getUI().getPage().open(path, "Lobby");
+			}
+		});
 		userMenu.addItem("Log out", new Command() {
 			@Override
 			public void menuSelected(MenuItem selectedItem) {
@@ -170,6 +177,10 @@ public class Ide extends CustomComponent {
 
 	public void setBelowEditorComponent(Component component) {
 		editorComponent.setBelowEditorComponent(component);
-	}	
+	}
+	
+	public Component getBelowEditorComponent() {
+		return editorComponent.getBelowEditorComponent();
+	}
 
 }

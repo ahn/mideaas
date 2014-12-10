@@ -1,5 +1,6 @@
 package org.vaadin.mideaas.app;
 
+import org.vaadin.mideaas.app.test.MideaasTest;
 import org.vaadin.mideaas.ide.MideaasEditorPlugin;
 import org.vaadin.mideaas.ide.model.SharedProject;
 

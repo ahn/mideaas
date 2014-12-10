@@ -1,33 +1,31 @@
 package org.vaadin.mideaas.app.maven;
 
-import java.io.File;
+import java.net.URI;
 
-import javax.servlet.http.HttpServletRequest;
-
-import org.vaadin.mideaas.app.VaadinProject;
-import org.vaadin.mideaas.ide.IdeUser;
+import org.vaadin.mideaas.app.maven.JettyServer.JettyServerListener;
+import org.vaadin.mideaas.app.maven.JettyServer.JettyStatus;
 
 import com.vaadin.server.ExternalResource;
-import com.vaadin.server.VaadinServletService;
+import com.vaadin.server.Page;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Link;
-import com.vaadin.ui.Notification;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.VerticalLayout;
 
 import fi.jasoft.qrcode.QRCode;
 
 @SuppressWarnings("serial")
-public class JettyComponent extends CustomComponent {
+public class JettyComponent extends CustomComponent implements JettyServerListener {
 
 	
 
-	private final VaadinProject project;
-	private final String contextPath;
-	private final IdeUser user;
+	private final JettyServer server;
+	
+	// TODO: common log for all
+	// Now, only the UI that started the build sees it.
 	private final LogView logView = new LogView();
 
 	private VerticalLayout layout = new VerticalLayout();
@@ -39,27 +37,63 @@ public class JettyComponent extends CustomComponent {
 	private Label statusLabel = new Label();
 	private Link link = new Link("Link To App", null);
 
-	private Integer port = null;
 	private QRCode qrCode = new QRCode();
 
-
-
-	public JettyComponent(VaadinProject project, IdeUser user) {
+	public JettyComponent(JettyServer server) {
 		super();
-		this.project = project;
-		this.user = user;
-		this.contextPath = JettyUtil.contextPathFor(project);
+		this.server = server;
 		Panel p = new Panel("Jetty Server");
 		p.setContent(layout);
 		layout.setMargin(true);
 		setCompositionRoot(p);
 	}
 
+	
+	
+	private void drawServerStatus(JettyStatus status) {
+		if (status.status == JettyServer.Status.STOPPED) {
+			drawServerStopped();
+		}
+		else if (status.status == JettyServer.Status.RUNNING) {
+			drawServerRunning(status);
+		}
+	}
+
+	private void drawServerStopped() {
+		startButton.setEnabled(true);
+		stopButton.setEnabled(false);
+		statusLabel.setValue(null);
+		link.setVisible(false);
+		qrCode.setVisible(false);
+	}
+
+	private void drawServerRunning(JettyStatus status) {
+		startButton.setEnabled(false);
+		stopButton.setEnabled(true);
+		statusLabel.setValue("Running");
+		
+		String url = getServerUrl() + ":" + status.port + server.getContextPath() + "/";
+		link.setResource(new ExternalResource(url));
+		link.setTargetName("_blank");
+		link.setVisible(true);
+		
+		qrCode.setValue(url);
+		qrCode.setVisible(true);
+	}
+
 	@Override
 	public void attach() {
 		super.attach();
-
 		buildLayout();
+		drawServerStatus(server.getStatus());
+		server.addListener(this);
+	}
+	
+	@Override
+	public void detach() {
+		super.detach();
+		
+		server.removeListener(this);
 	}
 
 	private void buildLayout() {		
@@ -81,64 +115,35 @@ public class JettyComponent extends CustomComponent {
 			@Override
 			public void buttonClick(ClickEvent event) {
 				logView.clear();
-				startJetty();
+				server.start(logView);
 			}
 		});
-	
 	
 		stopButton.addClickListener(new Button.ClickListener(){;
 			@Override
 			public void buttonClick(ClickEvent event) {
 				logView.clear();
-				stopJetty();
+				server.stop(logView);
+			}
+		});
+	}
+
+
+
+	@Override
+	public void jettyServerStatusChanged(final JettyStatus status) {
+		getUI().access(new Runnable() {
+			
+			@Override
+			public void run() {
+				drawServerStatus(status);
 			}
 		});
 	}
 	
-	private void startJetty() {
-		File pomXml = project.getPomXmlFile();
-		
-		String target = MavenUtil.targetDirFor(user);
-		port = JettyUtil.runJetty(pomXml, contextPath, target, logView);
-		
-		if (port < 0) {
-			Notification.show("Could not start Jetty", Notification.Type.ERROR_MESSAGE);
-		}
-
-		startButton.setEnabled(false);
-		stopButton.setEnabled(true);
-		statusLabel.setValue("Running");
-		
-		String uri = getServer() + ":" + port + contextPath + "/";
-		link.setResource(new ExternalResource(uri));
-		link.setVisible(true);
-		
-		qrCode.setValue(uri);
-		qrCode.setVisible(true);
-	}
-	
-	private static String getServer() {
-		HttpServletRequest request = VaadinServletService.getCurrentServletRequest();
-		return (request.isSecure() ? "https://" : "http://") + request.getServerName();
-	}
-
-	private void stopJetty() {
-		
-		if (port==null) {
-			return; // XXX
-		}
-		
-
-		File pomXml = project.getPomXmlFile();
-		
-		JettyUtil.stopJetty(port,pomXml,contextPath, logView);
-		
-
-		startButton.setEnabled(true);
-		stopButton.setEnabled(false);
-		statusLabel.setValue(null);
-		link.setVisible(false);
-		qrCode.setVisible(false);
+	private static String getServerUrl() {
+		URI loc = Page.getCurrent().getLocation();
+		return loc.getHost();
 	}
 	
 }

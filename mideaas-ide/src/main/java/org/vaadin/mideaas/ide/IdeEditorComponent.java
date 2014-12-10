@@ -77,6 +77,10 @@ public class IdeEditorComponent extends CustomComponent {
 		setCompositionRoot(split);
 	}
 
+	public Component getBelowEditorComponent() {
+		return below;
+	}
+
 	
 
 }

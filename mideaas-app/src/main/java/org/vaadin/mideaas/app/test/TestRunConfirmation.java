@@ -1,4 +1,4 @@
-package org.vaadin.mideaas.app;
+package org.vaadin.mideaas.app.test;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -7,19 +7,15 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import org.vaadin.mideaas.app.model.Server;
-import org.vaadin.mideaas.app.model.ServerContainer;
-import org.vaadin.mideaas.app.model.XmlRpcContact;
-import org.vaadin.mideaas.app.test.MideaasTest;
-import org.vaadin.mideaas.app.test.Script;
-import org.vaadin.mideaas.app.test.ScriptContainer;
+import org.vaadin.mideaas.app.MideaasConfig;
+import org.vaadin.mideaas.app.VaadinProject;
 
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.HorizontalLayout;
-import com.vaadin.ui.Panel;
 import com.vaadin.ui.Label;
+import com.vaadin.ui.Panel;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
@@ -37,7 +33,7 @@ public class TestRunConfirmation extends Window {
     final com.vaadin.ui.TextField textRuntimes = new com.vaadin.ui.TextField("Run # of times");
     final com.vaadin.ui.ComboBox cmbServer = new com.vaadin.ui.ComboBox("XMLRPC Server");
 	
-	protected Window newWindow(HashSet<Object> rows, final MideaasTest mideaasTest, final String projectName){
+	protected Window newWindow(HashSet<Object> rows, final MideaasTest mideaasTest, final VaadinProject project){
 		markedRows.addAll(rows);
 		
 		//the test confirmation window
@@ -122,7 +118,7 @@ public class TestRunConfirmation extends Window {
 					map.put("tolerance", (String)textTolerance.getValue());
 					map.put("runtimes", (String)textRuntimes.getValue());
 					
-					XmlRpcContact.executeParallelTests((String)cmbServer.getValue(), map, MideaasConfig.getExecutorNumber(), mideaasTest, projectName);
+					XmlRpcContact.executeParallelTests((String)cmbServer.getValue(), map, MideaasConfig.getExecutorNumber(), mideaasTest, project);
 					UI.getCurrent().removeWindow(confirmTests);
 				}
 			}

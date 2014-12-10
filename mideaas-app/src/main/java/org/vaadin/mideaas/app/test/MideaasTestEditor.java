@@ -1,4 +1,4 @@
-package org.vaadin.mideaas.app;
+package org.vaadin.mideaas.app.test;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -10,7 +10,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+import org.vaadin.mideaas.app.VaadinProject;
+
 import com.vaadin.ui.Button;
+import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.HorizontalLayout;
@@ -18,16 +21,6 @@ import com.vaadin.ui.Notification;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
-import com.vaadin.ui.Button.ClickEvent;
-
-
-
-
-import org.vaadin.mideaas.app.model.Server;
-import org.vaadin.mideaas.app.model.ServerContainer;
-import org.vaadin.mideaas.app.test.MideaasTest;
-import org.vaadin.mideaas.app.test.Script;
-import org.vaadin.mideaas.app.test.ScriptContainer;
 
 public class MideaasTestEditor extends CustomComponent {
 	
@@ -44,7 +37,7 @@ public class MideaasTestEditor extends CustomComponent {
     String savemode;
     Set<?> selection;
 	
-	public Window createEditor(String save, Set<?> newSelection, final MideaasTest mideaastest, final String projectName) {
+	public Window createEditor(String save, Set<?> newSelection, final MideaasTest mideaastest, final VaadinProject project) {
     	
 		savemode = save;
 		selection = newSelection;
@@ -116,7 +109,7 @@ public class MideaasTestEditor extends CustomComponent {
             		
             					//write test into a file
             					try {
-            						File path = new File(MideaasConfig.getProjectsDir() + "/" + projectName + "/" + textLocation.getValue());
+            						File path = new File(project.getProjectDir() + "/" + textLocation.getValue());
             						path.mkdirs();
             						File file = new File(path.getAbsolutePath() + "/" + textName.getValue() + ".txt");
             						System.out.println(file);
@@ -155,7 +148,7 @@ public class MideaasTestEditor extends CustomComponent {
             					//write test into a file
             					try {
             						System.out.println("testing");
-            						File path = new File(MideaasConfig.getProjectsDir() + "/" + projectName + "/" + textLocation.getValue());
+            						File path = new File(project.getProjectDir() + "/" + textLocation.getValue());
             						path.mkdirs();
             						File file = new File(path.getAbsolutePath() + "/" + textName.getValue() + ".txt");
             						System.out.println(file);
@@ -201,7 +194,7 @@ public class MideaasTestEditor extends CustomComponent {
         return editwindow;
 	}
 	
-	public Window editTest(String save, Set<?> newSelection, String projectName) {
+	public Window editTest(String save, Set<?> newSelection, VaadinProject project) {
     		// Open the subwindow by adding it to the parent
 			// window
     		if (editwindow.getParent() == null) {
@@ -216,7 +209,7 @@ public class MideaasTestEditor extends CustomComponent {
     				textDescription.setValue(item.getDescription());
     				cmbEngine.setValue(item.getEngine());
     				
-    				String path = MideaasConfig.getProjectsDir() + "/" + projectName + "/" + textLocation.getValue() + textName.getValue() + ".txt"; //TODO: project name needs to be dynamic
+    				String path = project.getProjectDir() + "/" + textLocation.getValue() + textName.getValue() + ".txt"; //TODO: project name needs to be dynamic
     				BufferedReader br = new BufferedReader(new FileReader(path));
     			    try {
     			        StringBuilder sb = new StringBuilder();

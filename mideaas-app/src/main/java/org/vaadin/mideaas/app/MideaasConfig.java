@@ -194,9 +194,6 @@ public class MideaasConfig {
 		return d==null ? null : new File(d);
 	}
 	
-	public static File getProjectsDir() {
-		return new File(MideaasConfig.getProperty(Prop.PROJECTS_DIR));
-	}
 	
 	public static String getFNTSServers() {
 		String servers = MideaasConfig.getProperty(Prop.FNTS_SERVERS);
@@ -214,10 +211,7 @@ public class MideaasConfig {
 	
 	public static void checkProperties(File f) {
 		
-		
-		if (!getProjectsDir().isDirectory()) {
-			throw new ConfigError(f, Prop.PROJECTS_DIR + " does not exist: " + getProjectsDir());
-		}
+
 		
 		
 		File logDir = getLogDir();

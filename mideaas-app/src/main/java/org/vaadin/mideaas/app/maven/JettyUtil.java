@@ -5,8 +5,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringWriter;
 import java.nio.file.Files;
-import java.nio.file.OpenOption;
-import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.util.Arrays;
 import java.util.List;
@@ -29,6 +27,13 @@ import org.xml.sax.SAXException;
 import com.vaadin.ui.Notification;
 
 public class JettyUtil {
+	
+	@SuppressWarnings("serial")
+	public static class JettyException extends RuntimeException {
+		public JettyException(String msg) {
+			super(msg);
+		}
+	}
 	
 	private static final List<String> GOAL_JETTY_RUN = Arrays
 			.asList(new String[] { "jetty:stop", "jetty:run" });
@@ -135,7 +140,7 @@ public class JettyUtil {
 	synchronized public static void stopJetty(int port, File pomXml, String contextPath, LogListener listener) {
 		Integer stopPort = portsInUse.remove(port);
 		if (stopPort==null) {
-			throw new IllegalArgumentException("No Jetty running in port "+port+" (that I know of...)");
+			throw new JettyException("No Jetty running in port "+port+" (that I know of...)");
 		}
 		portsAvailable.add(port);
 		stopPortsAvailable.add(stopPort);

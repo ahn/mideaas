@@ -1,4 +1,4 @@
-package org.vaadin.mideaas.app.model;
+package org.vaadin.mideaas.app.test;
 
 import java.net.URL;
 import java.util.HashMap;
@@ -6,8 +6,7 @@ import java.util.Map;
 
 import org.apache.xmlrpc.client.XmlRpcClient;
 import org.apache.xmlrpc.client.XmlRpcClientConfigImpl;
-import org.vaadin.mideaas.app.test.MideaasTest;
-import org.vaadin.mideaas.app.test.ScriptContainer;
+import org.vaadin.mideaas.app.VaadinProject;
 
 public class XmlRpcRunnable implements Runnable {
 	private final String server;
@@ -16,7 +15,7 @@ public class XmlRpcRunnable implements Runnable {
 	private final Map<String, String> map;
 	private final int i; 
 	private final MideaasTest mideaasTest;
-	private final String projectName;
+	private final VaadinProject project;
 	
 	XmlRpcRunnable(String server, String testName, String script, Map<String, String> map, int i, MideaasTest mideaasTest) {
 		this.server = server;
@@ -26,7 +25,7 @@ public class XmlRpcRunnable implements Runnable {
 		this.i = i;
 		System.out.println(this.map.toString());
 		this.mideaasTest = mideaasTest;
-		this.projectName = mideaasTest.getProjectName();
+		this.project = mideaasTest.getProject();
 	}
 	
 	@Override
@@ -46,7 +45,7 @@ public class XmlRpcRunnable implements Runnable {
 			result = client.execute("executeTestCase", new Object[] {newmap});
 			
 			for(String test : this.testName.split(", ")){
-				ScriptContainer.updateResult((HashMap<String, String>) result, test, this.projectName);
+				ScriptContainer.updateResult((HashMap<String, String>) result, test, this.project);
 			}
 			
 			mideaasTest.updateTable();
@@ -72,7 +71,7 @@ public class XmlRpcRunnable implements Runnable {
 		}
 		newmap.remove("testCaseName");
 		newmap.put("testCaseName", name);
-		newmap.put("projectName", this.projectName);
+		newmap.put("projectName", this.project.getName());
 		newmap.put("scriptNames", testName);  	// script file names
 		newmap.put("script", this.script);	// the test script
 		

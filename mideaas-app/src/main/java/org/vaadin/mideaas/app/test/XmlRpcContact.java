@@ -1,4 +1,4 @@
-package org.vaadin.mideaas.app.model;
+package org.vaadin.mideaas.app.test;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -15,9 +15,7 @@ import java.util.concurrent.Executors;
 import org.apache.xmlrpc.client.XmlRpcClient;
 import org.apache.xmlrpc.client.XmlRpcClientConfigImpl;
 import org.vaadin.mideaas.app.MideaasConfig;
-import org.vaadin.mideaas.app.test.MideaasTest;
-import org.vaadin.mideaas.app.test.Script;
-import org.vaadin.mideaas.app.test.ScriptContainer;
+import org.vaadin.mideaas.app.VaadinProject;
 
 import com.vaadin.ui.Notification;
 
@@ -60,7 +58,7 @@ public class XmlRpcContact {
 		return result;
 	}
 	
-	public static void executeParallelTests(String server, Map<String, String> map, int NTHREADS, final MideaasTest mideaasTest, String projectName) {
+	public static void executeParallelTests(String server, Map<String, String> map, int NTHREADS, final MideaasTest mideaasTest, VaadinProject project) {
 		/*
 		 * the executor runs all the tests in separate threads, making better use of FNTS
 		 * this way the page doesn't have to hang until the tests have been executed, they will be reported the instant
@@ -70,7 +68,7 @@ public class XmlRpcContact {
 		List<String> list = Arrays.asList(map.get("scriptNames").split("\\s*,\\s*"));
 		map.remove("scriptNames");
 		
-		List<HashMap<String, String>> blocks = CreateTestBlocks(list, projectName);
+		List<HashMap<String, String>> blocks = CreateTestBlocks(list, project);
 		
 		//commented just in case it's needed for some reason
 		/*if (list.size()/NTHREADS > 1) {
@@ -155,13 +153,13 @@ public class XmlRpcContact {
 	}
 	
 	
-	public static String getScriptFromFile(String scriptName, String projectName) {
+	public static String getScriptFromFile(String scriptName, VaadinProject project) {
 		System.out.println(scriptName);
 		Script item = ScriptContainer.getScriptFromContainer(scriptName);
 		System.out.println(item.toString());
 		String script = "";
 		try {
-			String path = MideaasConfig.getProjectsDir() + "/" + projectName + "/" + item.getLocation() + scriptName + ".txt"; //TODO: project name needs to be dynamic
+			String path = project.getProjectDir() + "/" + item.getLocation() + scriptName + ".txt"; //TODO: project name needs to be dynamic
 			BufferedReader br = new BufferedReader(new FileReader(path));
 			try {
 				StringBuilder sb = new StringBuilder();
@@ -187,7 +185,7 @@ public class XmlRpcContact {
 		return script;
 	}
 	
-	private static List<HashMap<String, String>> CreateTestBlocks(List<String> list, String projectName) {
+	private static List<HashMap<String, String>> CreateTestBlocks(List<String> list, VaadinProject project) {
 		Script script;
 		String engine;
 		boolean engineFound = false;
@@ -224,7 +222,7 @@ public class XmlRpcContact {
 			
 			if (maps.size() == 1){
 				System.out.println("testing if we get through");
-				maps.get(0).put("script", getScriptFromFile(maps.get(0).get("scriptNames"), projectName));
+				maps.get(0).put("script", getScriptFromFile(maps.get(0).get("scriptNames"), project));
 			}
 		}
 		System.out.println(maps);

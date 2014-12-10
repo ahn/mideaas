@@ -1,6 +1,5 @@
 package org.vaadin.mideaas.app;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -14,20 +13,24 @@ import org.vaadin.mideaas.app.git.GitHubLoginView;
 import org.vaadin.mideaas.app.maven.BuildComponent;
 import org.vaadin.mideaas.app.maven.Builder;
 import org.vaadin.mideaas.app.maven.JettyComponent;
+import org.vaadin.mideaas.app.maven.JettyUtil;
+import org.vaadin.mideaas.app.maven.MavenCommand;
+import org.vaadin.mideaas.app.test.TestCommand;
 import org.vaadin.mideaas.ide.DefaultIdeConfiguration;
 import org.vaadin.mideaas.ide.Ide;
 import org.vaadin.mideaas.ide.IdeLobbyView;
 import org.vaadin.mideaas.ide.IdeLoginView;
 import org.vaadin.mideaas.ide.IdeProject;
-import org.vaadin.mideaas.ide.IdeUtil;
 
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Button.ClickListener;
 import com.vaadin.ui.Component;
+import com.vaadin.ui.Label;
 import com.vaadin.ui.MenuBar;
 import com.vaadin.ui.MenuBar.Command;
 import com.vaadin.ui.MenuBar.MenuItem;
+import com.vaadin.ui.VerticalLayout;
 
 public class MideaasIdeConfiguration extends DefaultIdeConfiguration {
 
@@ -48,8 +51,12 @@ public class MideaasIdeConfiguration extends DefaultIdeConfiguration {
 		
 		if (ide.getProject() instanceof VaadinProject) {
 			VaadinProject vp = (VaadinProject) ide.getProject();
-			components.add(new BuildComponent(vp.getBuilder(), ide.getUser(), userSettings));
-			components.add(new JettyComponent(vp, ide.getUser()));
+			if (vp.getBuilder() != null) {
+				components.add(new BuildComponent(vp.getBuilder(), ide.getUser(), userSettings));
+			}
+			if (vp.getJettyServer() != null) {
+				components.add(new JettyComponent(vp.getJettyServer()));
+			}
 		}
 		
 		ide.addSideBarComponents(components);
@@ -57,31 +64,70 @@ public class MideaasIdeConfiguration extends DefaultIdeConfiguration {
 	
 	private void addMenuBarComponents(final Ide ide) {
 		MenuBar menuBar = ide.getMenuBar();
-		MenuItem menu = menuBar.addItem("Moi", null);
-		menu.addItem("Show some component", new Command() {
+		
+		
+		if (ide.getProject() instanceof VaadinProject) {
+			VaadinProject vp = (VaadinProject) ide.getProject();
+			addBuildMenu(menuBar, vp);
+			addTestMenu(menuBar, vp);
+			addDeployMenu(menuBar, vp, ide);
+		}
+	}
+
+	@SuppressWarnings("serial")
+	private void addDeployMenu(MenuBar menuBar, VaadinProject vp, final Ide ide) {
+		MenuItem menu = menuBar.addItem("Deploy", null);
+		menu.addItem("Deploy...", new Command() {
 			@Override
 			public void menuSelected(MenuItem selectedItem) {
-				ide.setBelowEditorComponent(createBelowEditorComponent("comp1", ide), 100);
-			}
-		});
-		menu.addItem("Show another component", new Command() {
-			@Override
-			public void menuSelected(MenuItem selectedItem) {
-				ide.setBelowEditorComponent(createBelowEditorComponent("comp2", ide), 100);
+				ide.setBelowEditorComponent(createBelowEditorComponent(ide), 100);
 			}
 		});
 	}
-
-	private Component createBelowEditorComponent(String text, final Ide ide) {
-		Button b = new Button("Close " + text);
+	
+	@SuppressWarnings("serial")
+	private Component createBelowEditorComponent(final Ide ide) {
+		VerticalLayout la = new VerticalLayout();
+		la.addComponent(new Label("TODO: deploy"));
+		Button b = new Button("Close");
 		b.addClickListener(new ClickListener() {
 			@Override
 			public void buttonClick(ClickEvent event) {
 				ide.setBelowEditorComponent(null);
 			}
 		});
-		return b;
+		la.addComponent(b);
+		return la;
 	}
+
+
+	private void addTestMenu(MenuBar menuBar, VaadinProject project) {
+		MenuItem root = menuBar.addItem("Tests", null);
+		root.addItem("Run tests...", new TestCommand(project));
+	}
+
+	@SuppressWarnings("serial")
+	private void addBuildMenu(MenuBar menuBar, final VaadinProject project) {
+		MenuItem menu = menuBar.addItem("Build", null);
+		final Builder builder = project.getBuilder();
+		menu.addItem("Compile widgetset", new MavenCommand(builder, new String[] {"vaadin:update-widgetset", "vaadin:compile"}));
+		menu.addItem("Clean", new MavenCommand(builder, new String[] {"clean"}));
+		
+		menu.addItem("Stop all Jetty servers", new Command() {
+			@Override
+			public void menuSelected(MenuItem selectedItem) {
+				JettyUtil.stopAllJettys();
+			}
+		});
+		
+		menu.addItem("Update classpath", new Command() {
+			@Override
+			public void menuSelected(MenuItem selectedItem) {
+				project.refreshClasspath();
+			}
+		});
+	}
+
 
 	@Override
 	public IdeProject createProject(String id, String name, Map<String, String> files) {

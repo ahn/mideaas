@@ -37,8 +37,7 @@ public class BuildComponent extends CustomComponent implements BuildListener {
 	private VerticalLayout resultLayout = new VerticalLayout();
 	private Embedded loadingImg = new Embedded(null, Icons.LOADING_INDICATOR);
 
-	private static final List<String> GOALS_PACKAGE = Arrays
-			.asList(new String[] { "vaadin:update-widgetset", "vaadin:compile", "package" });
+	private static final List<String> GOALS_PACKAGE = Arrays.asList(new String[] { "package" });
 
 
 	public BuildComponent(Builder builder, IdeUser user, final UserSettings userSettings) {

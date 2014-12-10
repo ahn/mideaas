@@ -3,17 +3,24 @@ package org.vaadin.mideaas.app;
 import java.io.File;
 import java.io.IOException;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.vaadin.aceeditor.Suggester;
 import org.vaadin.mideaas.app.java.JavaErrorChecker;
 import org.vaadin.mideaas.app.java.JavaSuggester;
 import org.vaadin.mideaas.app.java.util.CompilingService;
 import org.vaadin.mideaas.app.maven.Builder;
+import org.vaadin.mideaas.app.maven.JettyServer;
+import org.vaadin.mideaas.app.maven.JettyUtil;
 import org.vaadin.mideaas.app.maven.MavenUtil;
 import org.vaadin.mideaas.editor.AsyncErrorChecker;
 import org.vaadin.mideaas.ide.IdeDoc;
 import org.vaadin.mideaas.ide.IdeProject;
 import org.vaadin.mideaas.ide.IdeProjectSnapshot;
 import org.vaadin.mideaas.ide.IdeUser;
+
+import com.vaadin.server.VaadinServletService;
+import com.vaadin.ui.Component;
 
 
 public class VaadinProject extends IdeProject {
@@ -23,6 +30,7 @@ public class VaadinProject extends IdeProject {
 	private final CompilingService compiler;
 	
 	private final Builder builder;
+	private final JettyServer jettyServer;
 
 	/**
 	 * Storing written files so we can avoid writing files that have not been changed.
@@ -37,16 +45,29 @@ public class VaadinProject extends IdeProject {
 		super(id, name, new VaadinProjectCustomizer());
 		this.dir = dir;
 		System.out.println("new VaadinProject(" + name + ") -- dir: " + this.dir);
+		try {
+			// Have to write the project to disk for compiler and jetty server
+			writeToDisk();
+		} catch (IOException e) {
+			e.printStackTrace();
+			System.err.println("WARNING: Could not write VaadinProject to disk!");
+		}
 		compiler = new CompilingService(this);
 		builder = new Builder(this);
+		jettyServer = new JettyServer(getPomXmlFile(), JettyUtil.contextPathFor(this));
 	}
-
-	public String getClassPath() {
-		return MavenUtil.getClassPath(dir);
-	}
+//
+//	public String getClassPath() {
+//		return MavenUtil.getClassPath(dir);
+//		compiler.setClassPath(MavenUtil.getClassPath(dir));
+//	}
 	
 	public Builder getBuilder() {
 		return builder;
+	}
+	
+	public JettyServer getJettyServer() {
+		return jettyServer;
 	}
 
 	public void addClasspathListener(ClasspathListener li) {
@@ -105,5 +126,22 @@ public class VaadinProject extends IdeProject {
 		
 		return new JavaSuggester(pkg, compiler.getInMemoryCompiler(), doc, user.getEditorUser());
 	}
+
+	public void refreshClasspath() {
+		try {
+			writeToDisk();
+		} catch (IOException e) {
+			e.printStackTrace();
+			System.err.println("WARNING: could not write to disk when refreshing classpath at " + dir);
+			return;
+		}
+		String cp = MavenUtil.getClassPath(dir);
+		if (cp == null) {
+			System.err.println("WARNING: could not read classpath at " + dir);
+			return;
+		}
+		compiler.setClassPath(cp);
+	}
+
 
 }

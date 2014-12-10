@@ -6,7 +6,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
 
-import org.vaadin.mideaas.app.model.XmlTestWriter;
+import org.vaadin.mideaas.app.VaadinProject;
 
 import com.vaadin.data.util.BeanItemContainer;
 
@@ -49,7 +49,7 @@ public class ScriptContainer extends BeanItemContainer<Script> implements
         return c;
     }
     
-    public static ScriptContainer addTestToContainer(List testData, String projectName) {
+    public static ScriptContainer addTestToContainer(List testData, VaadinProject project) {
     	Script p = new Script();
     	
     	p.setName((String)testData.get(0));
@@ -61,7 +61,7 @@ public class ScriptContainer extends BeanItemContainer<Script> implements
         p.setNotes("This test has not been executed yet");
     	c.addItem(p);
     	
-    	XmlTestWriter.WriteTestsToXml(projectName);
+    	XmlTestWriter.WriteTestsToXml(project);
     
     	return c;
     }
@@ -108,7 +108,7 @@ public class ScriptContainer extends BeanItemContainer<Script> implements
     }
     
     
-    public static synchronized void updateResult(HashMap<String, String> map, String testName, String projectName) {
+    public static synchronized void updateResult(HashMap<String, String> map, String testName, VaadinProject project) {
     	for (Script p : c.getItemIds()) {
     		if (p.getName().equals(testName)) {
     			//found the correct test
@@ -124,7 +124,7 @@ public class ScriptContainer extends BeanItemContainer<Script> implements
     			break;	//no need to look for more tests
     		}
     	}
-    	XmlTestWriter.WriteTestsToXml(projectName);
+    	XmlTestWriter.WriteTestsToXml(project);
     }
     
     public static synchronized Script getScriptFromContainer(String scriptName) {
@@ -137,17 +137,17 @@ public class ScriptContainer extends BeanItemContainer<Script> implements
     	return item;
     }
     
-    public static synchronized void removeScriptFromContainer(String testName, String projectName) {
+    public static synchronized void removeScriptFromContainer(String testName, VaadinProject project) {
     	for (Script item : c.getAllItemIds()) {
     		if (item.getName().matches(testName)) {
     			c.removeItem(item);
     			break;
     		}
     	}
-    	XmlTestWriter.WriteTestsToXml(projectName);
+    	XmlTestWriter.WriteTestsToXml(project);
     }
     
-    public static synchronized void updateScriptCheckValue(HashSet<Object> markedRows, String projectName) {
+    public static synchronized void updateScriptCheckValue(HashSet<Object> markedRows, VaadinProject project) {
     	for (Script item : c.getAllItemIds()) {
     		if (markedRows.contains(item.getName())) {
     			item.setCheck(true);
@@ -155,7 +155,7 @@ public class ScriptContainer extends BeanItemContainer<Script> implements
     			item.setCheck(false);
     		}
     	}
-    	XmlTestWriter.WriteTestsToXml(projectName);
+    	XmlTestWriter.WriteTestsToXml(project);
     }
 }
 
