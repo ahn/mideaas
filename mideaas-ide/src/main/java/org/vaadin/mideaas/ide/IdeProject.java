@@ -60,16 +60,7 @@ public class IdeProject {
 	public synchronized IdeDoc getDoc(String id) {
 		return docs.get(id);
 	}
-//	
-//	public IdeDoc putDoc(String id, IdeDoc doc) {
-//		IdeDoc d;
-//		synchronized(this) {
-//			d = docs.put(id, doc);
-//		}
-//		fireChanged();
-//		return d;
-//	}
-	
+
 	public IdeDoc putDoc(String id, String content) {
 		MultiUserDoc doc;
 		if (customizer != null) {

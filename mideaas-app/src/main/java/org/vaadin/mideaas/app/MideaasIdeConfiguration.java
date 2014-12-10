@@ -48,8 +48,7 @@ public class MideaasIdeConfiguration extends DefaultIdeConfiguration {
 		
 		if (ide.getProject() instanceof VaadinProject) {
 			VaadinProject vp = (VaadinProject) ide.getProject();
-			Builder builder = new Builder(vp, userSettings);
-			components.add(new BuildComponent(builder, ide.getUser()));
+			components.add(new BuildComponent(vp.getBuilder(), ide.getUser(), userSettings));
 			components.add(new JettyComponent(vp, ide.getUser()));
 		}
 		
@@ -88,19 +87,14 @@ public class MideaasIdeConfiguration extends DefaultIdeConfiguration {
 	public IdeProject createProject(String id, String name, Map<String, String> files) {
 		if (files.containsKey("pom.xml")) { // TODO: more detailed check
 			try {
-				return new VaadinProject(id, name, createProjectDir(files));
+				Path dir = Files.createTempDirectory("mideaas-vaadin-");
+				return new VaadinProject(id, name, dir.toFile());
 			} catch (IOException e) {
 				e.printStackTrace();
 				System.err.println("Could not create VaadinProject for the above reason");
 			}
 		}
 		return super.createProject(id, name, files);
-	}
-
-	private static File createProjectDir(Map<String, String> files) throws IOException {
-		Path path = Files.createTempDirectory("mideaas-vaadin");
-		IdeUtil.saveFilesToPath(files, path);
-		return path.toFile();
 	}
 	
 	@Override

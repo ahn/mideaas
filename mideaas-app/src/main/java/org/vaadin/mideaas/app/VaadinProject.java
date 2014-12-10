@@ -7,10 +7,9 @@ import org.vaadin.aceeditor.Suggester;
 import org.vaadin.mideaas.app.java.JavaErrorChecker;
 import org.vaadin.mideaas.app.java.JavaSuggester;
 import org.vaadin.mideaas.app.java.util.CompilingService;
-import org.vaadin.mideaas.app.java.util.InMemoryCompiler;
+import org.vaadin.mideaas.app.maven.Builder;
 import org.vaadin.mideaas.app.maven.MavenUtil;
 import org.vaadin.mideaas.editor.AsyncErrorChecker;
-import org.vaadin.mideaas.editor.SharedDoc;
 import org.vaadin.mideaas.ide.IdeDoc;
 import org.vaadin.mideaas.ide.IdeProject;
 import org.vaadin.mideaas.ide.IdeProjectSnapshot;
@@ -22,6 +21,8 @@ public class VaadinProject extends IdeProject {
 	private final File dir;
 	
 	private final CompilingService compiler;
+	
+	private final Builder builder;
 
 	/**
 	 * Storing written files so we can avoid writing files that have not been changed.
@@ -37,10 +38,15 @@ public class VaadinProject extends IdeProject {
 		this.dir = dir;
 		System.out.println("new VaadinProject(" + name + ") -- dir: " + this.dir);
 		compiler = new CompilingService(this);
+		builder = new Builder(this);
 	}
 
 	public String getClassPath() {
 		return MavenUtil.getClassPath(dir);
+	}
+	
+	public Builder getBuilder() {
+		return builder;
 	}
 
 	public void addClasspathListener(ClasspathListener li) {

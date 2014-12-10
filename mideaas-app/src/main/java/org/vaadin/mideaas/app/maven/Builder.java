@@ -15,21 +15,38 @@ import org.vaadin.mideaas.app.maven.MavenTask.LogListener;
 public class Builder {
 
 	public interface BuildListener {
-		public void buildStarted(List<String> goals);
-		public void buildFinished(boolean success);
-		public void buildCancelled();
+		public void buildStatusChanged(BuildStatus status);
 	}
+	
+	public enum Status {
+		NEVER_RAN,
+		RUNNING,
+		CANCELLED, // TODO CANCELLED not used
+		SUCCEEDED,
+		FAILED
+	}
+	
+	public class BuildStatus {
+		public final Status status;
+		public final String errorMessage;
+		public final List<String> goals;
+		private BuildStatus(Status status, String errorMessage, List<String> goals) {
+			this.status = status;
+			this.errorMessage = errorMessage;
+			this.goals = goals;
+		}
+	}
+	
+	private BuildStatus status = new BuildStatus(Status.NEVER_RAN, null, null);
 
 	private ExecutorService executor = Executors.newSingleThreadExecutor();
 	private MavenTask task;
 
 	private final VaadinProject project;
-	private final UserSettings settings;
 	private CopyOnWriteArrayList<BuildListener> listeners = new CopyOnWriteArrayList<>();
 
-	public Builder(VaadinProject project, UserSettings settings) {
+	public Builder(VaadinProject project) {
 		this.project = project;
-		this.settings = settings;
 	}
 	
 	public synchronized void addBuildListener(BuildListener li) {
@@ -39,37 +56,48 @@ public class Builder {
 	public synchronized void removeBuildListener(BuildListener li) {
 		listeners.remove(li);
 	}
+	
+	public synchronized BuildStatus getStatus() {
+		return status;
+	}
 
-	public void build(List<String> goals, String buildDir, LogListener listener) {	
-		System.out.println("BUILD! " + goals +" - " + buildDir);
-		String writeError = null;
-		fireBuildStarted(goals);
+	public void build(List<String> goals, String buildDir, UserSettings settings, LogListener listener) {
 		synchronized (this) {
-			writeError = writeToDisk();
-			if (writeError==null) {
-				doBuild(goals, buildDir, "safari" /* TODO  */, listener);
+			if (status.status == Status.RUNNING) {
 				return;
 			}
 		}
-		fireBuildFinished(false);
+		System.out.println("BUILD! " + goals +" - " + buildDir);
+		setStatus(new BuildStatus(Status.RUNNING, null, goals));
+		synchronized (this) {
+			try {
+				project.writeToDisk();
+				doBuild(goals, buildDir, settings, listener);
+				return;
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+		setStatus(new BuildStatus(Status.FAILED, "File error", goals));
 	}
 	
-	
-	
-	private String writeToDisk() {
-		try {
-			project.writeToDisk();
-		} catch (IOException e) {
-			e.printStackTrace();
-			return e.getMessage();
+	private void setStatus(BuildStatus status) {
+		synchronized (this) {
+			this.status = status;
 		}
-		return null;
+		fireBuildStatusChanged(status);
 	}
 
-	private void doBuild(List<String> goals, String buildDir, String userAgent, LogListener listener) {
+	private void doBuild(final List<String> goals, String buildDir, UserSettings settings, LogListener listener) {
 		Properties props = new Properties();
 		props.setProperty("projectDirectory", project.getProjectDir().getAbsolutePath());
 		//compiles google appengine war
+		
+		// TODO: these settings are not taken into account in regular Vaadin apps!
+		// There's not mideaas.user.agent property in their pom.xml etc...
+		
+		String userAgent = settings.userAgent;
+		
 		if (settings.compileGae){
 			
 			//Downloads all the maven dependencies
@@ -98,22 +126,19 @@ public class Builder {
 			public void run() {
 				InvocationResult result = task.call();
 				boolean success = result != null && result.getExitCode() == 0;
-				fireBuildFinished(success);
+
+				if (success) {
+					setStatus(new BuildStatus(Status.SUCCEEDED, null, goals));
+				} else {
+					setStatus(new BuildStatus(Status.FAILED, "Failed", goals));
+				}
 			}
 		});
 	}
 	
-	private void fireBuildFinished(boolean success) {
-		// Doesn't need to fire in a different thread because this is always
-		// triggered by a background thread, never a Vaadin UI server visit.
+	private void fireBuildStatusChanged(BuildStatus status) {
 		for (BuildListener li : listeners) {
-			li.buildFinished(success);
-		}
-	}
-	
-	private void fireBuildStarted(List<String> goals) {
-		for (BuildListener li : listeners) {
-			li.buildStarted(goals);
+			li.buildStatusChanged(status);;
 		}
 	}
 
