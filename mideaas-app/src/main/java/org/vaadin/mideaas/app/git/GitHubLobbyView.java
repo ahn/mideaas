@@ -171,8 +171,10 @@ public class GitHubLobbyView extends CustomComponent implements IdeLobbyView {
 		ho.setMargin(true);
 
 		final TextField nameField = new TextField("Name:");
+		nameField.setValue("project");
 		final TextField urlField = new TextField("Git URL:");
 		urlField.setWidth("100%");
+		urlField.setValue("https://github.com/ahn/sampleapp.git");
 		Button b = new Button("Clone");
 		b.setWidth("100%");
 		b.addClickListener(new ClickListener() {
