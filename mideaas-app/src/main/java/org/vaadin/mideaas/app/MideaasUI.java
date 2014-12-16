@@ -6,12 +6,12 @@ import org.vaadin.mideaas.app.MideaasConfig.Prop;
 import org.vaadin.mideaas.app.maven.JettyUtil;
 import org.vaadin.mideaas.app.maven.MavenUtil;
 import org.vaadin.mideaas.ide.IdeConfiguration;
+import org.vaadin.mideaas.ide.IdeServlet;
 import org.vaadin.mideaas.ide.IdeUI;
 
 import com.vaadin.annotations.Theme;
 import com.vaadin.annotations.VaadinServletConfiguration;
 import com.vaadin.server.VaadinRequest;
-import com.vaadin.server.VaadinServlet;
 
 @Theme("mideaas")
 @SuppressWarnings("serial")
@@ -20,7 +20,11 @@ public class MideaasUI extends IdeUI
 
 	@WebServlet(value = "/*", asyncSupported = true)
     @VaadinServletConfiguration(productionMode = false, ui = MideaasUI.class, widgetset = "org.vaadin.mideaas.app.AppWidgetSet")
-    public static class Servlet extends VaadinServlet {}
+    public static class Servlet extends IdeServlet {
+		public Servlet() {
+			super(getProjects());
+		}
+	}
 	
 	private final UserSettings userSettings = MideaasConfig.getDefaultUserSettings();
 	static {
@@ -29,15 +33,11 @@ public class MideaasUI extends IdeUI
 	
 	@Override
 	public void init(VaadinRequest request) {
-		
 		IdeConfiguration config = createConfig();
 		super.init(request, config);
 	}
 	
-	
-
 	private IdeConfiguration createConfig() {
-//		return new DefaultIdeConfiguration();
 		return new MideaasIdeConfiguration(userSettings);
 	}
 	

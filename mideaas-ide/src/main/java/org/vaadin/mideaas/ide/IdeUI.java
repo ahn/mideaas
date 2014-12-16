@@ -115,7 +115,9 @@ public class IdeUI extends UI {
 		afterLoginNavigateTo = where;
 	}
 
-	
+	protected static ProjectContainer getProjects() {
+		return projects;
+	}
 
 	
 

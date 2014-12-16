@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Pattern;
 import java.util.TreeMap;
 
 import org.apache.commons.io.FileUtils;
@@ -18,6 +19,10 @@ import org.apache.commons.io.filefilter.IOFileFilter;
 public class IdeUtil {
 	
 	private static final Logger log = Logger.getLogger(IdeUtil.class.getName());
+	
+	public final static String RE_HEX = "[a-fA-f0-9-]";
+	public final static Pattern RE_URL_PROJECT = Pattern.compile("^("+RE_HEX+"+)/?$");
+	public final static Pattern RE_URL_FILE = Pattern.compile("^("+RE_HEX+"+)/(.+)$"); 
 
 	public static IdeProject createProject(String name, Map<String, String> contents, IdeConfiguration config, File workDir) {
 		IdeProject project = config.createProject(IdeProject.randomProjectId(), name, contents, workDir);

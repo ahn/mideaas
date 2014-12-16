@@ -40,6 +40,8 @@ public class FileList extends CustomComponent implements
 
 	private final Action ACTION_DELETE = new ShortcutAction("Delete file", ShortcutAction.KeyCode.DELETE, null);
 	private final Action ACTION_INSERT = new ShortcutAction("Add new...");
+	private final Action ACTION_OPEN_RAW = new ShortcutAction("View raw");
+	private final Action ACTION_OPEN_TAB = new ShortcutAction("Open in new tab", ShortcutAction.KeyCode.ENTER, null);
 
 	public FileList(IdeProject project, IdeConfiguration config) {
 		this.project = project;
@@ -177,13 +179,19 @@ public class FileList extends CustomComponent implements
 
 	@Override
 	public Action[] getActions(Object target, Object sender) {
-		return new Action[] { ACTION_INSERT, ACTION_DELETE };
+		String filename = (String) target;
+		if (filename != null && project.getDoc(filename) != null) {
+			return new Action[] { ACTION_INSERT, ACTION_DELETE, ACTION_OPEN_RAW, ACTION_OPEN_TAB };
+		}
+		else {
+			return new Action[] { ACTION_INSERT };
+		}
 	}
 
 	@Override
 	public void handleAction(Action action, Object sender, Object target) {
 		if (action == ACTION_DELETE) {
-			final String filename = (String) tree.getValue();
+			final String filename = (String) target;
 			if (filename == null || project.getDoc(filename) == null) {
 				return;
 			}
@@ -208,6 +216,20 @@ public class FileList extends CustomComponent implements
 			win.setContent(dac);
 			win.center();
 			getUI().addWindow(win);
+		}
+		else if (action == ACTION_OPEN_RAW) {
+			final String filename = (String) target;
+			if (filename == null || project.getDoc(filename) == null) {
+				return;
+			}
+			getUI().getPage().open("/raw/"+project.getId()+"/"+filename, "_blank");
+		}
+		else if (action == ACTION_OPEN_TAB) {
+			final String filename = (String) target;
+			if (filename == null || project.getDoc(filename) == null) {
+				return;
+			}
+			getUI().getPage().open("#!"+project.getId()+"/"+filename, "_blank");
 		}
 		
 	}

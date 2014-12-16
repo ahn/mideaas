@@ -25,5 +25,8 @@ public class IdeDoc {
 	public AceMode getAceMode() {
 		return mode;
 	}
+	public String getText() {
+		return doc.getBaseText();
+	}
 	
 }
