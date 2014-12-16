@@ -144,8 +144,8 @@ public class MideaasIdeConfiguration extends DefaultIdeConfiguration {
 	public IdeProject createProject(String id, String name, Map<String, String> files) {
 		if (files.containsKey("pom.xml")) { // TODO: more detailed check
 			try {
-				Path dir = Files.createTempDirectory("mideaas-vaadin-");
-				return new VaadinProject(id, name, dir.toFile());
+				
+				return new VaadinProject(id, name);
 			} catch (IOException e) {
 				e.printStackTrace();
 				System.err.println("Could not create VaadinProject for the above reason");

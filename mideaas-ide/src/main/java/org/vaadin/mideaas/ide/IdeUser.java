@@ -27,7 +27,7 @@ public class IdeUser {
 		return editorUser;
 	}
 
-	public static String randomId() {
+	public static String randomUserId() {
 		return UUID.randomUUID().toString();
 	}
 	

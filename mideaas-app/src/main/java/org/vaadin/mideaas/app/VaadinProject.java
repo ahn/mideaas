@@ -2,6 +2,8 @@ package org.vaadin.mideaas.app;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -17,48 +19,39 @@ import org.vaadin.mideaas.app.maven.MavenUtil;
 import org.vaadin.mideaas.editor.AsyncErrorChecker;
 import org.vaadin.mideaas.ide.IdeDoc;
 import org.vaadin.mideaas.ide.IdeProject;
+import org.vaadin.mideaas.ide.IdeProjectDir;
 import org.vaadin.mideaas.ide.IdeProjectSnapshot;
 import org.vaadin.mideaas.ide.IdeUser;
 
 
 public class VaadinProject extends IdeProject {
-	
-	private final File dir;
-	
+		
 	private final CompilingService compiler;
 	
 	private final Builder builder;
 	private final JettyServer jettyServer;
 
-	/**
-	 * Storing written files so we can avoid writing files that have not been changed.
-	 */
-	private IdeProjectSnapshot writtenSnapshot;
-
+	private final IdeProjectDir workDir;
+	
 	public interface ClasspathListener {
 		public void classpathChanged();
 	}
 
-	public VaadinProject(String id, String name, File dir) {
+	public VaadinProject(String id, String name) throws IOException {
 		super(id, name, new VaadinProjectCustomizer());
-		this.dir = dir;
-		System.out.println("new VaadinProject(" + name + ") -- dir: " + this.dir);
-		try {
-			// Have to write the project to disk for compiler and jetty server
-			writeToDisk();
-		} catch (IOException e) {
-			e.printStackTrace();
-			System.err.println("WARNING: Could not write VaadinProject to disk!");
-		}
+
+		workDir = createWorkDir();
+		// Have to write the project to disk for compiler and jetty server
+		workDir.writeToDisk();
+		
 		compiler = new CompilingService(this);
 		builder = new Builder(this);
 		jettyServer = new JettyServer(getPomXmlFile(), JettyUtil.contextPathFor(this));
 	}
-//
-//	public String getClassPath() {
-//		return MavenUtil.getClassPath(dir);
-//		compiler.setClassPath(MavenUtil.getClassPath(dir));
-//	}
+	
+	private IdeProjectDir createWorkDir() throws IOException {
+		return new IdeProjectDir(this, Files.createTempDirectory("mideaas-vaadin-").toFile());
+	}
 	
 	public Builder getBuilder() {
 		return builder;
@@ -83,32 +76,13 @@ public class VaadinProject extends IdeProject {
 		return s.replace("/", ".");
 	}
 
-	public void writeToDisk() throws IOException {
-		IdeProjectSnapshot written = getWrittenSnapshot();
-		IdeProjectSnapshot snapshot = getSnapshot();
-		if (written==null) {
-			snapshot.writeToDisk(dir.toPath());
-		}
-		else {
-			snapshot.writeChangedToDisk(dir.toPath(), written);
-		}
-		setWrittenSnapshot(snapshot);
-	}
 	
-	private synchronized IdeProjectSnapshot getWrittenSnapshot() {
-		return writtenSnapshot;
-	}
-	
-	private synchronized void setWrittenSnapshot(IdeProjectSnapshot snapshot) {
-		writtenSnapshot = snapshot;
-	}
-
-	public File getProjectDir() {
-		return dir;
+	public File getWorkDir() {
+		return workDir.getDir();
 	}
 
 	public File getPomXmlFile() {
-		return new File(dir, "pom.xml");
+		return new File(workDir.getDir(), "pom.xml");
 	}
 
 	@Override
@@ -130,12 +104,12 @@ public class VaadinProject extends IdeProject {
 			writeToDisk();
 		} catch (IOException e) {
 			e.printStackTrace();
-			System.err.println("WARNING: could not write to disk when refreshing classpath at " + dir);
+			System.err.println("WARNING: could not write to disk when refreshing classpath at " + workDir);
 			return;
 		}
-		String cp = MavenUtil.getClassPath(dir);
+		String cp = MavenUtil.getClassPath(workDir.getDir());
 		if (cp == null) {
-			System.err.println("WARNING: could not read classpath at " + dir);
+			System.err.println("WARNING: could not read classpath at " + workDir);
 			return;
 		}
 		compiler.setClassPath(cp);
@@ -157,5 +131,9 @@ public class VaadinProject extends IdeProject {
 	
 	public static boolean isJavaFile(String filename) {
 		return filename.startsWith("src/main/java/") && filename.endsWith(".java");
+	}
+
+	public void writeToDisk() throws IOException {
+		workDir.writeToDisk();
 	}
 }

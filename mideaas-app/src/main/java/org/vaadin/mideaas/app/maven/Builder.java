@@ -96,7 +96,7 @@ public class Builder {
 
 	private void doBuild(final List<String> goals, String buildDir, UserSettings settings, LogListener listener) {
 		Properties props = new Properties();
-		props.setProperty("projectDirectory", project.getProjectDir().getAbsolutePath());
+		props.setProperty("projectDirectory", project.getWorkDir().getAbsolutePath());
 		//compiles google appengine war
 		
 		// TODO: these settings are not taken into account in regular Vaadin apps!

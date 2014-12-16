@@ -103,7 +103,7 @@ public class XmlTestWriter{
 			TransformerFactory transformerFactory = TransformerFactory.newInstance();
 			Transformer transformer = transformerFactory.newTransformer();
 			DOMSource source = new DOMSource(doc);
-			StreamResult result = new StreamResult(new File(project.getProjectDir() + "/" + "TestDataStorage.xml"));
+			StreamResult result = new StreamResult(new File(project.getWorkDir() + "/" + "TestDataStorage.xml"));
 	 
 			// Output to console for testing
 			// StreamResult result = new StreamResult(System.out);
@@ -245,7 +245,7 @@ public class XmlTestWriter{
   	      		}
   	      	};
 
-  	      	File file = new File(project.getProjectDir() + "/" + "TestDataStorage.xml");	//TODO: needs changeable project name
+  	      	File file = new File(project.getWorkDir() + "/" + "TestDataStorage.xml");	//TODO: needs changeable project name
   	      	InputStream inputStream= new FileInputStream(file);
   	      	Reader reader = new InputStreamReader(inputStream,"UTF-8");
 

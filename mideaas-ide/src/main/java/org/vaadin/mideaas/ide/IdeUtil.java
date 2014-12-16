@@ -4,43 +4,24 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.StandardOpenOption;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.TreeMap;
-import java.util.UUID;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.filefilter.IOFileFilter;
 
 public class IdeUtil {
 
-//	private static MultiUserDoc customizedDoc(String filename, String content, ProjectCustomizer cust, IdeProject project) {
-//		Guard upGuard = cust.getUpwardsGuardFor(filename);
-//		Guard downGuard = cust.getDownwardsGuardFor(filename);
-//		Filter filter = cust.getFilterFor(filename);
-//		AsyncErrorChecker checker = cust.getErrorCheckerFor(filename, project);
-//		return new MultiUserDoc(new AceDoc(content), filter, upGuard, downGuard, checker);
-//	}
-//
-//	public static IdeDoc createDoc(String filename, String content, ProjectCustomizer customizer, IdeProject project) {
-//		MultiUserDoc doc = customizedDoc(filename, content, customizer, project);
-//		return new IdeDoc(doc, aceModeForFilename(filename));
-//	}
-
 	public static IdeProject createProject(String name, Map<String, String> contents, IdeConfiguration config) {
-		IdeProject project = config.createProject(UUID.randomUUID().toString(), name, contents);
+		IdeProject project = config.createProject(IdeProject.randomProjectId(), name, contents);
 		for (Entry<String, String> e : contents.entrySet()) {
 			project.putDoc(e.getKey(), e.getValue());
 		}
 		return project;
 	}
-//
-//	private static AceMode aceModeForFilename(String filename) {
-//		return AceMode.forFile(filename);
-//	}
 
 	public static Map<String, String> readContentsFromDir(File dir) {
 		int le = dir.getPath().length() + 1; // + 1 for the slash after dir

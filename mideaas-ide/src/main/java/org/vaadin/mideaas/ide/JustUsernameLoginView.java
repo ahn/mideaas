@@ -62,7 +62,7 @@ public class JustUsernameLoginView extends CustomComponent implements
 	public void buttonClick(ClickEvent event) {
 		String nick = usernameField.getValue();
 		if (nick != null && !nick.isEmpty()) {
-			IdeUser user = new IdeUser(IdeUser.randomId(), nick, null);
+			IdeUser user = new IdeUser(IdeUser.randomUserId(), nick, null);
 			((IdeUI) getUI()).logIn(user);
 		}
 	}

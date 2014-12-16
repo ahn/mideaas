@@ -3,6 +3,7 @@ package org.vaadin.mideaas.ide;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 import java.util.Map.Entry;
 import java.util.TreeMap;
 import java.util.TreeSet;
@@ -120,6 +121,9 @@ public class IdeProject {
 		return chat;
 	}
 
+	/**
+	 * can be overridden
+	 */
 	public void destroy() {
 		// Nothing for now...
 	}
@@ -148,6 +152,10 @@ public class IdeProject {
 	 */
 	public Suggester createSuggesterFor(String id, IdeUser user) {
 		return null;
+	}
+
+	public static String randomProjectId() {
+		return UUID.randomUUID().toString().substring(0,8);
 	}
 
 	
