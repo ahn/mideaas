@@ -143,12 +143,14 @@ public class MideaasIdeConfiguration extends DefaultIdeConfiguration {
 	public IdeProject createProject(String id, String name, Map<String, String> files, File workDir) {
 		if (files.containsKey("pom.xml")) { // TODO: more detailed check
 			try {
-				
 				return new VaadinProject(id, name, workDir);
 			} catch (IOException e) {
 				e.printStackTrace();
 				System.err.println("Could not create VaadinProject for the above reason");
 			}
+		}
+		else {
+			return new IdeProject(id, name, new WebProjectCustomizer());
 		}
 		return super.createProject(id, name, files, workDir);
 	}
