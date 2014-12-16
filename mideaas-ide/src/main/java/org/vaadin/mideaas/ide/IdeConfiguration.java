@@ -1,5 +1,6 @@
 package org.vaadin.mideaas.ide;
 
+import java.io.File;
 import java.util.Map;
 
 
@@ -35,9 +36,23 @@ public interface IdeConfiguration {
 	 * what kind of project to return based on the files.
 	 * @param name
 	 * @param files
+	 * @param workDir - may be null if there is no work dir
 	 * @return
 	 */
-	public IdeProject createProject(String id, String name, Map<String, String> files);
+	public IdeProject createProject(String id, String name, Map<String, String> files, File workDir);
 
-	public DocAdderComponent createDocAdderComponent();
+	/**
+	 * A component for adding new docs to project.
+	 * @param docAdder 
+	 */
+	public DocAdderComponent createDocAdderComponent(DocAdder docAdder);
+
+	/**
+	 * "Project files" are files that can be modified directly by user in the IDE.
+	 * They are shown in the file list.
+	 * 
+	 * When a project is loaded from disk, only project files are included in the project.
+	 */
+	public boolean isProjectFile(String filename);
+
 }

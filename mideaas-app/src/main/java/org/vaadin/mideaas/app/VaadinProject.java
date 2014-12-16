@@ -2,8 +2,6 @@ package org.vaadin.mideaas.app;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -19,7 +17,6 @@ import org.vaadin.mideaas.app.maven.MavenUtil;
 import org.vaadin.mideaas.editor.AsyncErrorChecker;
 import org.vaadin.mideaas.ide.IdeDoc;
 import org.vaadin.mideaas.ide.IdeProject;
-import org.vaadin.mideaas.ide.IdeProjectDir;
 import org.vaadin.mideaas.ide.IdeProjectSnapshot;
 import org.vaadin.mideaas.ide.IdeUser;
 
@@ -31,26 +28,21 @@ public class VaadinProject extends IdeProject {
 	private final Builder builder;
 	private final JettyServer jettyServer;
 
-	private final IdeProjectDir workDir;
+	
 	
 	public interface ClasspathListener {
 		public void classpathChanged();
 	}
 
-	public VaadinProject(String id, String name) throws IOException {
-		super(id, name, new VaadinProjectCustomizer());
+	public VaadinProject(String id, String name, File workDir) throws IOException {
+		super(id, name, new VaadinProjectCustomizer(), workDir);
 
-		workDir = createWorkDir();
 		// Have to write the project to disk for compiler and jetty server
-		workDir.writeToDisk();
+		//getWorkDirFile().writeToDisk();
 		
 		compiler = new CompilingService(this);
 		builder = new Builder(this);
 		jettyServer = new JettyServer(getPomXmlFile(), JettyUtil.contextPathFor(this));
-	}
-	
-	private IdeProjectDir createWorkDir() throws IOException {
-		return new IdeProjectDir(this, Files.createTempDirectory("mideaas-vaadin-").toFile());
 	}
 	
 	public Builder getBuilder() {
@@ -60,10 +52,18 @@ public class VaadinProject extends IdeProject {
 	public JettyServer getJettyServer() {
 		return jettyServer;
 	}
+	
+	@Override
+	public IdeDoc putDoc(String id, String content) {
+		IdeDoc doc = super.putDoc(id, content);
+		if (id.equals("pom.xml")) {
+			refreshClasspath();
+		}
+		return doc;
+	}
 
 	public void addClasspathListener(ClasspathListener li) {
 		// TODO!
-		
 	}
 
 	public synchronized AsyncErrorChecker createErrorChecker(String filename) {
@@ -75,14 +75,13 @@ public class VaadinProject extends IdeProject {
 		String s = filename.substring("src/main/java/".length(), filename.length() - ".java".length());
 		return s.replace("/", ".");
 	}
-
 	
-	public File getWorkDir() {
-		return workDir.getDir();
+	public File getWorkDirFile() {
+		return getWorkDir().toFile();
 	}
 
 	public File getPomXmlFile() {
-		return new File(workDir.getDir(), "pom.xml");
+		return new File(getWorkDirFile(), "pom.xml");
 	}
 
 	@Override
@@ -100,16 +99,10 @@ public class VaadinProject extends IdeProject {
 	}
 
 	public void refreshClasspath() {
-		try {
-			writeToDisk();
-		} catch (IOException e) {
-			e.printStackTrace();
-			System.err.println("WARNING: could not write to disk when refreshing classpath at " + workDir);
-			return;
-		}
-		String cp = MavenUtil.getClassPath(workDir.getDir());
+		writeToDisk();
+		String cp = MavenUtil.getClassPath(getWorkDirFile());
 		if (cp == null) {
-			System.err.println("WARNING: could not read classpath at " + workDir);
+			System.err.println("WARNING: could not read classpath at " + getWorkDirFile());
 			return;
 		}
 		compiler.setClassPath(cp);
@@ -133,7 +126,5 @@ public class VaadinProject extends IdeProject {
 		return filename.startsWith("src/main/java/") && filename.endsWith(".java");
 	}
 
-	public void writeToDisk() throws IOException {
-		workDir.writeToDisk();
-	}
+	
 }

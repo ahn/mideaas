@@ -1,12 +1,13 @@
 package org.vaadin.mideaas.ide;
 
+import java.io.File;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.UUID;
 import java.util.Map.Entry;
 import java.util.TreeMap;
 import java.util.TreeSet;
+import java.util.UUID;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.vaadin.aceeditor.AceMode;
@@ -32,18 +33,21 @@ public class IdeProject {
 	
 	private final HashMap<String, IdeDoc> docs = new HashMap<String, IdeDoc>();
 
+	private final IdeProjectDir workDir;
+	
 	private final Team team = new Team();
 	
 	private final SharedChat chat = new SharedChat();
 
-	public IdeProject(String id, String name, IdeProjectCustomizer customizer) {
+	public IdeProject(String id, String name, IdeProjectCustomizer customizer, File workDir) {
 		this.id = id;
 		this.name = name;
 		this.customizer = customizer;
+		this.workDir = new IdeProjectDir(this, workDir);
 	}
 	
 	public IdeProject(String id, String name) {
-		this(id, name, null);
+		this(id, name, null, null);
 	}
 	
 	public String getId() {
@@ -75,6 +79,9 @@ public class IdeProject {
 		synchronized(this) {
 			prev = docs.put(id, ideDoc);
 		}
+		
+		writeToDisk();
+		
 		fireChanged();
 		return prev;
 	}
@@ -137,11 +144,11 @@ public class IdeProject {
 		}
 		return new IdeProjectSnapshot(snap);
 	}
+	
 
-//	public ProjectCustomizer getCustomizer() {
-//		return customizer;
-//	}
-
+	protected IdeProjectDir getWorkDir() {
+		return workDir;
+	}
 	
 	/**
 	 * can be overridden
@@ -158,7 +165,11 @@ public class IdeProject {
 		return UUID.randomUUID().toString().substring(0,8);
 	}
 
+	public void writeToDisk() {
+		workDir.writeToDisk();
+	}
 	
 
 
+	
 }

@@ -3,11 +3,9 @@ package org.vaadin.mideaas.app.git;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.util.Map;
 
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.vaadin.mideaas.app.Icons;
-import org.vaadin.mideaas.ide.IdeUtil;
 
 import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.Image;
@@ -17,7 +15,7 @@ import com.vaadin.ui.VerticalLayout;
 public class GitProjectLoader extends CustomComponent {
 	
 	public interface ProjectLoaderListener {
-		public void success(Map<String, String> contents);
+		public void success(File dir);
 		public void failure(String reason);
 	}
 	
@@ -43,8 +41,7 @@ public class GitProjectLoader extends CustomComponent {
 			File dir = Files.createTempDirectory("mideaas").toFile();
 			System.out.println(gitUrl + " --> " + dir);
 			GitRepository.cloneFrom(gitUrl, dir, username, password);
-			Map<String, String> contents = IdeUtil.readContentsFromDir(dir);
-			fireSuccess(contents, li);
+			fireSuccess(dir, li);
 		} catch (IOException e) {
 			e.printStackTrace();
 			fireFailure("IO error", li);
@@ -54,11 +51,11 @@ public class GitProjectLoader extends CustomComponent {
 		}
 	}
 
-	private void fireSuccess(final Map<String, String> contents, final ProjectLoaderListener li) {
+	private void fireSuccess(final File dir, final ProjectLoaderListener li) {
 		getUI().access(new Runnable() {
 			@Override
 			public void run() {
-				li.success(contents);
+				li.success(dir);
 			}
 		});
 	}

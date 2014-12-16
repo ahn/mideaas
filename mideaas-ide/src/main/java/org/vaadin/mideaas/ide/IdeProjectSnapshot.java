@@ -32,7 +32,7 @@ public class IdeProjectSnapshot {
 		return Collections.unmodifiableMap(files);
 	}
 	
-	public void writeToDisk(Path path) throws IOException {
+	public void writeToDisk(Path path) {
 		IdeUtil.saveFilesToPath(files, path);
 	}
 	

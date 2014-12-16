@@ -109,7 +109,7 @@ public class MideaasTestEditor extends CustomComponent {
             		
             					//write test into a file
             					try {
-            						File path = new File(project.getWorkDir() + "/" + textLocation.getValue());
+            						File path = new File(project.getWorkDirFile() + "/" + textLocation.getValue());
             						path.mkdirs();
             						File file = new File(path.getAbsolutePath() + "/" + textName.getValue() + ".txt");
             						System.out.println(file);
@@ -148,7 +148,7 @@ public class MideaasTestEditor extends CustomComponent {
             					//write test into a file
             					try {
             						System.out.println("testing");
-            						File path = new File(project.getWorkDir() + "/" + textLocation.getValue());
+            						File path = new File(project.getWorkDirFile() + "/" + textLocation.getValue());
             						path.mkdirs();
             						File file = new File(path.getAbsolutePath() + "/" + textName.getValue() + ".txt");
             						System.out.println(file);
@@ -209,7 +209,7 @@ public class MideaasTestEditor extends CustomComponent {
     				textDescription.setValue(item.getDescription());
     				cmbEngine.setValue(item.getEngine());
     				
-    				String path = project.getWorkDir() + "/" + textLocation.getValue() + textName.getValue() + ".txt"; //TODO: project name needs to be dynamic
+    				String path = project.getWorkDirFile() + "/" + textLocation.getValue() + textName.getValue() + ".txt"; //TODO: project name needs to be dynamic
     				BufferedReader br = new BufferedReader(new FileReader(path));
     			    try {
     			        StringBuilder sb = new StringBuilder();

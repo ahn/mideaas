@@ -1,5 +1,6 @@
 package org.vaadin.mideaas.ide;
 
+import java.io.File;
 import java.util.Map;
 
 
@@ -21,13 +22,18 @@ public class DefaultIdeConfiguration implements IdeConfiguration {
 	}
 	
 	@Override
-	public IdeProject createProject(String id, String name, Map<String, String> files) {
+	public IdeProject createProject(String id, String name, Map<String, String> files, File workDir) {
 		return new IdeProject(id, name);
 	}
 
 	@Override
-	public DocAdderComponent createDocAdderComponent() {
-		return new SimpleDocAdderComponent();
+	public DocAdderComponent createDocAdderComponent(DocAdder docAdder) {
+		return new SimpleDocAdderComponent(docAdder);
+	}
+
+	@Override
+	public boolean isProjectFile(String filename) {
+		return !filename.startsWith(".");
 	}
 
 }

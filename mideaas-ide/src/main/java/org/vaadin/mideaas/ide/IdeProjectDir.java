@@ -1,7 +1,6 @@
 package org.vaadin.mideaas.ide;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -26,7 +25,7 @@ public class IdeProjectDir {
 		this.dir = dir;
 	}
 	
-	public synchronized void writeToDisk() throws IOException {
+	public synchronized void writeToDisk() {
 		log.log(Level.INFO, "Writing project " + project.getId() + " to " + dir);
 		IdeProjectSnapshot written = getWrittenSnapshot();
 		IdeProjectSnapshot snapshot = project.getSnapshot();
@@ -48,7 +47,7 @@ public class IdeProjectDir {
 		writtenSnapshot = snapshot;
 	}
 
-	public File getDir() {
+	public File toFile() {
 		return dir;
 	}
 }

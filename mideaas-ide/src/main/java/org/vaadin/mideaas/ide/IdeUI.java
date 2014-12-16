@@ -1,5 +1,6 @@
 package org.vaadin.mideaas.ide;
 
+import java.io.File;
 import java.util.Map;
 
 import org.vaadin.mideaas.editor.EditorUser;
@@ -42,7 +43,22 @@ public class IdeUI extends UI {
 	 * @param projectFileContents key:filename, 
 	 */
 	public void startProject(String projectName, Map<String, String> projectFileContents) {
-		IdeProject project = IdeUtil.createProject(projectName, projectFileContents, config);
+		startProject(projectName, projectFileContents, null);
+	}
+	
+	/**
+	 * Starts a project.
+	 * 
+	 * @param projectName
+	 * @param projectFileContents key:filename, 
+	 */
+	public void startProject(String projectName, File dir) {
+		Map<String, String> contents = IdeUtil.readContentsFromDir(dir, config);
+		startProject(projectName, contents, dir);
+	}
+	
+	private void startProject(String projectName, Map<String, String> projectFileContents, File workDir) {
+		IdeProject project = IdeUtil.createProject(projectName, projectFileContents, config, workDir);
 		projects.putProject(project.getId(), project);
 		navigator.navigateTo(project.getId());
 	}

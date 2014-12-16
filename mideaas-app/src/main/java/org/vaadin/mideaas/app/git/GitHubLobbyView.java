@@ -1,5 +1,6 @@
 package org.vaadin.mideaas.app.git;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -239,8 +240,8 @@ public class GitHubLobbyView extends CustomComponent implements IdeLobbyView {
 
 		loader.initializeProjectFromGit(url, username, password, new ProjectLoaderListener() {
 			@Override
-			public void success(Map<String, String> contents) {
-				((IdeUI) getUI()).startProject(name, contents);
+			public void success(File dir) {
+				((IdeUI) getUI()).startProject(name, dir);
 			}
 			
 			@Override

@@ -159,7 +159,7 @@ public class XmlRpcContact {
 		System.out.println(item.toString());
 		String script = "";
 		try {
-			String path = project.getWorkDir() + "/" + item.getLocation() + scriptName + ".txt"; //TODO: project name needs to be dynamic
+			String path = project.getWorkDirFile() + "/" + item.getLocation() + scriptName + ".txt"; //TODO: project name needs to be dynamic
 			BufferedReader br = new BufferedReader(new FileReader(path));
 			try {
 				StringBuilder sb = new StringBuilder();

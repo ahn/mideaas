@@ -15,7 +15,7 @@ public class XmlWriter {
 
     public synchronized void startWriting(VaadinProject project) {
         try {
-        	out = new BufferedWriter(new FileWriter(project.getWorkDir() + "/" + "TestDataStorage.xml")); //TODO: replace project name
+        	out = new BufferedWriter(new FileWriter(project.getWorkDirFile() + "/" + "TestDataStorage.xml")); //TODO: replace project name
 
         	this.childLoop(ScriptContainer.getContainer(), ServerContainer.getServerContainer());
 

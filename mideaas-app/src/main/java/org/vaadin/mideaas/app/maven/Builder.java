@@ -1,11 +1,12 @@
 package org.vaadin.mideaas.app.maven;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.Properties;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.apache.maven.shared.invoker.InvocationResult;
 import org.vaadin.mideaas.app.MideaasConfig;
@@ -15,6 +16,8 @@ import org.vaadin.mideaas.app.maven.MavenTask.LogListener;
 
 public class Builder {
 
+	private static final Logger log = Logger.getLogger(Builder.class.getName());
+	
 	public interface BuildListener {
 		public void buildStatusChanged(BuildStatus status);
 	}
@@ -73,18 +76,12 @@ public class Builder {
 				return;
 			}
 		}
-		System.out.println("BUILD! " + goals +" - " + buildDir);
+		log.log(Level.INFO, "Building " + goals +" at " + buildDir);
 		setStatus(new BuildStatus(Status.RUNNING, null, goals));
 		synchronized (this) {
-			try {
-				project.writeToDisk();
-				doBuild(goals, buildDir, settings, listener);
-				return;
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
+			project.writeToDisk();
+			doBuild(goals, buildDir, settings, listener);
 		}
-		setStatus(new BuildStatus(Status.FAILED, "File error", goals));
 	}
 	
 	private void setStatus(BuildStatus status) {
@@ -96,7 +93,7 @@ public class Builder {
 
 	private void doBuild(final List<String> goals, String buildDir, UserSettings settings, LogListener listener) {
 		Properties props = new Properties();
-		props.setProperty("projectDirectory", project.getWorkDir().getAbsolutePath());
+		props.setProperty("projectDirectory", project.getWorkDirFile().getAbsolutePath());
 		//compiles google appengine war
 		
 		// TODO: these settings are not taken into account in regular Vaadin apps!

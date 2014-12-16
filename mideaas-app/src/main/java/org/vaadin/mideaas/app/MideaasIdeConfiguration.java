@@ -1,8 +1,7 @@
 package org.vaadin.mideaas.app;
 
+import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -141,17 +140,17 @@ public class MideaasIdeConfiguration extends DefaultIdeConfiguration {
 
 
 	@Override
-	public IdeProject createProject(String id, String name, Map<String, String> files) {
+	public IdeProject createProject(String id, String name, Map<String, String> files, File workDir) {
 		if (files.containsKey("pom.xml")) { // TODO: more detailed check
 			try {
 				
-				return new VaadinProject(id, name);
+				return new VaadinProject(id, name, workDir);
 			} catch (IOException e) {
 				e.printStackTrace();
 				System.err.println("Could not create VaadinProject for the above reason");
 			}
 		}
-		return super.createProject(id, name, files);
+		return super.createProject(id, name, files, workDir);
 	}
 	
 	@Override
