@@ -16,12 +16,12 @@ import org.vaadin.mideaas.app.maven.JettyUtil;
 import org.vaadin.mideaas.app.maven.MavenUtil;
 import org.vaadin.mideaas.editor.AsyncErrorChecker;
 import org.vaadin.mideaas.ide.IdeDoc;
-import org.vaadin.mideaas.ide.IdeProject;
+import org.vaadin.mideaas.ide.IdeProjectWithWorkDir;
 import org.vaadin.mideaas.ide.IdeProjectSnapshot;
 import org.vaadin.mideaas.ide.IdeUser;
 
 
-public class VaadinProject extends IdeProject {
+public class VaadinProject extends IdeProjectWithWorkDir {
 		
 	private final CompilingService compiler;
 	

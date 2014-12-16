@@ -25,7 +25,7 @@ import com.vaadin.ui.Window;
 
 @SuppressWarnings("serial")
 public class FileList extends CustomComponent implements
-		IdeProject.Listener, ValueChangeListener, ItemClickListener, Handler {
+		IdeProjectWithWorkDir.Listener, ValueChangeListener, ItemClickListener, Handler {
 
 	public interface Listener {
 		public void selected(String name);

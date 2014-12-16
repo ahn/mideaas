@@ -19,6 +19,7 @@ import org.vaadin.mideaas.ide.DefaultIdeConfiguration;
 import org.vaadin.mideaas.ide.Ide;
 import org.vaadin.mideaas.ide.IdeLobbyView;
 import org.vaadin.mideaas.ide.IdeLoginView;
+import org.vaadin.mideaas.ide.IdeProjectWithWorkDir;
 import org.vaadin.mideaas.ide.IdeProject;
 
 import com.vaadin.ui.Button;

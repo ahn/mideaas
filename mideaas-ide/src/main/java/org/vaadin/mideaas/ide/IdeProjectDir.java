@@ -1,6 +1,13 @@
 package org.vaadin.mideaas.ide;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.FileVisitResult;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.attribute.BasicFileAttributes;
+import java.nio.file.SimpleFileVisitor;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -12,7 +19,7 @@ public class IdeProjectDir {
 	
 	private static final Logger log = Logger.getLogger(IdeProjectDir.class.getName());
 
-	private final IdeProject project;
+	private final IdeProjectWithWorkDir project;
 	private final File dir;
 	
 	/**
@@ -20,7 +27,7 @@ public class IdeProjectDir {
 	 */
 	private IdeProjectSnapshot writtenSnapshot;
 	
-	public IdeProjectDir(IdeProject project, File dir) {
+	public IdeProjectDir(IdeProjectWithWorkDir project, File dir) {
 		this.project = project;
 		this.dir = dir;
 	}
@@ -49,5 +56,34 @@ public class IdeProjectDir {
 
 	public File toFile() {
 		return dir;
+	}
+	
+	public void destroy() {
+		try {
+			destroyOrThrow();
+		} catch (IOException e) {
+			log.log(Level.WARNING, "Could not destroy " + dir);
+		}
+	}
+
+	private void destroyOrThrow() throws IOException {
+		Path directory = dir.toPath();
+		Files.walkFileTree(directory, new SimpleFileVisitor<Path>() {
+
+			@Override
+			public FileVisitResult visitFile(Path file,
+					BasicFileAttributes attrs) throws IOException {
+				Files.delete(file);
+				return FileVisitResult.CONTINUE;
+			}
+
+			@Override
+			public FileVisitResult postVisitDirectory(Path dir, IOException exc)
+					throws IOException {
+				Files.delete(dir);
+				return FileVisitResult.CONTINUE;
+			}
+
+		});
 	}
 }

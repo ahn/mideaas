@@ -1,6 +1,5 @@
 package org.vaadin.mideaas.ide;
 
-import java.io.File;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -33,21 +32,18 @@ public class IdeProject {
 	
 	private final HashMap<String, IdeDoc> docs = new HashMap<String, IdeDoc>();
 
-	private final IdeProjectDir workDir;
-	
 	private final Team team = new Team();
 	
 	private final SharedChat chat = new SharedChat();
 
-	public IdeProject(String id, String name, IdeProjectCustomizer customizer, File workDir) {
+	public IdeProject(String id, String name, IdeProjectCustomizer customizer) {
 		this.id = id;
 		this.name = name;
 		this.customizer = customizer;
-		this.workDir = new IdeProjectDir(this, workDir);
 	}
 	
 	public IdeProject(String id, String name) {
-		this(id, name, null, null);
+		this(id, name, null);
 	}
 	
 	public String getId() {
@@ -79,8 +75,6 @@ public class IdeProject {
 		synchronized(this) {
 			prev = docs.put(id, ideDoc);
 		}
-		
-		writeToDisk();
 		
 		fireChanged();
 		return prev;
@@ -145,11 +139,6 @@ public class IdeProject {
 		return new IdeProjectSnapshot(snap);
 	}
 	
-
-	protected IdeProjectDir getWorkDir() {
-		return workDir;
-	}
-	
 	/**
 	 * can be overridden
 	 * 
@@ -164,12 +153,6 @@ public class IdeProject {
 	public static String randomProjectId() {
 		return UUID.randomUUID().toString().substring(0,8);
 	}
-
-	public void writeToDisk() {
-		workDir.writeToDisk();
-	}
-	
-
 
 	
 }

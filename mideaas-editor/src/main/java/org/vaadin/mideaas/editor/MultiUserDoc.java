@@ -96,7 +96,6 @@ public class MultiUserDoc implements Listener {
 			else {
 				child.numRegistered += 1;
 			}
-			System.out.println(this + "   REGISTER " + user.getId() + " -> " + child.numRegistered+"");
 		}
 		
 		if (changed) {
@@ -133,7 +132,6 @@ public class MultiUserDoc implements Listener {
 			else {
 				child.numRegistered -= 1;
 			}
-			System.out.println(this + " UNREGISTER " + user.getId() + " -> " + child.numRegistered+"");
 		}
 		
 		if (changed) {

@@ -21,7 +21,7 @@ import javax.xml.transform.TransformerFactoryConfigurationError;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.vaadin.mideaas.app.maven.MavenTask.LogListener;
-import org.vaadin.mideaas.ide.IdeProject;
+import org.vaadin.mideaas.ide.IdeProjectWithWorkDir;
 import org.xml.sax.SAXException;
 
 import com.vaadin.ui.Notification;
@@ -193,7 +193,7 @@ public class JettyUtil {
 	}
 
 
-	public static String contextPathFor(IdeProject project) {
+	public static String contextPathFor(IdeProjectWithWorkDir project) {
 		return "/apps/"+project.getName();
 	}
 	

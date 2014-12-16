@@ -10,7 +10,6 @@ import org.vaadin.mideaas.ide.IdeProject;
 
 public class VaadinProjectCustomizer extends DefaultProjectCustomizer {
 
-	
 	@Override
 	public Guard getUpwardsGuardFor(String filename) {
 		if (filename.endsWith(".css")) {
