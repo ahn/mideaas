@@ -62,14 +62,19 @@ public class ExampleProjectLobbyView extends CustomComponent implements IdeLobby
 		TreeMap<String, String> contents = new TreeMap<String, String>();
 		contents.put("index.html", INDEX_HTML);
 		contents.put("style.css", STYLE_CSS);
+		contents.put("script.js", SCRIPT_JS);
 		return contents;
 	}
 	
 
 	private static String INDEX_HTML = "<!DOCTYPE html>\n<html>\n    <head>\n        <title>Hello</title>\n"
-			+ "        <link href=\"./style.css\" rel=\"stylesheet\" />\n    <head>\n"
+			+ "        <link href=\"./style.css\" rel=\"stylesheet\" />\n" 
+			+ "        <script src=\"./script.js\"></script>\n" 
+			+ "    </head>\n"
 			+ "    <body>\n        <p>Hello!</p>\n    </body>\n</html>\n";
 	
 	private static String STYLE_CSS = "body {\n    color: red;\n}\n";
+	
+	private static String SCRIPT_JS = "console.log(\"Hello!\");\n";
 	
 }

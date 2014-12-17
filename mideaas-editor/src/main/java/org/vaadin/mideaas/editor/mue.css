@@ -29,11 +29,11 @@
 }
 
 .mue .collab-square-image-passive {
-	opacity: 1;
+	
 }
 
 .mue .collab-square-image-active {
-	opacity: 0.25;
+	transform: scaleY(-1);
 }
 
 .mue .collab-square-image:hover {

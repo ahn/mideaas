@@ -155,25 +155,25 @@ public class MideaasIdeConfiguration extends DefaultIdeConfiguration {
 		return super.createProject(id, name, files, workDir);
 	}
 	
-	@Override
-	public IdeLoginView createLoginView() {
-		String key = MideaasConfig.getProperty(Prop.GITHUB_KEY);
-		String secret = MideaasConfig.getProperty(Prop.GITHUB_SECRET);
-		if (key == null || secret == null) {
-			throw new IllegalArgumentException("No " + Prop.GITHUB_KEY + "/" + Prop.GITHUB_SECRET +" in config.");
-		}
-		return new GitHubLoginView(key, secret);
-	}
-
-	@Override
-	public IdeLobbyView createLobbyView() {
-		String key = MideaasConfig.getProperty(Prop.GITHUB_KEY);
-		String secret = MideaasConfig.getProperty(Prop.GITHUB_SECRET);
-		if (key == null || secret == null) {
-			throw new IllegalArgumentException("No " + Prop.GITHUB_KEY + "/" + Prop.GITHUB_SECRET +" in config.");
-		}
-		return new GitHubLobbyView(key, secret);
-	}
+//	@Override
+//	public IdeLoginView createLoginView() {
+//		String key = MideaasConfig.getProperty(Prop.GITHUB_KEY);
+//		String secret = MideaasConfig.getProperty(Prop.GITHUB_SECRET);
+//		if (key == null || secret == null) {
+//			throw new IllegalArgumentException("No " + Prop.GITHUB_KEY + "/" + Prop.GITHUB_SECRET +" in config.");
+//		}
+//		return new GitHubLoginView(key, secret);
+//	}
+//
+//	@Override
+//	public IdeLobbyView createLobbyView() {
+//		String key = MideaasConfig.getProperty(Prop.GITHUB_KEY);
+//		String secret = MideaasConfig.getProperty(Prop.GITHUB_SECRET);
+//		if (key == null || secret == null) {
+//			throw new IllegalArgumentException("No " + Prop.GITHUB_KEY + "/" + Prop.GITHUB_SECRET +" in config.");
+//		}
+//		return new GitHubLobbyView(key, secret);
+//	}
 
 	
 }

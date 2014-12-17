@@ -2,6 +2,8 @@ package org.vaadin.mideaas.ide;
 
 import java.io.File;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.vaadin.mideaas.editor.EditorUser;
 
@@ -15,6 +17,8 @@ import com.vaadin.ui.UI;
 @SuppressWarnings("serial")
 @Push
 public class IdeUI extends UI {
+	
+	private static final Logger log = Logger.getLogger(IdeUI.class.getName());
 
 	private final Navigator navigator = new Navigator(this, this);
 	private IdeConfiguration config;
@@ -92,7 +96,7 @@ public class IdeUI extends UI {
 	@Override
 	public void detach() {
 		int n = getSession().getUIs().size();
-		System.out.println("Before detaching " + this + " there are " + n + " UIs left in session " + getSession());
+		log.log(Level.INFO, "Before detaching there are " + n + " UIs left in session " + getSession());
 		if (n < 1) {
 			IdeUser user = getIdeUser();
 			if (user != null) {
@@ -118,11 +122,5 @@ public class IdeUI extends UI {
 	protected static ProjectContainer getProjects() {
 		return projects;
 	}
-
-	
-
-	
-
-	
 		
 }

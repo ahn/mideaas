@@ -1,5 +1,6 @@
 package org.vaadin.mideaas.ide;
 
+import com.vaadin.event.ShortcutAction.KeyCode;
 import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
@@ -50,9 +51,11 @@ public class JustUsernameLoginView extends CustomComponent implements
 		layout.addComponent(new Label("Enter your name to get started"));
 
 		usernameField = new TextField();
+		usernameField.focus();
 		layout.addComponent(usernameField);
 
 		Button b = new Button("Log in");
+		b.setClickShortcut(KeyCode.ENTER);
 
 		b.addClickListener(this);
 		layout.addComponent(b);

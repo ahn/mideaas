@@ -62,10 +62,8 @@ public class TeamLayout extends CustomComponent implements Team.Listener {
 	
 	@Override
 	public void detach() {
-		System.out.println(this + " detach");
 		team.removeListener(this);
 		super.detach();
-		System.out.println(this + " detached");
 	}
 
 	@Override
@@ -77,9 +75,7 @@ public class TeamLayout extends CustomComponent implements Team.Listener {
 		ui.access(new Runnable() {
 			@Override
 			public void run() {
-				System.out.println(this + " Updating users " + users);
 				update(users);
-				System.out.println(this + " updated");
 			}
 		});
 	}

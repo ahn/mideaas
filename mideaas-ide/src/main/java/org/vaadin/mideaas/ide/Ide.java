@@ -158,7 +158,7 @@ public class Ide extends CustomComponent {
 
 		TeamLayout tela = new TeamLayout(project.getTeam());
 		tela.setMaxCols(4);
-		sidebarLayout.addComponent(tela);
+		sidebarLayout.addComponent(new Panel("Here now:", tela));
 
 		IdeChatBox chat = new IdeChatBox(project.getChat(), editorUser);
 		chat.setWidth("100%");

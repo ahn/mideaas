@@ -19,6 +19,7 @@ public class SimpleDocAdderComponent extends DocAdderComponent implements ClickL
 		la.setSpacing(true);
 		la.addComponent(nameField);
 		la.addComponent(addButton);
+		nameField.focus();
 		addButton.addClickListener(this);
 		setCompositionRoot(la);
 	}
