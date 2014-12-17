@@ -6,9 +6,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import org.vaadin.mideaas.app.MideaasConfig.Prop;
-import org.vaadin.mideaas.app.git.GitHubLobbyView;
-import org.vaadin.mideaas.app.git.GitHubLoginView;
 import org.vaadin.mideaas.app.maven.BuildComponent;
 import org.vaadin.mideaas.app.maven.Builder;
 import org.vaadin.mideaas.app.maven.JettyComponent;
@@ -17,15 +14,16 @@ import org.vaadin.mideaas.app.maven.MavenCommand;
 import org.vaadin.mideaas.app.test.TestCommand;
 import org.vaadin.mideaas.ide.DefaultIdeConfiguration;
 import org.vaadin.mideaas.ide.Ide;
-import org.vaadin.mideaas.ide.IdeLobbyView;
-import org.vaadin.mideaas.ide.IdeLoginView;
 import org.vaadin.mideaas.ide.IdeProject;
+import org.vaadin.mideaas.ide.IdeUI;
 
+import com.vaadin.server.ExternalResource;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Button.ClickListener;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.Label;
+import com.vaadin.ui.Link;
 import com.vaadin.ui.MenuBar;
 import com.vaadin.ui.MenuBar.Command;
 import com.vaadin.ui.MenuBar.MenuItem;
@@ -60,6 +58,12 @@ public class MideaasIdeConfiguration extends DefaultIdeConfiguration {
 			// Compiling all at the beginning
 			vp.refreshClasspath();
 			vp.compileAll();
+		}
+		else if (ide.getProject().getDoc("index.html") != null) {
+			String url = ((IdeUI)IdeUI.getCurrent()).getServerRootUrl() + "raw/" + ide.getProject().getId() + "/index.html";
+			Link link = new Link("View index.html", new ExternalResource(url));
+			link.setTargetName("_blank");
+			components.add(link);
 		}
 		
 		ide.addSideBarComponents(components);
@@ -118,7 +122,7 @@ public class MideaasIdeConfiguration extends DefaultIdeConfiguration {
 		
 		menu.addItem("Stop all Jetty servers", new Command() {
 			@Override
-			public void menuSelected(MenuItem selectedItem) {
+			public void menuSelected(MenuItem selected) {
 				JettyUtil.stopAllJettys();
 			}
 		});
@@ -150,7 +154,7 @@ public class MideaasIdeConfiguration extends DefaultIdeConfiguration {
 			}
 		}
 		else {
-			return new IdeProject(id, name, new WebProjectCustomizer());
+			return new IdeProject(id, name, new WebProjectCustomizer(id));
 		}
 		return super.createProject(id, name, files, workDir);
 	}

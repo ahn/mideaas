@@ -45,7 +45,6 @@ public class MideaasUI extends IdeUI
 		return userSettings;
 	}
 	
-	
 	private static void processConfig() {
 		JettyUtil.setPortRange(
 				MideaasConfig.getPropertyInt(Prop.JETTY_PORT_MIN),
@@ -58,8 +57,6 @@ public class MideaasUI extends IdeUI
 		JettyUtil.stopAllJettys();
 		
 		MavenUtil.setMavenHome(MideaasConfig.getMavenHome());
-		
-		
 	}
 
 }
