@@ -39,15 +39,15 @@ public class XmlRpcServerDetails extends Window {
         
         Panel labelPanel = new Panel();
         HorizontalLayout labelPanelLayout = new HorizontalLayout();
-        Label label = new Label("This label should contain instructions of how to use the tool,</br>" +
-        		"but instead it contains a boring placeholder!</br></br>" + 
-        		"just checking how this works.");
-        label.setContentMode(ContentMode.HTML);
+        //Label label = new Label("This label should contain instructions of how to use the tool,</br>" +
+        //		"but instead it contains a boring placeholder!</br></br>" + 
+        //		"just checking how this works.");
+        //label.setContentMode(ContentMode.HTML);
         Label gap = new Label("&nbsp;");
         gap.setContentMode(ContentMode.HTML);
         gap.setWidth("15px");
         labelPanelLayout.addComponent(gap);
-        labelPanelLayout.addComponent(label);
+        //labelPanelLayout.addComponent(label);
         labelPanel.setContent(labelPanelLayout);
         
         VerticalLayout main = new VerticalLayout();

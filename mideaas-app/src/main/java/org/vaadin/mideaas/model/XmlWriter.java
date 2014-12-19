@@ -14,9 +14,9 @@ public class XmlWriter {
 
     public synchronized void startWriting(String projectName) {
         try {
-        	out = new BufferedWriter(new FileWriter(MideaasConfig.getProjectsDir() + "/" + projectName + "/" + "TestDataStorage.xml")); //TODO: replace project name
+        	out = new BufferedWriter(new FileWriter(MideaasConfig.getProjectsDir() + "/" + projectName + "/" + "TestDataStorage.xml")); 
 
-        	this.childLoop(ScriptContainer.getContainer(), ServerContainer.getServerContainer());
+        	this.childLoop(ScriptContainer.getContainer(), ServerContainer.getServerContainer(), projectName);
 
         	out.close();
         }
@@ -30,9 +30,9 @@ public class XmlWriter {
         }
     }     
     
-    private void childLoop(ScriptContainer scriptcontainer, ServerContainer servercontainer) {
+    private void childLoop(ScriptContainer scriptcontainer, ServerContainer servercontainer, String projectName) {
         this.startDocument();
-        this.startElement("project", "name", "test"); //TODO: changeable project name
+        this.startElement("project", "name", projectName); 
         this.startElement("tests", "", "");
         for (Script script : scriptcontainer.getItemIds()) {
         	this.startElement("test", "name", script.getName());
@@ -68,6 +68,7 @@ public class XmlWriter {
         	this.endElement("test");
         }
         this.endElement("tests");
+        System.out.println(servercontainer.getItemIds());
         this.startElement("servers", "", "");
         for (Server server : servercontainer.getItemIds()) {
         	this.startElement("server", "IP", server.getIP());

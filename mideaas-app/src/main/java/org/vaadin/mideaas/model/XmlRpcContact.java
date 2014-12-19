@@ -158,9 +158,10 @@ public class XmlRpcContact {
 	
 	
 	public static String getScriptFromFile(String scriptName, String projectName) {
+		
 		System.out.println(scriptName);
 		Script item = ScriptContainer.getScriptFromContainer(scriptName);
-		System.out.println(item.toString());
+		//System.out.println(item.toString());
 		String script = "";
 		try {
 			String path = MideaasConfig.getProjectsDir() + "/" + projectName + "/" + item.getLocation() + scriptName + ".txt"; //TODO: project name needs to be dynamic
@@ -225,7 +226,7 @@ public class XmlRpcContact {
 			}
 			
 			if (maps.size() == 1){
-				System.out.println("testing if we get through");
+				//System.out.println("testing if we get through");
 				maps.get(0).put("script", getScriptFromFile(maps.get(0).get("scriptNames"), projectName));
 			}
 		}

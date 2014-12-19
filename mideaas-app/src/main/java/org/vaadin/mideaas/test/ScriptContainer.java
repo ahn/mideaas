@@ -93,6 +93,7 @@ public class ScriptContainer extends BeanItemContainer<Script> implements
     public static synchronized ScriptContainer SetRunnableTests(List<String> testNames) {
     	try {
     		System.out.println("Trying to mark runnable tests");
+    		System.out.println("before: " + c.getItemIds());
     		for (String name : testNames) {
     			for (Script item : (List<Script>) c.getItemIds()) {
     				if (item.getName().equals(name)) {
@@ -105,11 +106,13 @@ public class ScriptContainer extends BeanItemContainer<Script> implements
     	} catch (Exception e) {
     		e.printStackTrace();
     	}
+    	System.out.println("after: " + c.getItemIds());
     	return c;
     }
     
     
     public static synchronized void updateResult(HashMap<String, String> map, String testName, String projectName) {
+    	System.out.println("before: " + c.getItemIds());
     	for (Script p : c.getItemIds()) {
     		if (p.getName().equals(testName)) {
     			//found the correct test
@@ -125,6 +128,7 @@ public class ScriptContainer extends BeanItemContainer<Script> implements
     			break;	//no need to look for more tests
     		}
     	}
+    	System.out.println("after: " + c.getItemIds());
     	XmlTestWriter.WriteTestsToXml(projectName);
     }
     
