@@ -31,11 +31,6 @@ import com.vaadin.annotations.StyleSheet;
 @SuppressWarnings("serial")
 @StyleSheet("ace-markers.css")
 public class CollaborativeAceEditor extends AceEditor implements SelectionChangeListener {
-	
-	private static long lastId = 0L;
-	private static long newId() {
-		return ++lastId;
-	}
 
 	private final SharedDoc sharedText;
 	//private final long id = newId();

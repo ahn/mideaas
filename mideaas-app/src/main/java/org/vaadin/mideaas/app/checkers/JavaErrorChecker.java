@@ -1,4 +1,4 @@
-package org.vaadin.mideaas.app.java;
+package org.vaadin.mideaas.app.checkers;
 
 import java.util.ArrayList;
 import java.util.Collections;

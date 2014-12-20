@@ -1,10 +1,13 @@
 package org.vaadin.mideaas.app;
 
+import org.vaadin.mideaas.app.checkers.CssErrorChecker;
 import org.vaadin.mideaas.app.guards.CSSGuard;
 import org.vaadin.mideaas.app.guards.HtmlGuard;
 import org.vaadin.mideaas.app.guards.JavaScriptGuard;
+import org.vaadin.mideaas.editor.AsyncErrorChecker;
 import org.vaadin.mideaas.editor.DocDiffMediator.Guard;
 import org.vaadin.mideaas.ide.DefaultProjectCustomizer;
+import org.vaadin.mideaas.ide.IdeProject;
 
 public class WebProjectCustomizer extends DefaultProjectCustomizer {
 
@@ -20,6 +23,14 @@ public class WebProjectCustomizer extends DefaultProjectCustomizer {
 			return new JavaScriptGuard();
 		}
 		return super.getUpwardsGuardFor(filename);
+	}
+	
+	@Override
+	public AsyncErrorChecker getErrorCheckerFor(String filename, IdeProject project) {
+		if (filename.endsWith(".css")) {
+			return new CssErrorChecker();
+		}
+		return super.getErrorCheckerFor(filename, project);
 	}
 
 }

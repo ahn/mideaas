@@ -5,6 +5,7 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.logging.Logger;
 
 import org.vaadin.aceeditor.AceEditor;
 import org.vaadin.aceeditor.AceEditor.DiffEvent;
@@ -26,6 +27,8 @@ import com.vaadin.ui.UI;
  *
  */
 public class SharedDoc implements DiffListener, ResultListener {
+	
+	private static final Logger log = Logger.getLogger(SharedDoc.class.getName());
 	
 	public interface ChangeListener {
 		public void changed(AceDoc newDoc, ServerSideDocDiff diff);
@@ -81,23 +84,11 @@ public class SharedDoc implements DiffListener, ResultListener {
 		boolean textChanged;
 		
 		synchronized (this) {
-			
 			if (this.doc.equals(doc)) {
 				return null;
 			}
-			
-			// XXX
-	//		try {
-	//			Thread.sleep(new Random().nextInt(1000));
-	//		} catch (InterruptedException e) {
-	//			// TODO Auto-generated catch block
-	//			e.printStackTrace();
-	//		}
-			
 			textChanged = !this.doc.getText().equals(doc.getText());
-			
 			this.doc = doc;
-			
 			for (final AceEditor editor : editors) {
 				UI ui = editor.getUI();
 				if (ui == null) {
@@ -161,23 +152,25 @@ public class SharedDoc implements DiffListener, ResultListener {
 		if (checker == null) {
 			return;
 		}
-		// TODO: possible concurrency problems
-		// a brief windows in which changes by somebody else are
-		// overwritten, because of setDoc instead of using diffs...
-		//setDoc(docWithoutErrorMarkers(getDoc()));
 		final String text = getDoc().getText();
 		checker.checkErrors(text, new ResultListener() {
 			@Override
 			public void errorsChecked(List<Error> errors) {
-				AceDoc docNow = getDoc();
-				if (text.equals(docNow.getText())) {
-					setDoc(docWithErrors(docNow, errors));
-				}
-				else {
-					setDoc(docWithoutErrorMarkers(docNow));
-				}
+				applyErrorCheckResult(text, errors);
 			}
 		});
+	}
+	
+	private synchronized void applyErrorCheckResult(String checkText, List<Error> errors) {
+		AceDoc docNow = getDoc();
+		if (checkText.equals(docNow.getText())) {
+			//log.info("Applying errors: " + errors.size());
+			setDoc(docWithErrors(docNow, errors));
+		}
+		else {
+			//log.info("Ignoring errors: " + errors.size());
+			setDoc(docWithoutErrorMarkers(docNow));
+		}
 	}
 
 	public synchronized DocDiffMediator fork() {

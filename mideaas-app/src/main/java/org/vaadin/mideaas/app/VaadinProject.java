@@ -7,7 +7,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.vaadin.aceeditor.Suggester;
-import org.vaadin.mideaas.app.java.JavaErrorChecker;
+import org.vaadin.mideaas.app.checkers.JavaErrorChecker;
 import org.vaadin.mideaas.app.java.JavaSuggester;
 import org.vaadin.mideaas.app.java.util.CompilingService;
 import org.vaadin.mideaas.app.maven.Builder;

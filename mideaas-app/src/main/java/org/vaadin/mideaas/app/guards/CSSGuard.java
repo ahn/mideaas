@@ -39,8 +39,8 @@ public class CSSGuard implements Guard {
 		try {
 			stream = new ByteArrayInputStream(text.getBytes("UTF-8"));
 			InputSource source = new InputSource(new InputStreamReader(stream));
-	        CSSOMParser parser = new CSSOMParser();
-	        parser.setErrorHandler(new ErrorHandler() {
+			CSSOMParser parser = new CSSOMParser();
+			parser.setErrorHandler(new ErrorHandler() {
 				
 				@Override
 				public void warning(CSSParseException arg0) throws CSSException {
@@ -57,7 +57,7 @@ public class CSSGuard implements Guard {
 					errors[0] = true;
 				}
 			});
-	        parser.parseStyleSheet(source, null, null);
+			parser.parseStyleSheet(source, null, null);
 		} catch (IOException e) {
 			return false;
 		}
@@ -66,9 +66,6 @@ public class CSSGuard implements Guard {
 				stream.close();
 			}
 		}
-
 		return !errors[0];
-
-		
 	}
 }

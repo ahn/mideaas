@@ -2,6 +2,7 @@ package org.vaadin.mideaas.editor;
 
 /**
  * How the users' edits are applied to the shared document.
+ * TODO: currently not used anywhere...
  */
 public enum SyncMode {
 	
