@@ -1,5 +1,6 @@
 package org.vaadin.mideaas.ide;
 
+import org.vaadin.aceeditor.Suggester;
 import org.vaadin.mideaas.editor.EditorUser;
 import org.vaadin.mideaas.editor.MultiUserEditor;
 
@@ -13,22 +14,11 @@ public class SimpleView extends CustomComponent implements View {
 
 	private final String title;
 	
-	public SimpleView(IdeDoc doc, EditorUser user, String title) {
+	public SimpleView(IdeDoc doc, IdeUser user, String title, Suggester suggester) {
 		this.title = title;
-		
-		MultiUserEditor ed = new MultiUserEditor(user, doc.getDoc(), doc.getAceMode());
+		IdeEditorComponent ed = new IdeEditorComponent(doc, user, suggester);
 		ed.setSizeFull();
-		
-		IdeChatBox chat = new IdeChatBox(doc.getChat(), user);
-		chat.setSizeFull();
-		
-		VerticalSplitPanel split = new VerticalSplitPanel();
-		split.setSizeFull();
-		this.setSizeFull();
-		split.setFirstComponent(ed);
-		split.setSecondComponent(chat);
-		split.setSplitPosition(125, Unit.PIXELS, true);
-		setCompositionRoot(split);
+		setCompositionRoot(ed);
 	}
 	
 	@Override

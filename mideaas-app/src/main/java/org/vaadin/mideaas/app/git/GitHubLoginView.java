@@ -4,7 +4,6 @@ import org.vaadin.addon.oauthpopup.OAuthListener;
 import org.vaadin.addon.oauthpopup.buttons.GitHubButton;
 import org.vaadin.mideaas.ide.IdeLoginView;
 import org.vaadin.mideaas.ide.IdeUI;
-import org.vaadin.mideaas.ide.UserProfile;
 import org.vaadin.mideaas.ide.UserToken;
 
 import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;

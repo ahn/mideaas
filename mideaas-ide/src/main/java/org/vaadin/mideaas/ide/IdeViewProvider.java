@@ -2,6 +2,8 @@ package org.vaadin.mideaas.ide;
 
 import java.util.regex.Matcher;
 
+import org.vaadin.aceeditor.Suggester;
+
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewProvider;
 
@@ -85,7 +87,9 @@ public final class IdeViewProvider implements ViewProvider {
 				IdeDoc doc = project.getDoc(filename);
 				if (doc != null) {
 					String title = filename.substring(filename.lastIndexOf("/")+1);
-					return new SimpleView(doc, ui.getIdeUser().getEditorUser(),  title);
+					IdeUser user = ui.getIdeUser();
+					Suggester suggester = project.createSuggesterFor(filename, user);
+					return new SimpleView(doc, user, title, suggester);
 				}
 			}
 		}

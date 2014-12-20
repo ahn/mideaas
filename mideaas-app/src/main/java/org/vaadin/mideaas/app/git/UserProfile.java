@@ -1,17 +1,18 @@
-package org.vaadin.mideaas.ide;
+package org.vaadin.mideaas.app.git;
 
-import org.vaadin.mideaas.ide.OAuthService.Service;
+import org.vaadin.mideaas.app.git.OAuthService.Service;
+import org.vaadin.mideaas.ide.UserToken;
 
 
 public class UserProfile {
-	
+
 	private final Service service;
 	private final UserToken token;
 	private final String identifier;
 	private final String name;
 	private final String email;
 	private final String imgUrl;
-	
+
 	public UserProfile(Service service, UserToken token, String identifier, String name, String email, String imgUrl) {
 		this.service = service;
 		this.token = token;

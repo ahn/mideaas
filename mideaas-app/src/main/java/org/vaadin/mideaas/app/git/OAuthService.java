@@ -1,4 +1,6 @@
-package org.vaadin.mideaas.ide;
+package org.vaadin.mideaas.app.git;
+
+import org.vaadin.mideaas.ide.UserToken;
 
 
 public abstract class OAuthService {

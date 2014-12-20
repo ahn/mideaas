@@ -9,7 +9,6 @@ import org.kohsuke.github.GHRepository;
 import org.vaadin.mideaas.app.git.GitProjectLoader.ProjectLoaderListener;
 import org.vaadin.mideaas.ide.IdeLobbyView;
 import org.vaadin.mideaas.ide.IdeUI;
-import org.vaadin.mideaas.ide.UserProfile;
 
 import com.vaadin.data.Property.ValueChangeEvent;
 import com.vaadin.data.Property.ValueChangeListener;
