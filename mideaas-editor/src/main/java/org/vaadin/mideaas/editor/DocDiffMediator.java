@@ -2,7 +2,7 @@ package org.vaadin.mideaas.editor;
 
 import org.vaadin.aceeditor.ServerSideDocDiff;
 import org.vaadin.aceeditor.client.AceDoc;
-import org.vaadin.mideaas.editor.SharedDoc.Listener;
+import org.vaadin.mideaas.editor.SharedDoc.ChangeListener;
 
 /**
  * Mediates changes between two {@link SharedDoc} classes: upstream and downstream.
@@ -37,16 +37,16 @@ public class DocDiffMediator {
 	private Guard upwardsGuard;
 	private Guard downwardsGuard;
 	
-	private final Listener upstreamListener = new Listener() {
+	private final ChangeListener upstreamListener = new ChangeListener() {
 		@Override
-		public void changed() {
+		public void changed(AceDoc newDoc, ServerSideDocDiff diff) {
 			upstreamChanged();
 		}
 	};
 	
-	private final Listener downstreamListener = new Listener() {
+	private final ChangeListener downstreamListener = new ChangeListener() {
 		@Override
-		public void changed() {
+		public void changed(AceDoc newDoc, ServerSideDocDiff diff) {
 			downstreamChanged();
 		}
 	};
@@ -96,15 +96,16 @@ public class DocDiffMediator {
 	
 	private void tryToApplyFrom(SharedDoc fromDoc, SharedDoc toDoc, Guard guard) {
 		AceDoc destDoc = null;
+		ServerSideDocDiff diff;
 		synchronized (upstream) {
 		synchronized (downstream) {
 		synchronized(this) {
 			AceDoc sourceDoc = filtered(fromDoc.getDoc());
-			ServerSideDocDiff d = ServerSideDocDiff.diff(shadow,sourceDoc);
-			if (!d.isIdentity()) {
+			diff = ServerSideDocDiff.diff(shadow,sourceDoc);
+			if (!diff.isIdentity()) {
 				//System.out.println(this + " " + d.toString());
-				destDoc = d.applyTo(toDoc.getDoc());
-				if (guard==null || guard.isAcceptable(destDoc, d)) {
+				destDoc = diff.applyTo(toDoc.getDoc());
+				if (guard==null || guard.isAcceptable(destDoc, diff)) {
 					shadow = sourceDoc;
 					destDoc = toDoc.setDocNoFire(destDoc);
 				}
@@ -116,7 +117,7 @@ public class DocDiffMediator {
 		}
 		}
 		if (destDoc!=null) {
-			toDoc.fireChanged();
+			toDoc.fireChanged(destDoc, diff);
 		}
 	}
 

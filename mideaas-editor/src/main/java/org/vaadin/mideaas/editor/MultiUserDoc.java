@@ -6,6 +6,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import org.vaadin.aceeditor.ServerSideDocDiff;
 import org.vaadin.aceeditor.client.AceDoc;
 import org.vaadin.mideaas.editor.DocDiffMediator;
 import org.vaadin.mideaas.editor.DocDiffMediator.Filter;
@@ -13,9 +14,9 @@ import org.vaadin.mideaas.editor.DocDiffMediator.Guard;
 import org.vaadin.mideaas.editor.DocDifference;
 import org.vaadin.mideaas.editor.EditorUser;
 import org.vaadin.mideaas.editor.SharedDoc;
-import org.vaadin.mideaas.editor.SharedDoc.Listener;
+import org.vaadin.mideaas.editor.SharedDoc.ChangeListener;
 
-public class MultiUserDoc implements Listener {
+public class MultiUserDoc implements ChangeListener {
 
 	public interface DifferingChangedListener {
 		public void differingChanged(Map<EditorUser, DocDifference> diffs);
@@ -172,7 +173,7 @@ public class MultiUserDoc implements Listener {
 	}
 
 	@Override
-	public void changed() {
+	public void changed(AceDoc newDoc, ServerSideDocDiff diff) {
 		// Delaying a bit. Not acting on each change, only after a while.
 		// This is a bit so so...
 		synchronized (baseChangeTimer) {

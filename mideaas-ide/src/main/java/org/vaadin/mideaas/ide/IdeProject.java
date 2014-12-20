@@ -66,6 +66,7 @@ public class IdeProject {
 		MultiUserDoc doc;
 		if (customizer != null) {
 			doc = customizedDoc(id, content);
+			customizer.docCreated(id, doc);
 		}
 		else {
 			doc = new MultiUserDoc(new AceDoc(content));

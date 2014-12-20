@@ -3,6 +3,7 @@ package org.vaadin.mideaas.ide;
 import org.vaadin.mideaas.editor.AsyncErrorChecker;
 import org.vaadin.mideaas.editor.DocDiffMediator.Filter;
 import org.vaadin.mideaas.editor.DocDiffMediator.Guard;
+import org.vaadin.mideaas.editor.MultiUserDoc;
 
 public class DefaultProjectCustomizer implements IdeProjectCustomizer {
 
@@ -26,6 +27,13 @@ public class DefaultProjectCustomizer implements IdeProjectCustomizer {
 	public AsyncErrorChecker getErrorCheckerFor(String filename, IdeProject project) {
 		return null;
 	}
+
+	@Override
+	public void docCreated(String id, MultiUserDoc doc) {
+		// TODO Auto-generated method stub
+		
+	}
+
 
 
 

@@ -27,11 +27,11 @@ import com.vaadin.ui.UI;
  */
 public class SharedDoc implements DiffListener, ResultListener {
 	
-	public interface Listener {
-		public void changed();
+	public interface ChangeListener {
+		public void changed(AceDoc newDoc, ServerSideDocDiff diff);
 	}
 
-	private final CopyOnWriteArrayList<Listener> listeners = new CopyOnWriteArrayList<Listener>();
+	private final CopyOnWriteArrayList<ChangeListener> listeners = new CopyOnWriteArrayList<ChangeListener>();
 
 	private LinkedList<AceEditor> editors = new LinkedList<AceEditor>();
 	
@@ -65,7 +65,7 @@ public class SharedDoc implements DiffListener, ResultListener {
 		AceDoc oldDoc = getDoc();
 		AceDoc newDoc = applyDiffNoFire(diff);
 		if (newDoc!=null) {
-			fireChanged();
+			fireChanged(newDoc, diff);
 			if (!newDoc.getText().equals(oldDoc.getText())) {
 				startErrorCheck();
 			}
@@ -127,7 +127,7 @@ public class SharedDoc implements DiffListener, ResultListener {
 	public void setDoc(AceDoc doc) {
 		AceDoc newDoc = setDocNoFire(doc);
 		if (newDoc!=null) {
-			fireChanged();
+			fireChanged(newDoc, null);
 			if (!newDoc.getText().equals(doc.getText())) {
 				startErrorCheck();
 			}
@@ -138,17 +138,17 @@ public class SharedDoc implements DiffListener, ResultListener {
 		return doc;
 	}
 
-	public void addListener(Listener li) {
+	public void addListener(ChangeListener li) {
 		listeners.add(li);
 	}
 	
-	public void removeListener(Listener li) {
+	public void removeListener(ChangeListener li) {
 		listeners.remove(li);
 	}
 	
-	public void fireChanged() {
-		for (Listener li : listeners) {
-			li.changed();
+	public void fireChanged(AceDoc newDoc, ServerSideDocDiff diff) {
+		for (ChangeListener li : listeners) {
+			li.changed(newDoc, diff);
 		}
 	}
 
