@@ -1,6 +1,7 @@
 package org.vaadin.mideaas.ide;
 
 import java.io.File;
+import java.net.URI;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -121,6 +122,16 @@ public class IdeUI extends UI {
 
 	protected static ProjectContainer getProjects() {
 		return projects;
+	}
+
+	/**
+	 * http://example.com/plaa/ 
+	 */
+	public String getServerRootUrl() {
+		URI loc = getUI().getPage().getLocation();
+		String root = loc.getScheme() + "://" +  loc.getAuthority() + loc.getPath();
+		root = root.endsWith("/") ? root : root + "/";
+		return root;
 	}
 		
 }

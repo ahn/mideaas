@@ -1,6 +1,5 @@
 package org.vaadin.mideaas.ide;
 
-import java.net.URI;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.Map;
@@ -223,9 +222,7 @@ public class FileList extends CustomComponent implements
 			if (filename == null || project.getDoc(filename) == null) {
 				return;
 			}
-			URI loc = getUI().getPage().getLocation();
-			String root = loc.getScheme() + "://" +  loc.getAuthority() + loc.getPath();
-			root = root.endsWith("/") ? root : root + "/";
+			String root = ((IdeUI)UI.getCurrent()).getServerRootUrl();
 			getUI().getPage().open(root + "raw/"+project.getId()+"/"+filename, "_blank");
 		}
 		else if (action == ACTION_OPEN_TAB) {
