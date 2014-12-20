@@ -1,0 +1,48 @@
+div.user-square {
+	cursor: pointer;
+/* 	user-select: none;
+	-webkit-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none; */
+	margin-right: 2px;	
+	margin-top: 2px;
+}
+
+div.user-square .gwt-Label {
+	font-size: 11px;
+}
+
+div.user-square .gwt-Label.name {
+	background-color:rgba(255,255,255,0.5);
+	color: black;
+}
+
+div.user-square .gwt-Label.error {
+	border: 2px solid red;
+	border-radius: 100px;
+	background-color: red;
+	color: white;
+	font-weight: bold;
+	min-width: 14px;
+	text-align: center;
+}
+
+
+div.user-square.user-0 {
+	background-color: LightGreen;
+}
+div.user-square.user-1 {
+	background-color: LightSalmon;
+}
+div.user-square.user-2 {
+	background-color: LightGoldenRodYellow;
+}
+div.user-square.user-3 {
+	background-color: LightCoral;
+}
+div.user-square.user-4 {
+	background-color: LightSeaGreen;
+}
+div.user-square.user-5 {
+	background-color: LightPink;
+}

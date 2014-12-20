@@ -4,7 +4,7 @@ import java.util.List;
 
 import org.vaadin.aceeditor.Suggester;
 import org.vaadin.mideaas.editor.EditorUser;
-import org.vaadin.mideaas.editor.TeamLayout;
+import org.vaadin.mideaas.editor.user.TeamLayout;
 
 import com.vaadin.ui.Component;
 import com.vaadin.ui.CustomComponent;

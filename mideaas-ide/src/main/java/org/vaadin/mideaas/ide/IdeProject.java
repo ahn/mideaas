@@ -17,7 +17,7 @@ import org.vaadin.mideaas.editor.AsyncErrorChecker;
 import org.vaadin.mideaas.editor.DocDiffMediator.Filter;
 import org.vaadin.mideaas.editor.DocDiffMediator.Guard;
 import org.vaadin.mideaas.editor.MultiUserDoc;
-import org.vaadin.mideaas.editor.Team;
+import org.vaadin.mideaas.editor.user.Team;
 
 public class IdeProject {
 	

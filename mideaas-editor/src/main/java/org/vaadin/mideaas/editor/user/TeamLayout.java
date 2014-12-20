@@ -1,7 +1,9 @@
-package org.vaadin.mideaas.editor;
+package org.vaadin.mideaas.editor.user;
 
 import java.util.LinkedList;
 import java.util.List;
+
+import org.vaadin.mideaas.editor.EditorUser;
 
 import com.vaadin.annotations.StyleSheet;
 import com.vaadin.event.MouseEvents.ClickEvent;
@@ -14,7 +16,7 @@ import com.vaadin.ui.Layout;
 import com.vaadin.ui.UI;
 
 @SuppressWarnings("serial")
-@StyleSheet("mue.css") // ???
+@StyleSheet("team-layout.css")
 public class TeamLayout extends CustomComponent implements Team.Listener {
 
 	public interface UserClickListener {
@@ -22,22 +24,22 @@ public class TeamLayout extends CustomComponent implements Team.Listener {
 	}
 	
 	private final Team team;
-	private int imageSize;
+	private int squareSize;
 	private int maxCols;
 	private final LinkedList<UserClickListener> listeners = new LinkedList<UserClickListener>();
 
 	public TeamLayout(Team team) {
 		this.team = team;
-		this.imageSize = 32;
+		this.squareSize = 48;
 		this.maxCols = 0;
-		this.setPrimaryStyleName("mue"); // ???
+		this.setPrimaryStyleName("team-layout"); // ???
 	}
 	
 	public void setImageSize(int imageSize) {
-		if (this.imageSize == imageSize) {
+		if (this.squareSize == imageSize) {
 			return;
 		}
-		this.imageSize = imageSize;
+		this.squareSize = imageSize;
 		if (isAttached()) {
 			update(team.getUsers());
 		}
@@ -103,7 +105,7 @@ public class TeamLayout extends CustomComponent implements Team.Listener {
 			la = new HorizontalLayout();
 		}
 		for (final EditorUser user : users) {
-			UserSquare square = new UserSquare(user, imageSize, false);
+			UserSquare square = new UserSquare(user, squareSize);
 			square.addClickListener(new ClickListener() {
 				@Override
 				public void click(ClickEvent event) {

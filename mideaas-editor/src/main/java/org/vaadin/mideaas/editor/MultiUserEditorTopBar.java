@@ -2,6 +2,8 @@ package org.vaadin.mideaas.editor;
 
 import java.util.Map;
 
+import org.vaadin.mideaas.editor.user.UserSquare;
+
 import com.vaadin.event.MouseEvents.ClickEvent;
 import com.vaadin.event.MouseEvents.ClickListener;
 import com.vaadin.ui.CustomComponent;
@@ -27,7 +29,7 @@ public class MultiUserEditorTopBar extends CustomComponent {
 	public void setDiffering(Map<EditorUser, DocDifference> diffs) {
 		layout.removeAllComponents();
 		
-		UserSquare base = new UserSquare(null, 16);
+		UserSquare base = new UserSquare("Base", 32);
 		base.addClickListener(new ClickListener() {
 			@Override
 			public void click(ClickEvent event) {
@@ -37,7 +39,11 @@ public class MultiUserEditorTopBar extends CustomComponent {
 		layout.addComponent(base);
 		
 		for (final DocDifference dd : diffs.values()) {
-			UserSquare b = new UserSquare(dd.getUser(), 16, dd.isChanged());
+			UserSquare b = new UserSquare(dd.getUser(), 32);
+			if (dd.isChanged()) {
+				int err = dd.getInserts() + dd.getDeletes();
+				b.setError(""+err);
+			}
 			b.addClickListener(new ClickListener() {
 				@Override
 				public void click(ClickEvent event) {

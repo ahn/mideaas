@@ -1,8 +1,10 @@
-package org.vaadin.mideaas.editor;
+package org.vaadin.mideaas.editor.user;
 
 import java.util.LinkedList;
 import java.util.List;
 import java.util.TreeMap;
+
+import org.vaadin.mideaas.editor.EditorUser;
 
 public class Team {
 	

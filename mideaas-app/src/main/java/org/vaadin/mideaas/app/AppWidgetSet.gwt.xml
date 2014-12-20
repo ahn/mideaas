@@ -35,4 +35,8 @@
     <inherits name="org.vaadin.chatbox.WidgetSet" />
 
     <inherits name="fi.jasoft.qrcode.QrcodeWidgetset" />
+
+    
+
+    <inherits name="org.vaadin.mideaas.editor.user.WidgetSet" />
 </module>
