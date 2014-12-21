@@ -41,6 +41,7 @@ public class MideaasIdeConfiguration extends DefaultIdeConfiguration {
 	public void ideCreated(Ide ide) {
 		addSideBarComponents(ide);
 		addMenuBarComponents(ide);
+		ide.openDoc("index.html"); // ???
 	}
 
 	private void addSideBarComponents(Ide ide) {

@@ -10,15 +10,16 @@ import com.vaadin.ui.CustomComponent;
 public class SimpleView extends CustomComponent implements View {
 
 	private final String title;
-	
+
 	public SimpleView(IdeDoc doc, IdeUser user, String title, Suggester suggester) {
 		this.title = title;
 		IdeEditorComponent ed = new IdeEditorComponent(doc, user, suggester);
+		ed.setTitle(title);
 		ed.setSizeFull();
 		setSizeFull();
 		setCompositionRoot(ed);
 	}
-	
+
 	@Override
 	public void enter(ViewChangeEvent event) {
 		getUI().getPage().setTitle(title);

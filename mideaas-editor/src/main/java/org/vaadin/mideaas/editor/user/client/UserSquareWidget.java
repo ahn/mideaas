@@ -48,8 +48,7 @@ public class UserSquareWidget extends FocusPanel {
 	public void setErrorSize(int errorSize) {
 		if (errorSize == 0) {
 			errorLabel.setVisible(false);
-		}
-		else {
+		} else {
 			errorLabel.setVisible(true);
 			int es = errorSize < 6 ? 6 : errorSize;
 			errorLabel.setPixelSize(es, es);

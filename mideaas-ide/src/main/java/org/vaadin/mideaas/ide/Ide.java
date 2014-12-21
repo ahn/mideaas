@@ -41,50 +41,50 @@ public class Ide extends CustomComponent {
 		VerticalLayout la = new VerticalLayout();
 		la.setSizeFull();
 		la.addComponent(createMenuBar());
-		
+
 		split.setSizeFull();
 		split.setFirstComponent(createSidebar());
 		split.setSecondComponent(editorComponent);
 		split.setSplitPosition(200, Unit.PIXELS);
 		la.addComponent(split);
-		
+
 		la.setExpandRatio(split, 1);
 
 		setCompositionRoot(la);
-		
+
 		closeDoc();
 	}
-	
+
 	public IdeProject getProject() {
 		return project;
 	}
-	
+
 	public IdeUser getUser() {
 		return user;
 	}
-	
+
 	public MenuBar getMenuBar() {
 		return menuBar;
 	}
-	
+
 	public void addSideBarComponents(List<Component> components) {
 		for (Component c : components) {
 			sidebarLayout.addComponent(c);
 		}
 	}
-	
+
 	@Override
 	public void attach() {
 		super.attach();
 		project.getTeam().addUser(editorUser);
 	}
-	
+
 	@Override
 	public void detach() {
 		super.detach();
 		project.getTeam().removeUser(editorUser);
 	}
-	
+
 	public void closeDoc() {
 		setActiveDoc(null);
 		editorComponent.removeEditor();
@@ -95,22 +95,23 @@ public class Ide extends CustomComponent {
 		if (doc == null) {
 			return;
 		}
-		
+
 		setActiveDoc(doc);
-		
+
 		// XXX
 		Suggester suggester = project.createSuggesterFor(name, user);
-		
+
 		editorComponent.setEditor(doc, user, suggester);
+		editorComponent.setTitle(name.substring(name.lastIndexOf("/")+1));
 	}
-	
+
 	private void setActiveDoc(IdeDoc doc) {
 		if (activeDoc != null) {
 			// TODO??? activeDoc.getDoc().removeChildDoc(user);
 		}
 		activeDoc = doc;
 	}
-	
+
 	private MenuBar createMenuBar() {
 		menuBar = new MenuBar();
 		menuBar.setWidth("100%");
@@ -128,16 +129,16 @@ public class Ide extends CustomComponent {
 				((IdeUI)getUI()).logOut();
 			}
 		});
-		
+
 		return menuBar;
 	}
 
 	private Component createSidebar() {
-		
+
 		VerticalSplitPanel split = new VerticalSplitPanel();
 		split.setSizeFull();
 		split.setSplitPosition(250, Unit.PIXELS);
-		
+
 		FileList fileList = new FileList(project, config);
 		fileList.setSizeFull();
 		fileList.addListener(new FileList.Listener() {
@@ -152,7 +153,7 @@ public class Ide extends CustomComponent {
 		});
 
 		split.setFirstComponent(fileList);
-		
+
 		sidebarLayout = new VerticalLayout();
 		sidebarLayout.setSpacing(true);
 
@@ -178,7 +179,7 @@ public class Ide extends CustomComponent {
 	public void setBelowEditorComponent(Component component) {
 		editorComponent.setBelowEditorComponent(component);
 	}
-	
+
 	public Component getBelowEditorComponent() {
 		return editorComponent.getBelowEditorComponent();
 	}

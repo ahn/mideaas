@@ -26,12 +26,13 @@ public class MultiUserEditor extends CustomComponent implements DifferingChanged
 	private MultiUserEditorTopBar topBar;
 	private CollaborativeAceEditor editor;
 	private EditorUser visibleUser;
+	private String title;
 
 
 	public MultiUserEditor(EditorUser user, MultiUserDoc mud, AceMode mode) {
 		this(user, mud, mode, null);
 	}
-	
+
 	public MultiUserEditor(EditorUser user, MultiUserDoc mud, AceMode mode, Suggester suggester) {
 		this.user = user;
 		this.mud = mud;
@@ -39,7 +40,14 @@ public class MultiUserEditor extends CustomComponent implements DifferingChanged
 		this.suggester = suggester;
 		addStyleName("mue");
 	}
-	
+
+	public void setTitle(String title) {
+		this.title = title;
+		if (topBar != null) {
+			topBar.setTitle(title);
+		}
+	}
+
 	@Override
 	public void attach() {
 		super.attach();
@@ -62,7 +70,7 @@ public class MultiUserEditor extends CustomComponent implements DifferingChanged
 		unregisterVisibleDoc();
 		super.detach();
 	}
-	
+
 	private void unregisterVisibleDoc() {
 		if (visibleUser==user) {
 			mud.unregisterChildDoc(user);
@@ -73,9 +81,10 @@ public class MultiUserEditor extends CustomComponent implements DifferingChanged
 		VerticalLayout layout = new VerticalLayout();
 		layout.setSizeFull();
 		topBar = new MultiUserEditorTopBar(this, visibleUser);
+		topBar.setTitle(title);
 		topBar.setDiffering(mud.getDifferences());
 		layout.addComponent(topBar);
-		
+
 		SharedDoc doc = createDoc();
 		if (doc != null) {
 			editor = new CollaborativeAceEditor(doc, visibleUser==user ? user : null);
@@ -101,23 +110,23 @@ public class MultiUserEditor extends CustomComponent implements DifferingChanged
 			new SuggestionExtension(suggester).extend(editor);
 		}
 	}
-	
+
 	protected AceEditor getCurrentEditor() {
 		return editor;
 	}
-	
+
 	public String getCurrentText() {
 		return editor==null ? null : editor.getDoc().getText();
 	}
-	
+
 	public TextRange getCurrentSelection() {
 		return editor==null ? null : editor.getSelection();
 	}
-	
+
 	private SharedDoc createDoc() {
 		if (visibleUser == null) {
 			return mud.getBase();
-		} 
+		}
 		else {
 			return mud.getChildDoc(visibleUser);
 		}
@@ -142,5 +151,5 @@ public class MultiUserEditor extends CustomComponent implements DifferingChanged
 	public void userClicked(EditorUser newUser) {
 		setVisibleUser(newUser);
 	}
-	
+
 }

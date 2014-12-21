@@ -15,29 +15,38 @@ public class IdeEditorComponent extends CustomComponent {
 	private Component below = null;
 	private VerticalSplitPanel split;
 	private int belowHeight = 150;
-	
+	private String title;
+
 	public IdeEditorComponent() {
 		setSizeFull();
 		removeEditor();
 	}
-	
+
 	public IdeEditorComponent(IdeDoc doc, IdeUser user, Suggester suggester) {
 		setSizeFull();
 		setEditor(doc, user, suggester);
-		
+
 	}
-	
+
 	public void setEditor(IdeDoc doc, IdeUser user, Suggester suggester) {
 		editor = new MultiUserEditor(user.getEditorUser(), doc.getDoc(), doc.getAceMode(), suggester);
+		editor.setTitle(title);
 		editor.setSizeFull();
 		draw();
 	}
-	
+
+	public void setTitle(String title) {
+		this.title = title;
+		if (editor != null) {
+			editor.setTitle(title);
+		}
+	}
+
 	public void removeEditor() {
 		editor = null;
 		draw();
 	}
-	
+
 	public void setBelowEditorComponent(Component belowEditorComponent, int initialHeightPixels) {
 		below = belowEditorComponent;
 		belowHeight = initialHeightPixels;
@@ -46,12 +55,12 @@ public class IdeEditorComponent extends CustomComponent {
 		}
 		draw();
 	}
-	
+
 	public void setBelowEditorComponent(Component belowEditorComponent) {
 		below = belowEditorComponent;
 		draw();
 	}
-	
+
 	private void draw() {
 		if (below == null) {
 			setCompositionRoot(getFirstComponent());
@@ -60,11 +69,11 @@ public class IdeEditorComponent extends CustomComponent {
 			drawSplit();
 		}
 	}
-	
+
 	private Component getFirstComponent() {
 		return editor != null ? editor : new VerticalLayout(); // ?
 	}
-	
+
 	private void drawSplit() {
 		setCompositionRoot(null); // to avoid adding the editorView twice
 		if (split == null) {
@@ -81,6 +90,8 @@ public class IdeEditorComponent extends CustomComponent {
 		return below;
 	}
 
-	
+
+
+
 
 }

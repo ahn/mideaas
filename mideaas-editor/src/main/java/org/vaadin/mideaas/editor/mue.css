@@ -100,4 +100,10 @@
 	background-color: LightPink;
 }
 
+.mue .collabeditor-layout .collabeditor-title {
+	font-family: "monospace";
+	margin-left: 8px;
+	margin-right: 12px;
+	text-align: left;
+}
 
