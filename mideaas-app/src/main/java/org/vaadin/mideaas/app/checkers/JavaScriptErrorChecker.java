@@ -1,8 +1,11 @@
-package org.vaadin.mideaas.app.guards;
+package org.vaadin.mideaas.app.checkers;
 
-import org.vaadin.aceeditor.ServerSideDocDiff;
-import org.vaadin.aceeditor.client.AceDoc;
-import org.vaadin.mideaas.editor.DocDiffMediator.Guard;
+import java.util.LinkedList;
+import java.util.List;
+
+import org.vaadin.aceeditor.client.Util;
+import org.vaadin.mideaas.editor.AsyncErrorChecker;
+import org.vaadin.mideaas.editor.ErrorChecker.Error;
 
 import com.google.javascript.jscomp.BasicErrorManager;
 import com.google.javascript.jscomp.CheckLevel;
@@ -11,14 +14,15 @@ import com.google.javascript.jscomp.CompilerOptions;
 import com.google.javascript.jscomp.JSError;
 import com.google.javascript.jscomp.SourceFile;
 
-public class JavaScriptGuard implements Guard {
+public class JavaScriptErrorChecker implements AsyncErrorChecker {
+
 
 	@Override
-	public boolean isAcceptable(AceDoc candidate, ServerSideDocDiff diff) {
-		return compile(candidate.getText());
+	public void checkErrors(final String s, final ResultListener listener) {
+		listener.errorsChecked(getErrors(s));
 	}
 
-	public static boolean compile(String code) {
+	public static List<Error> getErrors(String code) {
 		Compiler compiler = new Compiler();
 
 		CompilerOptions options = new CompilerOptions();
@@ -47,9 +51,18 @@ public class JavaScriptGuard implements Guard {
 		// compile() returns a Result, but it is not needed here.
 		compiler.compile(input, externs, options);
 
-		// The compiler is responsible for generating the compiled code; it is
-		// not accessible via the Result.
-		return compiler.getErrorCount() == 0;
+		LinkedList<Error> errors = new LinkedList<Error>();
+		for (JSError e : compiler.getErrors()) {
+			errors.add(errorFromJsError(e, code));
+		}
+		return errors;
+	}
+
+	private static Error errorFromJsError(JSError e, String text) {
+		int line = e.getLineNumber();
+		int col = e.getCharno();
+		int start = Util.cursorPosFromLineCol(text, line, col, 1);
+		return new Error(e.toString(), start, start+1);
 	}
 
 }
