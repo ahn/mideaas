@@ -5,12 +5,15 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
+import java.util.logging.Logger;
 
 import org.apache.commons.io.FileUtils;
 
 
 public class MideaasConfig {
-	
+
+	private static final Logger log = Logger.getLogger(MideaasConfig.class.getName());
+
 	@SuppressWarnings("serial")
 	public static class ConfigError extends RuntimeException {
 		public ConfigError(File config, String message) {
@@ -28,136 +31,152 @@ public class MideaasConfig {
 			}
 		}
 	}
-    
+
 	//get using: MideaasConfig.getProperty(Prop.JETTY_STOP_PORT_MAX)
-    public enum Prop {
-        DEPLOY_DIR,
-        DEPLOY_SERVER,
-        MAVEN_HOME,
-        FNTS_SERVERS,
-        EXECUTORS,
-        PROJECTS_DIR,
-        APP_PACKAGE_BASE,
-        VISUAL_DESIGNER_URL,
-        JETTY_PORT_MIN,
-        JETTY_PORT_MAX,
-        JETTY_STOP_PORT_MIN,
-        JETTY_STOP_PORT_MAX,
-        
-        EASICLOUDS_FEATURES, 
-        PAAS_DEPLOY, 
-        GAE_COMPILE,
-        COAPS_API_URI, 
-        USE_SLA_SELECTION_MAP, 
-        SLA_SELECTION_MAP_URI,
-        
-        EXPERIMENT,
-        LOG_DIR,
-        DEFAULT_WIDGETSET_USER_AGENT,
-        FEEDBACK_FILE,
+	public enum Prop {
+		DEPLOY_DIR,
+		DEPLOY_SERVER,
+		MAVEN_HOME,
+		FNTS_SERVERS,
+		EXECUTORS,
+		PROJECTS_DIR,
+		APP_PACKAGE_BASE,
+		VISUAL_DESIGNER_URL,
+		JETTY_PORT_MIN,
+		JETTY_PORT_MAX,
+		JETTY_STOP_PORT_MIN,
+		JETTY_STOP_PORT_MAX,
 
-        GITHUB_KEY,
-        GITHUB_SECRET,
-        
-        FACEBOOK_KEY,
-        FACEBOOK_SECRET,
-        
-        TWITTER_KEY,
-        TWITTER_SECRET
-    }
+		EASICLOUDS_FEATURES,
+		PAAS_DEPLOY,
+		GAE_COMPILE,
+		COAPS_API_URI,
+		USE_SLA_SELECTION_MAP,
+		SLA_SELECTION_MAP_URI,
 
-    public static final String MIDEAAS_CONFIG_FILE_IN_CLASSPATH = "mideaas.properties";
-    
-    public static final String ENV_FILE = "MIDEAAS_CONFIG_FILE";
-    
-    private static final Properties properties = new Properties();
-    
-    // Default properties:
-    static {
-        properties.put(Prop.APP_PACKAGE_BASE.toString(), "com.arvue.apps");
-    }
-    
-    static {
-        String configFile = System.getenv().get(ENV_FILE);
-        if (configFile==null) {
-            readDefaultConfig();
-        }
-        else {
-            File f = new File(configFile);
-            if (f.exists()) {
-                try {
-                    readConfigFrom(f);
-                } catch (IOException e) {
-                    System.err.println("WARNING: error reading config from '" + f +"'. Reading default config.");
-                    readDefaultConfig();
-                }
-            }
-            else {
-                System.err.println("WARNING: file " + f +" does not exist. Reading default config.");
-                readDefaultConfig();
-            }
-        }
-       
-    }
-    
-    public static final String getProperty(Prop p) {
-        return properties.getProperty(p.toString());
-    }
-    
-    public static int getPropertyInt(Prop p) {
+		EXPERIMENT,
+		LOG_DIR,
+		DEFAULT_WIDGETSET_USER_AGENT,
+		FEEDBACK_FILE,
+
+		GITHUB_KEY,
+		GITHUB_SECRET,
+
+		FACEBOOK_KEY,
+		FACEBOOK_SECRET,
+
+		TWITTER_KEY,
+		TWITTER_SECRET,
+
+		SEND_FILE_CHANGES_TO_SOCKET_PORT
+	}
+
+	public static final String MIDEAAS_CONFIG_FILE_IN_CLASSPATH = "mideaas.properties";
+
+	public static final String ENV_FILE = "MIDEAAS_CONFIG_FILE";
+
+	private static final Properties properties = new Properties();
+
+	// Default properties:
+	static {
+		properties.put(Prop.APP_PACKAGE_BASE.toString(), "com.arvue.apps");
+	}
+
+	static {
+		String configFile = System.getenv().get(ENV_FILE);
+		if (configFile==null) {
+			readDefaultConfig();
+		}
+		else {
+			File f = new File(configFile);
+			if (f.exists()) {
+				try {
+					readConfigFrom(f);
+				} catch (IOException e) {
+					log.warning("error reading config from '" + f +"'. Reading default config.");
+					readDefaultConfig();
+				}
+			}
+			else {
+				log.warning("file " + f +" does not exist. Reading default config.");
+				readDefaultConfig();
+			}
+		}
+
+	}
+
+	public static final String getProperty(Prop p) {
+		return properties.getProperty(p.toString());
+	}
+
+	public static int getPropertyInt(Prop p) {
 		return Integer.valueOf(getProperty(p));
 	}
 
-    private static void readConfigFrom(File f) throws IOException {
-        readConfigFrom(new FileInputStream(f));
-        // checkProperties(f);
-    }
-    
-    private static void readConfigFrom(InputStream inputStream) throws IOException {
-    	try {
-            properties.load(inputStream);
-        }
-        finally {
-            if (inputStream!=null) {
-            	inputStream.close();
-            }
-        }
-    }
+	public static int getPropertyInt(Prop p, int defaultValue) {
+		String prop = getProperty(p);
+		if (prop == null) {
+			return defaultValue;
+		}
+		try {
+			return Integer.valueOf(prop);
+		}
+		catch (NumberFormatException e) {
+			log.warning(p + " Invalid int: " + prop);
+			return defaultValue;
+		}
+	}
 
-    private static void readDefaultConfig() {
-        InputStream inputStream = MideaasConfig.class.getClassLoader()
-                .getResourceAsStream(MIDEAAS_CONFIG_FILE_IN_CLASSPATH);
-    
-        if (inputStream == null) {
-        	throw new ConfigError(new File(MIDEAAS_CONFIG_FILE_IN_CLASSPATH), "Could not load properties file.");
-        }
-        else {
-            try {
-                readConfigFrom(inputStream);
-                // checkProperties(null);
-            } catch (IOException e) {
-            	throw new ConfigError(new File(MIDEAAS_CONFIG_FILE_IN_CLASSPATH), "Could not read", e);
-            }
-        }
-    }
+	private static void readConfigFrom(File f) throws IOException {
+		readConfigFrom(new FileInputStream(f));
+		// checkProperties(f);
+	}
 
-    public static boolean easiCloudsFeaturesTurnedOn(){
-    	return "on".equals(MideaasConfig.getProperty(Prop.EASICLOUDS_FEATURES));
-    }
+	private static void readConfigFrom(InputStream inputStream) throws IOException {
+		try {
+			properties.load(inputStream);
+		}
+		finally {
+			if (inputStream!=null) {
+				inputStream.close();
+			}
+		}
+	}
 
-    public static boolean compileGaeTurnedOn(){
-    	return "on".equals(MideaasConfig.getProperty(Prop.GAE_COMPILE));
-    }
+	private static void readDefaultConfig() {
+		InputStream inputStream = MideaasConfig.class.getClassLoader()
+				.getResourceAsStream(MIDEAAS_CONFIG_FILE_IN_CLASSPATH);
 
-    public static boolean paasDeployTurnedOn(){
-    	String value = MideaasConfig.getProperty(Prop.PAAS_DEPLOY);
-    	boolean boolValue = "on".equals(value);
-    	return boolValue;
-    }
-    
-    public static boolean isExperiment() {
-    	return "on".equals(MideaasConfig.getProperty(Prop.EXPERIMENT));
-    }
+		if (inputStream == null) {
+			throw new ConfigError(new File(MIDEAAS_CONFIG_FILE_IN_CLASSPATH), "Could not load properties file.");
+		}
+		else {
+			try {
+				readConfigFrom(inputStream);
+				// checkProperties(null);
+			} catch (IOException e) {
+				throw new ConfigError(new File(MIDEAAS_CONFIG_FILE_IN_CLASSPATH), "Could not read", e);
+			}
+		}
+	}
+
+	public static boolean easiCloudsFeaturesTurnedOn(){
+		return "on".equals(MideaasConfig.getProperty(Prop.EASICLOUDS_FEATURES));
+	}
+
+	public static boolean compileGaeTurnedOn(){
+		return "on".equals(MideaasConfig.getProperty(Prop.GAE_COMPILE));
+	}
+
+	public static boolean paasDeployTurnedOn(){
+		String value = MideaasConfig.getProperty(Prop.PAAS_DEPLOY);
+		boolean boolValue = "on".equals(value);
+		return boolValue;
+	}
+
+	public static boolean isExperiment() {
+		return "on".equals(MideaasConfig.getProperty(Prop.EXPERIMENT));
+	}
 
 	public static File getLogDir() {
 		String d = MideaasConfig.getProperty(Prop.LOG_DIR);
@@ -171,62 +190,62 @@ public class MideaasConfig {
 		String coapsApiUri = MideaasConfig.coapsApiUri();
 		boolean useSLASelectionMap = MideaasConfig.useSLASelectionMap();
 		String slaSelectionMapUri = MideaasConfig.slaSelectionMapUri();
-		
+
 		UserSettings settings = new UserSettings(coapsApiUri, ecFeaturesOn, pdOn, cgon, useSLASelectionMap, slaSelectionMapUri);
 		settings.userAgent = getProperty(Prop.DEFAULT_WIDGETSET_USER_AGENT);
 		return settings;
 	}
 
 	private static String slaSelectionMapUri() {
-    	return MideaasConfig.getProperty(Prop.SLA_SELECTION_MAP_URI);
+		return MideaasConfig.getProperty(Prop.SLA_SELECTION_MAP_URI);
 	}
 
 	private static boolean useSLASelectionMap() {
-    	return "on".equals(MideaasConfig.getProperty(Prop.USE_SLA_SELECTION_MAP));
+		return "on".equals(MideaasConfig.getProperty(Prop.USE_SLA_SELECTION_MAP));
 	}
 
 	private static String coapsApiUri() {
-    	return MideaasConfig.getProperty(Prop.COAPS_API_URI);
+		return MideaasConfig.getProperty(Prop.COAPS_API_URI);
 	}
 
 	public static File getFeedbackFile() {
 		String d = MideaasConfig.getProperty(Prop.FEEDBACK_FILE);
 		return d==null ? null : new File(d);
 	}
-	
-	
+
+
 	public static String getFNTSServers() {
 		String servers = MideaasConfig.getProperty(Prop.FNTS_SERVERS);
 		return servers;
 	}
-	
+
 	public static int getExecutorNumber() {
 		int executors = Integer.valueOf(MideaasConfig.getProperty(Prop.EXECUTORS));
 		return executors;
 	}
-	
+
 	public static File getMavenHome() {
 		return new File(getProperty(Prop.MAVEN_HOME));
 	}
-	
-	public static void checkProperties(File f) {
-		
 
-		
-		
+	public static void checkProperties(File f) {
+
+
+
+
 		File logDir = getLogDir();
 		if (logDir!=null && !logDir.isDirectory()) {
 			throw new ConfigError(f, Prop.LOG_DIR + " does not exist: " + logDir);
 		}
-		
+
 		File mvn = FileUtils.getFile(getMavenHome(), "bin", "mvn");
 		if (!mvn.isFile()) {
 			throw new ConfigError(f, "Not a proper "+Prop.MAVEN_HOME+": "+getMavenHome()+" - "+mvn+" does not exist.");
 		}
-		
+
 		// TODO: more checks
 	}
 
-	
+
 
 }

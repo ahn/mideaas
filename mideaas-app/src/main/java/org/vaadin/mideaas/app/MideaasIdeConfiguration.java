@@ -32,20 +32,20 @@ import com.vaadin.ui.VerticalLayout;
 public class MideaasIdeConfiguration extends DefaultIdeConfiguration {
 
 	private final UserSettings userSettings;
-	
+
 	public MideaasIdeConfiguration(UserSettings userSettings) {
 		this.userSettings = userSettings;
 	}
-	
+
 	@Override
 	public void ideCreated(Ide ide) {
 		addSideBarComponents(ide);
 		addMenuBarComponents(ide);
 	}
-	
+
 	private void addSideBarComponents(Ide ide) {
 		List<Component> components = new LinkedList<Component>();
-		
+
 		if (ide.getProject() instanceof VaadinProject) {
 			VaadinProject vp = (VaadinProject) ide.getProject();
 			if (vp.getBuilder() != null) {
@@ -54,7 +54,7 @@ public class MideaasIdeConfiguration extends DefaultIdeConfiguration {
 			if (vp.getJettyServer() != null) {
 				components.add(new JettyComponent(vp.getJettyServer()));
 			}
-			
+
 			// Compiling all at the beginning
 			vp.refreshClasspath();
 			vp.compileAll();
@@ -65,14 +65,14 @@ public class MideaasIdeConfiguration extends DefaultIdeConfiguration {
 			link.setTargetName("_blank");
 			components.add(link);
 		}
-		
+
 		ide.addSideBarComponents(components);
 	}
-	
+
 	private void addMenuBarComponents(final Ide ide) {
 		MenuBar menuBar = ide.getMenuBar();
-		
-		
+
+
 		if (ide.getProject() instanceof VaadinProject) {
 			VaadinProject vp = (VaadinProject) ide.getProject();
 			addBuildMenu(menuBar, vp);
@@ -91,7 +91,7 @@ public class MideaasIdeConfiguration extends DefaultIdeConfiguration {
 			}
 		});
 	}
-	
+
 	@SuppressWarnings("serial")
 	private Component createBelowEditorComponent(final Ide ide) {
 		VerticalLayout la = new VerticalLayout();
@@ -119,21 +119,21 @@ public class MideaasIdeConfiguration extends DefaultIdeConfiguration {
 		final Builder builder = project.getBuilder();
 		menu.addItem("Compile widgetset", new MavenCommand(builder, new String[] {"vaadin:update-widgetset", "vaadin:compile"}));
 		menu.addItem("Clean", new MavenCommand(builder, new String[] {"clean"}));
-		
+
 		menu.addItem("Stop all Jetty servers", new Command() {
 			@Override
 			public void menuSelected(MenuItem selected) {
 				JettyUtil.stopAllJettys();
 			}
 		});
-		
+
 		menu.addItem("Update classpath", new Command() {
 			@Override
 			public void menuSelected(MenuItem selectedItem) {
 				project.refreshClasspath();
 			}
 		});
-		
+
 		menu.addItem("Compile all", new Command() {
 			@Override
 			public void menuSelected(MenuItem selectedItem) {
@@ -142,10 +142,10 @@ public class MideaasIdeConfiguration extends DefaultIdeConfiguration {
 		});
 	}
 
-
 	@Override
 	public IdeProject createProject(String id, String name, Map<String, String> files, File workDir) {
-		if (files.containsKey("pom.xml")) { // TODO: more detailed check
+		// TODO: more thorough project type checking
+		if (files.containsKey("pom.xml")) {
 			try {
 				return new VaadinProject(id, name, workDir);
 			} catch (IOException e) {
@@ -158,26 +158,26 @@ public class MideaasIdeConfiguration extends DefaultIdeConfiguration {
 		}
 		return super.createProject(id, name, files, workDir);
 	}
-	
-//	@Override
-//	public IdeLoginView createLoginView() {
-//		String key = MideaasConfig.getProperty(Prop.GITHUB_KEY);
-//		String secret = MideaasConfig.getProperty(Prop.GITHUB_SECRET);
-//		if (key == null || secret == null) {
-//			throw new IllegalArgumentException("No " + Prop.GITHUB_KEY + "/" + Prop.GITHUB_SECRET +" in config.");
-//		}
-//		return new GitHubLoginView(key, secret);
-//	}
-//
-//	@Override
-//	public IdeLobbyView createLobbyView() {
-//		String key = MideaasConfig.getProperty(Prop.GITHUB_KEY);
-//		String secret = MideaasConfig.getProperty(Prop.GITHUB_SECRET);
-//		if (key == null || secret == null) {
-//			throw new IllegalArgumentException("No " + Prop.GITHUB_KEY + "/" + Prop.GITHUB_SECRET +" in config.");
-//		}
-//		return new GitHubLobbyView(key, secret);
-//	}
 
-	
+	//	@Override
+	//	public IdeLoginView createLoginView() {
+	//		String key = MideaasConfig.getProperty(Prop.GITHUB_KEY);
+	//		String secret = MideaasConfig.getProperty(Prop.GITHUB_SECRET);
+	//		if (key == null || secret == null) {
+	//			throw new IllegalArgumentException("No " + Prop.GITHUB_KEY + "/" + Prop.GITHUB_SECRET +" in config.");
+	//		}
+	//		return new GitHubLoginView(key, secret);
+	//	}
+	//
+	//	@Override
+	//	public IdeLobbyView createLobbyView() {
+	//		String key = MideaasConfig.getProperty(Prop.GITHUB_KEY);
+	//		String secret = MideaasConfig.getProperty(Prop.GITHUB_SECRET);
+	//		if (key == null || secret == null) {
+	//			throw new IllegalArgumentException("No " + Prop.GITHUB_KEY + "/" + Prop.GITHUB_SECRET +" in config.");
+	//		}
+	//		return new GitHubLobbyView(key, secret);
+	//	}
+
+
 }

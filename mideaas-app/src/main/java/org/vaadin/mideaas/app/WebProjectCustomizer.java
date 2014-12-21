@@ -3,6 +3,7 @@ package org.vaadin.mideaas.app;
 import java.io.IOException;
 import java.util.logging.Logger;
 
+import org.vaadin.mideaas.app.MideaasConfig.Prop;
 import org.vaadin.mideaas.app.checkers.CssErrorChecker;
 import org.vaadin.mideaas.app.checkers.JavaScriptErrorChecker;
 import org.vaadin.mideaas.app.guards.CSSGuard;
@@ -17,26 +18,31 @@ import org.vaadin.mideaas.ide.IdeProject;
 public class WebProjectCustomizer extends DefaultProjectCustomizer {
 
 	private static final Logger log = Logger.getLogger(WebProjectCustomizer.class.getName());
-	
-	private static final int CHANGE_SOCKET_PORT = 4321; // ???
-	
+
+	private static final int CHANGE_SOCKET_PORT = MideaasConfig.getPropertyInt(Prop.SEND_FILE_CHANGES_TO_SOCKET_PORT, -1);
+
 	private static FileChangeSocketSender sender;
 	static {
-		try {
-			sender = new FileChangeSocketSender("localhost", CHANGE_SOCKET_PORT);
-		} catch (IOException e) {
-			e.printStackTrace();
-			log.warning("Can not send file changes to socket on port "+ CHANGE_SOCKET_PORT);
+		if (CHANGE_SOCKET_PORT == -1) {
 			sender = null;
 		}
+		else {
+			try {
+				sender = new FileChangeSocketSender("localhost", CHANGE_SOCKET_PORT);
+			} catch (IOException e) {
+				e.printStackTrace();
+				log.warning("Can not send file changes to socket on port "+ CHANGE_SOCKET_PORT);
+				sender = null;
+			}
+		}
 	}
-		
+
 	private final String projectId;
-	
+
 	public WebProjectCustomizer(String projectId) {
 		this.projectId = projectId;
 	}
-	
+
 	@Override
 	public Guard getUpwardsGuardFor(String filename) {
 		if (filename.endsWith(".css")) {
@@ -64,9 +70,13 @@ public class WebProjectCustomizer extends DefaultProjectCustomizer {
 
 	@Override
 	public void docCreated(final String id, MultiUserDoc doc) {
-		if (sender != null && (id.endsWith(".html") || id.endsWith(".css"))) {
+		if (sender != null && fileSendable(id)) {
 			sender.follow(projectId+"/"+id, doc.getBase());
 		}
+	}
+
+	private boolean fileSendable(String filename) {
+		return filename.endsWith(".html") || filename.endsWith(".css");
 	}
 
 }
