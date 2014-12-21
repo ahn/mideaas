@@ -11,22 +11,21 @@ public class UserSquareWidget extends FocusPanel {
 	private final Label nameLabel = new Label();
 	private final Image image = new Image();
 	private final Label errorLabel = new Label();
-	
+
 	public UserSquareWidget() {
 		create();
 	}
-	
+
 	private void create() {
 		setStyleName("user-square");
 		add(panel);
 		panel.add(image, 4, 4);
 		panel.add(nameLabel, 4, 0);
-		panel.add(errorLabel, 1, 1	);
+		panel.add(errorLabel, 1, 1);
 		nameLabel.addStyleName("name");
 		nameLabel.setWordWrap(false);
 		errorLabel.addStyleName("error");
-		errorLabel.setHeight("14px");
-		setError(null);
+		setErrorSize(0);
 	}
 
 	public void setName(String name) {
@@ -46,13 +45,14 @@ public class UserSquareWidget extends FocusPanel {
 		nameLabel.setPixelSize(imageSize, 12);
 	}
 
-	public void setError(String error) {
-		if (error == null) {
+	public void setErrorSize(int errorSize) {
+		if (errorSize == 0) {
 			errorLabel.setVisible(false);
 		}
 		else {
 			errorLabel.setVisible(true);
-			errorLabel.setText(error);
+			int es = errorSize < 6 ? 6 : errorSize;
+			errorLabel.setPixelSize(es, es);
 		}
 	}
 }

@@ -21,11 +21,12 @@ public class UserSquareConnector extends AbstractComponentConnector {
 
 	public UserSquareConnector() {
 		getWidget().addClickHandler(new ClickHandler() {
+			@Override
 			public void onClick(ClickEvent event) {
 				final MouseEventDetails mouseDetails = MouseEventDetailsBuilder
 						.buildMouseEventDetails(event.getNativeEvent(),
 								getWidget().getElement());
-				
+
 				// When the widget is clicked, the event is sent to server with ServerRpc
 				rpc.clicked(mouseDetails);
 			}
@@ -39,7 +40,7 @@ public class UserSquareConnector extends AbstractComponentConnector {
 		return GWT.create(UserSquareWidget.class);
 	}
 
-	
+
 	// We must implement getWidget() to cast to correct type
 	@Override
 	public UserSquareWidget getWidget() {
@@ -66,7 +67,7 @@ public class UserSquareConnector extends AbstractComponentConnector {
 		if (getState().imageUrl != null) {
 			w.setImageUrl(getState().imageUrl);
 		}
-		w.setError(getState().error);
+		w.setErrorSize(getState().errorSize);
 	}
 
 }

@@ -11,10 +11,10 @@ import com.vaadin.ui.HorizontalLayout;
 
 @SuppressWarnings("serial")
 public class MultiUserEditorTopBar extends CustomComponent {
-	
+
 	private final MultiUserEditor parent;
 	private final HorizontalLayout layout;
-	
+
 	public MultiUserEditorTopBar(MultiUserEditor parent, EditorUser user) {
 		this.parent = parent;
 		layout = new HorizontalLayout();
@@ -28,7 +28,7 @@ public class MultiUserEditorTopBar extends CustomComponent {
 
 	public void setDiffering(Map<EditorUser, DocDifference> diffs) {
 		layout.removeAllComponents();
-		
+
 		UserSquare base = new UserSquare("Base", 32);
 		base.addClickListener(new ClickListener() {
 			@Override
@@ -37,12 +37,11 @@ public class MultiUserEditorTopBar extends CustomComponent {
 			}
 		});
 		layout.addComponent(base);
-		
+
 		for (final DocDifference dd : diffs.values()) {
 			UserSquare b = new UserSquare(dd.getUser(), 32);
 			if (dd.isChanged()) {
-				int err = dd.getInserts() + dd.getDeletes();
-				b.setError(""+err);
+				b.setErrorAmount(errorAmount(dd));
 			}
 			b.addClickListener(new ClickListener() {
 				@Override
@@ -53,6 +52,11 @@ public class MultiUserEditorTopBar extends CustomComponent {
 			layout.addComponent(b);
 		}
 	}
-	
+
+	private static double errorAmount(DocDifference dd) {
+		int err = dd.getInserts() + dd.getDeletes();
+		return Math.min(1.0, Math.sqrt(err*0.0025));
+	}
+
 
 }

@@ -18,15 +18,9 @@ div.user-square .gwt-Label.name {
 }
 
 div.user-square .gwt-Label.error {
-	border: 2px solid red;
-	border-radius: 100px;
+	border-radius: 50%;
 	background-color: red;
-	color: white;
-	font-weight: bold;
-	min-width: 14px;
-	text-align: center;
 }
-
 
 div.user-square.user-0 {
 	background-color: LightGreen;

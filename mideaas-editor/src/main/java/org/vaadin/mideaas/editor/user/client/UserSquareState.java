@@ -6,5 +6,6 @@ public class UserSquareState extends com.vaadin.shared.AbstractComponentState {
 	public String style;
 	public String imageUrl;
 	public int size;
-	public String error;
+	//	public String error;
+	public int errorSize;
 }
