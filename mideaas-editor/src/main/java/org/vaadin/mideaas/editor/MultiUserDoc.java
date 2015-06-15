@@ -126,12 +126,10 @@ public class MultiUserDoc implements ChangeListener {
 			if (child == null) {
 				return;
 			}
-			if (child.numRegistered == 1) {
-				removeChildDoc(child);
+			child.numRegistered -= 1;
+			
+			if (child.numRegistered == 0) {
 				changed = true;
-			}
-			else {
-				child.numRegistered -= 1;
 			}
 		}
 		
@@ -140,6 +138,7 @@ public class MultiUserDoc implements ChangeListener {
 		}
 	}
 	
+	// TODO when to call this?
 	private void removeChildDoc(ChildDoc child) {
 
 		childDocs.remove(child.user);
@@ -199,6 +198,9 @@ public class MultiUserDoc implements ChangeListener {
 	public synchronized Map<EditorUser, DocDifference> getDifferences() {
 		HashMap<EditorUser, DocDifference> diffs = new HashMap<EditorUser, DocDifference>();
 		for (ChildDoc cd : childDocs.values()) {
+			if (cd.numRegistered == 0) {
+				continue;
+			}
 			DocDifference dd = new DocDifference(cd.user, base.getDoc(), cd.doc.getDoc());
 			//if (dd.isChanged()) {
 				diffs.put(cd.user, dd);
