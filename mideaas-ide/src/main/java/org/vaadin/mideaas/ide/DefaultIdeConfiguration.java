@@ -27,7 +27,7 @@ public class DefaultIdeConfiguration implements IdeConfiguration {
 	}
 
 	@Override
-	public DocAdderComponent createDocAdderComponent(DocAdder docAdder) {
+	public DocAdderComponent createDocAdderComponent(IdeProject project, String suggestedParent, DocAdder docAdder) {
 		return new SimpleDocAdderComponent(docAdder);
 	}
 

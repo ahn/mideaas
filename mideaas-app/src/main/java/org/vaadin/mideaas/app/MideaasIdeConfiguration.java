@@ -6,6 +6,9 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import org.vaadin.mideaas.app.MideaasConfig.Prop;
+import org.vaadin.mideaas.app.git.GitHubLobbyView;
+import org.vaadin.mideaas.app.git.GitHubLoginView;
 import org.vaadin.mideaas.app.maven.BuildComponent;
 import org.vaadin.mideaas.app.maven.Builder;
 import org.vaadin.mideaas.app.maven.JettyComponent;
@@ -13,9 +16,14 @@ import org.vaadin.mideaas.app.maven.JettyUtil;
 import org.vaadin.mideaas.app.maven.MavenCommand;
 import org.vaadin.mideaas.app.test.TestCommand;
 import org.vaadin.mideaas.ide.DefaultIdeConfiguration;
+import org.vaadin.mideaas.ide.DocAdder;
+import org.vaadin.mideaas.ide.DocAdderComponent;
 import org.vaadin.mideaas.ide.Ide;
+import org.vaadin.mideaas.ide.IdeLobbyView;
+import org.vaadin.mideaas.ide.IdeLoginView;
 import org.vaadin.mideaas.ide.IdeProject;
 import org.vaadin.mideaas.ide.IdeUI;
+import org.vaadin.mideaas.ide.SimpleDocAdderComponent;
 
 import com.vaadin.server.ExternalResource;
 import com.vaadin.ui.Button;
@@ -142,6 +150,19 @@ public class MideaasIdeConfiguration extends DefaultIdeConfiguration {
 			}
 		});
 	}
+	
+	@Override
+	public DocAdderComponent createDocAdderComponent(IdeProject project, String suggestedParent, DocAdder docAdder) {
+		String javaDir = "src/main/java/";
+		if (project instanceof VaadinProject && suggestedParent.startsWith(javaDir)) {
+			String pkg = suggestedParent.substring(javaDir.length()).replace('/', '.');
+			return new JavaDocAdderComponent((VaadinProject)project, pkg, docAdder);
+		}
+		else {
+			return new SimpleDocAdderComponent(docAdder);
+		}
+		
+	}
 
 	@Override
 	public IdeProject createProject(String id, String name, Map<String, String> files, File workDir) {
@@ -160,25 +181,27 @@ public class MideaasIdeConfiguration extends DefaultIdeConfiguration {
 		return super.createProject(id, name, files, workDir);
 	}
 
-	//	@Override
-	//	public IdeLoginView createLoginView() {
-	//		String key = MideaasConfig.getProperty(Prop.GITHUB_KEY);
-	//		String secret = MideaasConfig.getProperty(Prop.GITHUB_SECRET);
-	//		if (key == null || secret == null) {
-	//			throw new IllegalArgumentException("No " + Prop.GITHUB_KEY + "/" + Prop.GITHUB_SECRET +" in config.");
-	//		}
-	//		return new GitHubLoginView(key, secret);
-	//	}
-	//
-	//	@Override
-	//	public IdeLobbyView createLobbyView() {
-	//		String key = MideaasConfig.getProperty(Prop.GITHUB_KEY);
-	//		String secret = MideaasConfig.getProperty(Prop.GITHUB_SECRET);
-	//		if (key == null || secret == null) {
-	//			throw new IllegalArgumentException("No " + Prop.GITHUB_KEY + "/" + Prop.GITHUB_SECRET +" in config.");
-	//		}
-	//		return new GitHubLobbyView(key, secret);
-	//	}
+	@Override
+	public IdeLoginView createLoginView() {
+		String key = MideaasConfig.getProperty(Prop.GITHUB_KEY);
+		String secret = MideaasConfig.getProperty(Prop.GITHUB_SECRET);
+		if (key == null || secret == null) {
+			throw new IllegalArgumentException("No " + Prop.GITHUB_KEY + "/"
+					+ Prop.GITHUB_SECRET + " in config.");
+		}
+		return new GitHubLoginView(key, secret);
+	}
+
+	@Override
+	public IdeLobbyView createLobbyView() {
+		String key = MideaasConfig.getProperty(Prop.GITHUB_KEY);
+		String secret = MideaasConfig.getProperty(Prop.GITHUB_SECRET);
+		if (key == null || secret == null) {
+			throw new IllegalArgumentException("No " + Prop.GITHUB_KEY + "/"
+					+ Prop.GITHUB_SECRET + " in config.");
+		}
+		return new GitHubLobbyView(key, secret);
+	}
 
 
 }

@@ -43,9 +43,10 @@ public interface IdeConfiguration {
 
 	/**
 	 * A component for adding new docs to project.
+	 * @param project 
 	 * @param docAdder 
 	 */
-	public DocAdderComponent createDocAdderComponent(DocAdder docAdder);
+	public DocAdderComponent createDocAdderComponent(IdeProject project, String suggestedParent, DocAdder docAdder);
 
 	/**
 	 * "Project files" are files that can be modified directly by user in the IDE.
