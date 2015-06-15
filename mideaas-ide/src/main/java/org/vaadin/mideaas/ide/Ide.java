@@ -120,7 +120,7 @@ public class Ide extends CustomComponent {
 			@Override
 			public void menuSelected(MenuItem selectedItem) {
 				String path = getUI().getPage().getLocation().getPath();
-				getUI().getPage().open(path, "Lobby");
+				getUI().getPage().open(path, null);
 			}
 		});
 		userMenu.addItem("Log out", new Command() {
