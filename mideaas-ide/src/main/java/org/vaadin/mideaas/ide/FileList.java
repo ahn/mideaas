@@ -1,13 +1,17 @@
 package org.vaadin.mideaas.ide;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
+import org.apache.commons.lang3.StringUtils;
 import org.vaadin.dialogs.ConfirmDialog;
+import org.vaadin.mideaas.editor.EditorUser;
 
 import com.vaadin.data.Property.ValueChangeEvent;
 import com.vaadin.data.Property.ValueChangeListener;
@@ -43,7 +47,7 @@ public class FileList extends CustomComponent implements
 	private final Action ACTION_OPEN_RAW = new ShortcutAction("View raw");
 	private final Action ACTION_OPEN_TAB = new ShortcutAction("Open in new tab", ShortcutAction.KeyCode.ENTER, null);
 
-	public FileList(IdeProject project, IdeConfiguration config) {
+	public FileList(final IdeProject project, IdeConfiguration config) {
 		this.project = project;
 		this.config = config;
 		tree = new Tree();
@@ -52,6 +56,14 @@ public class FileList extends CustomComponent implements
 		tree.addItemClickListener(this);
 		tree.addActionHandler(this);
 		tree.addValueChangeListener(this);
+		
+//		tree.setItemStyleGenerator(new ItemStyleGenerator() {
+//			@Override
+//			public String getStyle(Tree source, Object itemId) {
+//				boolean edited = !project.getUsersOf((String)itemId).isEmpty();
+//				return edited ? "edited" : "notedited";
+//			}
+//		});
 
 		VerticalLayout la = new VerticalLayout();
 		la.addComponent(tree);
@@ -95,7 +107,7 @@ public class FileList extends CustomComponent implements
 		for (Entry<String, Collection<String>> e : dirFiles.entrySet()) {
 			for (String f : e.getValue()) {
 				tree.addItem(f);
-				tree.setItemCaption(f, shortName(f));
+				tree.setItemCaption(f, friendlyFilename(f, project.getUsersOf(f)));
 				tree.setChildrenAllowed(f, false);
 			}
 			String dir = e.getKey();
@@ -108,7 +120,7 @@ public class FileList extends CustomComponent implements
 		}
 	}
 
-	private String shortName(String f) {
+	private static String shortName(String f) {
 		return f.substring(f.lastIndexOf('/')+1); // works for -1 too
 	}
 
@@ -147,6 +159,34 @@ public class FileList extends CustomComponent implements
 				}
 			}
 		});
+	}
+	
+	@Override
+	public void usersChanged(final String filename, final Set<EditorUser> users) {
+		UI ui = getUI();
+		if (ui == null) {
+			return;
+		}
+		ui.access(new Runnable() {
+			@Override
+			public void run() {
+				if (isAttached()) {
+					tree.setItemCaption(filename, friendlyFilename(filename, project.getUsersOf(filename)));
+				}
+			}
+		});
+	}
+
+	private static String friendlyFilename(String filename, Set<EditorUser> users) {
+		return users.isEmpty() ? shortName(filename) : shortName(filename) + " (" + userNames(users) + ")";
+	}
+	
+	private static String userNames(Set<EditorUser> users) {
+		ArrayList<String> names = new ArrayList<String>(users.size());
+		for (EditorUser u : users) {
+			names.add(StringUtils.split(u.getName(), " ")[0]);
+		}
+		return StringUtils.join(names, ", ");
 	}
 
 	@Override
@@ -235,5 +275,7 @@ public class FileList extends CustomComponent implements
 		}
 		
 	}
+
+	
 
 }

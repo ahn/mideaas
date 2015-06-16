@@ -74,6 +74,17 @@ public class DocDifference {
 		return "DD "+user.getName()+" +" + getInserts() + " -" + getDeletes();
 	}
 
+	// TODO
+//	@Override
+//	public boolean equals(Object other) {
+//		if (other instanceof DocDifference) {
+//			DocDifference odd = (DocDifference)other;
+//			
+//			
+//		}
+//		return false;
+//	}
+
 	public String buttonText() {
 		int inserts = getInserts();
 		int deletes = getDeletes();
