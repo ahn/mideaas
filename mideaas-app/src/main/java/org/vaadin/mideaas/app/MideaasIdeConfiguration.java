@@ -7,8 +7,10 @@ import java.util.List;
 import java.util.Map;
 
 import org.vaadin.mideaas.app.MideaasConfig.Prop;
+import org.vaadin.mideaas.app.git.GitHubIdeUser;
 import org.vaadin.mideaas.app.git.GitHubLobbyView;
 import org.vaadin.mideaas.app.git.GitHubLoginView;
+import org.vaadin.mideaas.app.git.GitHubMenu;
 import org.vaadin.mideaas.app.maven.BuildComponent;
 import org.vaadin.mideaas.app.maven.Builder;
 import org.vaadin.mideaas.app.maven.JettyComponent;
@@ -23,6 +25,7 @@ import org.vaadin.mideaas.ide.IdeLobbyView;
 import org.vaadin.mideaas.ide.IdeLoginView;
 import org.vaadin.mideaas.ide.IdeProject;
 import org.vaadin.mideaas.ide.IdeUI;
+import org.vaadin.mideaas.ide.IdeUser;
 import org.vaadin.mideaas.ide.SimpleDocAdderComponent;
 
 import com.vaadin.server.ExternalResource;
@@ -33,6 +36,7 @@ import com.vaadin.ui.Component;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Link;
 import com.vaadin.ui.MenuBar;
+import com.vaadin.ui.UI;
 import com.vaadin.ui.MenuBar.Command;
 import com.vaadin.ui.MenuBar.MenuItem;
 import com.vaadin.ui.VerticalLayout;
@@ -81,12 +85,12 @@ public class MideaasIdeConfiguration extends DefaultIdeConfiguration {
 	private void addMenuBarComponents(final Ide ide) {
 		MenuBar menuBar = ide.getMenuBar();
 
-
 		if (ide.getProject() instanceof VaadinProject) {
 			VaadinProject vp = (VaadinProject) ide.getProject();
 			addBuildMenu(menuBar, vp);
 			addTestMenu(menuBar, vp);
 			addDeployMenu(menuBar, vp, ide);
+			addGithubMenu(menuBar, vp);
 		}
 	}
 
@@ -120,6 +124,13 @@ public class MideaasIdeConfiguration extends DefaultIdeConfiguration {
 	private void addTestMenu(MenuBar menuBar, VaadinProject project) {
 		MenuItem root = menuBar.addItem("Tests", null);
 		root.addItem("Run tests...", new TestCommand(project));
+	}
+	
+	private void addGithubMenu(MenuBar menuBar, VaadinProject project) {
+		IdeUser user = ((IdeUI)UI.getCurrent()).getIdeUser();
+		if (user instanceof GitHubIdeUser) {
+			GitHubMenu.addMenu(menuBar, project, (GitHubIdeUser)user);
+		}
 	}
 
 	@SuppressWarnings("serial")

@@ -3,6 +3,7 @@ package org.vaadin.mideaas.app.git;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.util.UUID;
 
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.vaadin.mideaas.app.Icons;
@@ -40,7 +41,8 @@ public class GitProjectLoader extends CustomComponent {
 		try {
 			File dir = Files.createTempDirectory("mideaas").toFile();
 			System.out.println(gitUrl + " --> " + dir);
-			GitRepository.cloneFrom(gitUrl, dir, username, password);
+			GitRepository repo = GitRepository.cloneFrom(gitUrl, dir, username, password);
+			repo.checkoutNewBranch(UUID.randomUUID().toString());
 			fireSuccess(dir, li);
 		} catch (IOException e) {
 			e.printStackTrace();

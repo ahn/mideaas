@@ -34,7 +34,7 @@ public class IdeProjectWithWorkDir extends IdeProject {
 		workDir.destroy();
 	}
 	
-	protected IdeProjectDir getWorkDir() {
+	public IdeProjectDir getWorkDir() {
 		return workDir;
 	}
 
